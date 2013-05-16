@@ -1,0 +1,6 @@
+pymadx, S. Boogert, May 2013, Egham
+
+Interface and plotting for madx using python. 
+Python madx interface already exists, possibly use that? 
+Reguires : ipython, matplotlib, numpy, etc
+
