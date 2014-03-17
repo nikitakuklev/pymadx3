@@ -65,7 +65,12 @@ class Tfs :
                         
         # Convert to array
         for v in self.dataName : 
-            self.data[v] = _pl.array(self.data[v])            
+            self.data[v] = _pl.array(self.data[v]) 
+    
+        self._UpdateDataLength()
+    
+    def _UpdateDataLength(self):
+        self.nitems = len(self.data[self.data.keys()[0]])
 
 class Common : 
     '''class Common 
