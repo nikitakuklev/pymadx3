@@ -25,7 +25,7 @@ class Tfs:
     a.databyindex[321] #returns item number 321 from beamline (0 counting)
 
     """
-    def __init__(self):
+    def __init__(self,filename=None):
         self.header      = {}
         self.columns     = []
         self.formats     = []
@@ -33,6 +33,8 @@ class Tfs:
         self.databyindex = {}
         self.sequence    = []
         self.nitems      = 0
+        if filename != None:
+            self.Load(filename)
         
     def Clear(self):
         self.__init__()
