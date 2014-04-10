@@ -62,12 +62,24 @@ class Tfs:
             else:
                 #data
                 d = [Cast(item) for item in sl]
-                self.sequence.append(d[0]) # keep the name in sequence
-                self.data[d[0]] = d[1:]    # put in data dict by name
+                name = self._CheckName(d[0])
+                self.sequence.append(name) # keep the name in sequence
+                self.data[name] = d[1:]    # put in data dict by name
                 self.databyindex[self.nitems] = d
                 self.nitems += 1 # keep tally of number of items
-                
         f.close()
+
+    def _CheckName(self,name):
+        if self.data.has_key(name):
+            #name already exists - boo degenerate names!
+            i = 1
+            basename = name
+            while self.data.has_key(name):
+                name = basename+'_'+str(i)
+                i = i + 1
+            return name
+        else:
+            return name
 
     def NameFromIndex(self,index):
         """
