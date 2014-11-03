@@ -1,3 +1,4 @@
+import tarfile
 
 class Tfs:
     """
@@ -5,6 +6,7 @@ class Tfs:
 
     a = Tfs()
     a.Load('myfile.tfs')
+    a.Load('myfile.tar') -> extracts from tar file
 
     a has data members:
     
@@ -45,7 +47,15 @@ class Tfs:
         
         read the tfs file and prepare data structures
         """
-        f = open(filename)
+        if filename.endswith('tar'):
+            #it's gzipped - extract to temporary file
+            print 'zipped file'
+            tar = tarfile.open(filename,'r:gz')
+            f = tar.extractfile(tar.firstmember)
+        else:
+            #normal file
+            print 'normal file'
+            f = open(filename)
 
         for line in f:
             splitline = line.strip('\n').split()
