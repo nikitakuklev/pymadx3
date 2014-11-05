@@ -35,6 +35,7 @@ class Tfs:
         self.databyindex = {}
         self.sequence    = []
         self.nitems      = 0
+        self.filename    = filename
         if filename != None:
             self.Load(filename)
         
@@ -141,6 +142,40 @@ class Tfs:
         """
         i = self.ColumnIndex(columnstring)
         return [self.data[name][i] for name in self.sequence]
+
+    def InterrogateItem(self,itemname):
+        """
+        InterrogateItem(itemname)
+        
+        Print out all the parameters and their
+        names for a particlular element in the 
+        sequence identified by name
+        """
+        for i,parameter in enumerate(self.columns):
+            print parameter.ljust(10,'.'),self.data[itemname][i]
+
+    def GetElementsOfType(self,typename):
+        """
+        GetElementsOfType(typename) ie GetElementsOfType('SBEND')
+
+        Returns a list of the names of elements of a certain type
+        """
+        i = self.ColumnIndex('KEYWORD')
+        return [name for name in self.sequence if self.data[name][i] == typename]
+
+    def ReportPopulations(self):
+        """
+        Print out all the population of each type of
+        element in the beam line (sequence)
+        """
+        print 'Filename > ',self.filename
+        print 'Total number of items > ',self.nitems
+        i = self.ColumnIndex('KEYWORD')
+        keys = set([self.data[name][i] for name in self.sequence])
+        populations = [(len(self.GetElementsOfType(key)),key) for key in keys]
+        print 'Type'.ljust(15,'.'),'Population'
+        for item in sorted(populations)[::-1]:
+            print item[1].ljust(15,'.'),item[0]
         
 
 
