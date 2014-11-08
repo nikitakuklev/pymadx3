@@ -28,6 +28,7 @@ class Tfs:
 
     """
     def __init__(self,filename=None):
+        self.index       = []
         self.header      = {}
         self.columns     = []
         self.formats     = []
@@ -80,6 +81,8 @@ class Tfs:
                 self.nitems += 1 # keep tally of number of items
         f.close()
 
+        self.index = range(0,len(self.data),1)
+
     def _CheckName(self,name):
         if self.data.has_key(name):
             #name already exists - boo degenerate names!
@@ -99,6 +102,34 @@ class Tfs:
         return the name of the beamline element at index
         """
         return self.sequence[index]
+
+    def NameFromNearestS(self,S) : 
+        """
+        NameFromNearestS(S) 
+
+        return the name of the beamline element clostest to S 
+        """
+        
+        i = self.IndexFromNearestS(S) 
+        return self.sequence[i]
+
+    def IndexFromNearestS(self,S) : 
+        """
+        IndexFromNearestS(S) 
+
+        return the index of the beamline element clostest to S 
+        """
+        s = self.ColumnByIndex('S')
+
+        ci = [i for i in self.index[0:-1] if (S > s[i]  and S < s[i+1])] 
+        ci = ci[0]
+
+        if abs(S-s[ci]) < abs(S-s[ci+1]) : 
+            return ci 
+        else : 
+            return ci+1 
+
+
 
     def IndexFromName(self,namestring):
         """
