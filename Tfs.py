@@ -200,11 +200,8 @@ class Tfs:
 
         Returns a list of the names of elements of a certain type
         """        
-
         i = self.ColumnIndex('KEYWORD')
         return [name for name in self.sequence if self.data[name][i] in typenames ]
-        pass
-
 
     def ReportPopulations(self):
         """
