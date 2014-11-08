@@ -159,9 +159,21 @@ class Tfs:
         GetElementsOfType(typename) ie GetElementsOfType('SBEND')
 
         Returns a list of the names of elements of a certain type
-        """
+        """        
         i = self.ColumnIndex('KEYWORD')
         return [name for name in self.sequence if self.data[name][i] == typename]
+
+    def GetElementsOfTypes(self,typenames) :
+        """
+        GetElementsOfTypes(typenames) ie GetElementsOfType(['SBEND','RBEND'])
+
+        Returns a list of the names of elements of a certain type
+        """        
+
+        i = self.ColumnIndex('KEYWORD')
+        return [name for name in self.sequence if self.data[name][i] in typenames ]
+        pass
+
 
     def ReportPopulations(self):
         """
