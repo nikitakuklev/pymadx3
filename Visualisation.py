@@ -48,6 +48,11 @@ class Visualisation(object) :
         fig.canvas.mpl_connect('button_press_event', click) 
             
     def drawMachine(self) : 
+        ############## draw bend
+        def drawBend(s,l) : 
+            br = _patches.Rectangle((s,-0.1),l,0.2,color='g')
+            ax = _pyplot.gca()
+            ax.add_patch(br)
         ############## draw quad
         def drawQuad(s,l,k) : 
             if k > 0 :
@@ -59,20 +64,25 @@ class Visualisation(object) :
 
             ax = _pyplot.gca()
             ax.add_patch(qr)
-
-        ############## draw bend
-        def drawBend(s,l) : 
-            br = _patches.Rectangle((s,-0.1),l,0.2,color='g')
-            ax = _pyplot.gca()
-            ax.add_patch(br)
-
+        ############## draw sextupole
+        def drawSext(s,l,k) : # 6-a-gon
+            pass 
+        ############## draw octupole 
+        def drawOct(s,l,k) : # Octagon
+            pass 
+        ############## draw multipole    
+        def drawMulti(s,l) : # ellipse
+            pass
         def drawMarker(s) :         
             _pyplot.plot([s,s],[0.4,0.6],"-")
 #            _pylab.axvline(s)
             
+
+        ############## draw monitor
         def drawMonitor(s) : 
             _pyplot.plot([s,s],[0.65,0.85],"-")            
 
+        ############## draw collimator
         def drawCollimator(s,l) : 
             br = _patches.Rectangle((s,-0.6),l,0.2,color='k')
             ax = _pyplot.gca()
