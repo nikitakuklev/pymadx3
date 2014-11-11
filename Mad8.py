@@ -3,6 +3,7 @@
 # multipole
 
 import os as _os 
+import re as _re 
 
 def ConvertDir(inputDir) : 
     files = _os.listdir(inputDir) 
@@ -20,9 +21,9 @@ def Mad8ToMadX(inputName) :
     for l in inputFile : 
         l = l.rstrip()
 
-        # find comments 
+        # find comments (comment index)
         ci = l.find('!')
-        # find line continuations 
+        # find line continuations (ampersand indeX)
         ai = l.find('&')
 
         # if a continuation line is found 
@@ -47,7 +48,6 @@ def Mad8ToMadX(inputName) :
             acl = l[ci:]  # after comment
             pl  = bcl+ltc+acl
  
-
         #######################################################################################
         # Simple replacements 
         #######################################################################################
@@ -81,15 +81,94 @@ def Mad8ToMadX(inputName) :
         # replce ecoll with ecollimator
         if pl.find('ECOLLIMATOR') == -1 :
             pl = pl.replace('ECOLL','ECOLLIMATOR') 
-        # replce ecoll with ecollimator
+        if pl.find('ECOLLIMATOR') == -1 :
+            pl = pl.replace('ECOL','ECOLLIMATOR') 
+        # replce rcoll with ecollimator
         if pl.find('RCOLLIMATOR') == -1 :
             pl = pl.replace('RCOLL','RCOLLIMATOR') 
+        if pl.find('RCOLLIMATOR') == -1 :
+            pl = pl.replace('RCOL','RCOLLIMATOR')
+        if pl.find('HKICKER') == -1 : 
+            pl = pl.replace('HKICK','HKICKER')
+        if pl.find('HKICKER') == -1 : 
+            pl = pl.replace('HKIC','HKICKER')
+        if pl.find('VKICKER') == -1 : 
+            pl = pl.replace('VKICK','HKICKER')
+        if pl.find('VKICKER') == -1 : 
+            pl = pl.replace('VKIC','HKICKER')
+
+
 
         #######################################################################################
         # Regular expressions 
         #######################################################################################
         # constant 
+        if pl.find('CONSTANT') != -1 : 
+            print pl
+            m = _re.search('(\w+)\s*:\s*CONSTANT\s*=\s*([A-Za-z0-9+-/*.()]+)',pl)
+            pl = '   const '+m.group(1)+'='+m.group(2)+';'
+            print pl
 
         # multipole 
+        if pl.find('MULTIPOLE') != -1: 
+            print pl
+            n  = _re.search('([A-Za-z0-9.]+)\s*:\s*MULTIPOLE',pl)
+            m0 = _re.search('K0L\s*=\s*([A-Za-z0-9+-/*.()]+),',pl)
+            m1 = _re.search('K1L\s*=\s*([A-Za-z0-9+-/*.()]+),',pl)
+            m2 = _re.search('K2L\s*=\s*([A-Za-z0-9+-/*.()]+),',pl)
+            m3 = _re.search('K3L\s*=\s*([A-Za-z0-9+-/*.()]+),',pl)
+            m4 = _re.search('K4L\s*=\s*([A-Za-z0-9+-/*.()]+),',pl)
+            m5 = _re.search('K5L\s*=\s*([A-Za-z0-9+-/*.()]+),',pl)
+            m6 = _re.search('K6L\s*=\s*([A-Za-z0-9+-/*.()]+),',pl)
+            ml  = _re.search('L\s*=\s*([0-9.E+-])',pl)                 # match length
+            mt  = _re.search('TYPE\s*=\s*("(.*?)")',pl)            # match type
+            mr  = _re.search('LRAD\s*=\s*([A-Za-z0-9+-/*.()]+)\s*,',pl)    # match lrad
+            ma  = _re.search('APERTURE\s*=\s*([A-Za-z0-9+-/*.()]+)\s*,',pl)# match aperture
 
+            pl = '   '+n.group(1)+' : MULTIPOLE, '
+
+            if ml : 
+                pl = pl+' L='+ml.group(1)
+
+            k0l = '0.0'
+            k1l = '0.0'
+            k2l = '0.0'
+            k3l = '0.0'
+            k4l = '0.0'
+            k5l = '0.0'
+            k6l = '0.0'
+                
+            if m0 : 
+                k0l = m0.group(1)
+            if m1 : 
+                k1l = m1.group(1)
+            if m2 : 
+                k2l = m1.group(1)
+            if m3 : 
+                k3l = m3.group(1)
+            if m4 : 
+                k4l = m4.group(1)
+            if m5 : 
+                k5l = m5.group(1)
+            if m6 : 
+                k6l = m6.group(1)
+            
+            pl = pl+ ', KNL={'+k0l+','+k1l+','+k2l+','+k3l+','+k4l+','+k5l+','+k6l+'}'
+            
+            if mt : 
+                pl = pl +', TYPE='+mt.group(1)
+            if ma : 
+                pl = pl +', APERTURE='+ma.group(1)
+            if mr : 
+                pl = pl +', LRAD='+mr.group(1)
+
+            pl = pl+';'
+
+            print pl
+                
+        # attributes 
+        def maFunc(m) : 
+            return m.group(1)+'->'+m.group(2)
+
+        pl = _re.sub('([a-zA-Z0-9_-]+)\[([a-zA-Z]+)\]',maFunc,pl) # replace [] with ->
         outputFile.write(pl+'\n')
