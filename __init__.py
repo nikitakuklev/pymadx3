@@ -9,5 +9,7 @@ Visualisation - visualisation of the loaded lattice
 
 """
 
+import Convert
+
 from Tfs import Tfs
 from Visualisation import Visualisation

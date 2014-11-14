@@ -1,3 +1,8 @@
+"""
+Interrogate a MadX lattice visually.
+
+"""
+
 import pymadx as _pymadx
 import pylab as _pylab
 import numpy as _numpy
