@@ -49,13 +49,11 @@ class Tfs:
         
         read the tfs file and prepare data structures
         """
-        if filename.endswith('tar'):
-            #it's gzipped - extract to temporary file
+        if ('tar' in filename) or ('gz' in filename):
             print 'zipped file'
-            tar = tarfile.open(filename,'r:gz')
+            tar = tarfile.open(filename,'r')
             f = tar.extractfile(tar.firstmember)
         else:
-            #normal file
             print 'normal file'
             f = open(filename)
 
