@@ -8,7 +8,8 @@ import re as _re
 def ConvertDir(inputDir) : 
     files = _os.listdir(inputDir) 
     for f in files : 
-        Mad8ToMadX(inputDir+'/'+f)
+        if f.find('~') == -1 : 
+            Mad8ToMadX(inputDir+'/'+f)
         
 def Mad8ToMadX(inputName) : 
     inputFile  = open(inputName) 
