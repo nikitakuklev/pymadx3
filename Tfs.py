@@ -50,11 +50,11 @@ class Tfs:
         read the tfs file and prepare data structures
         """
         if ('tar' in filename) or ('gz' in filename):
-            print 'zipped file'
+            print 'pymadx.Load> zipped file'
             tar = tarfile.open(filename,'r')
             f = tar.extractfile(tar.firstmember)
         else:
-            print 'normal file'
+            print 'pymadx.Load> normal file'
             f = open(filename)
 
         for line in f:
@@ -126,8 +126,6 @@ class Tfs:
             return ci 
         else : 
             return ci+1 
-
-
 
     def IndexFromName(self,namestring):
         """
