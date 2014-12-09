@@ -144,7 +144,7 @@ def Mad8ToMadX(inputName) :
             if m1 : 
                 k1l = m1.group(1)
             if m2 : 
-                k2l = m1.group(1)
+                k2l = m2.group(1)
             if m3 : 
                 k3l = m3.group(1)
             if m4 : 
