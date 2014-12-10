@@ -207,20 +207,19 @@ class Tfs:
         for i,parameter in enumerate(self.columns):
             print parameter.ljust(10,'.'),self.data[itemname][i]
 
-    def GetElementsOfType(self,typename):
+    def GetElementsOfType(self,typename) :
         """
-        GetElementsOfType(typename) ie GetElementsOfType('SBEND')
-
+        GetElementsOfType(typename) 
+        
         Returns a list of the names of elements of a certain type
-        """        
-        i = self.ColumnIndex('KEYWORD')
-        return [name for name in self.sequence if self.data[name][i] == typename]
 
-    def GetElementsOfTypes(self,typenames) :
-        """
-        GetElementsOfTypes(typenames) ie GetElementsOfType(['SBEND','RBEND'])
+        typename can be a single string or a tuple or list of strings
 
-        Returns a list of the names of elements of a certain type
+        ie 
+        GetElementsOfType('SBEND')
+        GetElementsOfType(['SBEND','RBEND'])
+        GetElementsOfType(('SBEND','RBEND','QUADRUPOLE'))
+
         """        
         i = self.ColumnIndex('KEYWORD')
         return [name for name in self.sequence if self.data[name][i] in typenames ]
