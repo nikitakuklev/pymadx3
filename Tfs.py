@@ -81,6 +81,22 @@ class Tfs:
 
         self.index = range(0,len(self.data),1)
 
+    def __repr__(self):
+        s =  ''
+        s += 'pymadx.Tfs instance\n'
+        s += str(self.nitems) + ' items in lattice\n'
+        return s
+
+    def __iter__(self):
+        self._iterindex = -1
+        return self
+
+    def next(self):
+        if self._iterindex == len(self.sequence)-1:
+            raise StopIteration
+        self._iterindex += 1
+        return self.GetElementDict(self.sequence[self._iterindex])
+
     def _CheckName(self,name):
         if self.data.has_key(name):
             #name already exists - boo degenerate names!
