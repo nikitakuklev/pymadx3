@@ -80,6 +80,7 @@ class Tfs:
         f.close()
 
         self.index = range(0,len(self.data),1)
+        self.smax  = self[-1]['S']
 
     def __repr__(self):
         s =  ''
@@ -97,6 +98,20 @@ class Tfs:
         self._iterindex += 1
         return self.GetElementDict(self.sequence[self._iterindex])
 
+    def __getitem__(self,index):
+        #return single item or slice of lattice
+        if type(index) == slice:
+            #prepare step integer - allow reverse stepping too
+            if index.stop > index.start:
+                index = slice(index.start,index.stop,1)
+            else:
+                index = slice(index.start,index.stop,-1)
+            return [self.GetElementDict(self.sequence[i]) for i in range(index.start,index.stop,index.step)]
+        elif type(index) == int:
+            return self.GetElementDict(self.sequence[index])
+        else:
+            raise ValueError("argument not an index or a slice")
+    
     def _CheckName(self,name):
         if self.data.has_key(name):
             #name already exists - boo degenerate names!
@@ -222,7 +237,7 @@ class Tfs:
 
         """        
         i = self.ColumnIndex('KEYWORD')
-        return [name for name in self.sequence if self.data[name][i] in typenames ]
+        return [name for name in self.sequence if self.data[name][i] in typename]
 
     def ReportPopulations(self):
         """
