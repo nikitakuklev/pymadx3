@@ -19,20 +19,31 @@ def Mad8ToMadX(inputName) :
     print 'Mad8ToMadX, input > ',inputName
     print 'Mad8ToMadX, output> ',outputName
 
-    for l in inputFile : 
-        l = l.rstrip()
 
+    ml = '' # merged line 
+    inputFile1 = []
+    for l in inputFile : 
+        l  = l.rstrip() 
+        
+        # find line continuations (apersand index) 
+        ai = l.find('&')
+        if ai != -1 : 
+            l = l.replace('&','')
+            ml = ml+l
+        else :
+            if len(ml) == 0 :
+                ml = l
+            else :
+                ml = ml+l
+            inputFile1.append(ml)
+            ml = ''
+        
+    ltc = ';'
+    for l in inputFile1 : 
+        l = l.rstrip()
+        
         # find comments (comment index)
         ci = l.find('!')
-        # find line continuations (ampersand indeX)
-        ai = l.find('&')
-
-        # if a continuation line is found 
-        if ai != -1 :
-            l     = l.replace('&',' ')
-            ltc   = ' ' 
-        else : 
-            ltc   = ';'
 
         # Deal with each line
         if ci == -1 and len(l) == 0: # Empty line  
@@ -105,7 +116,7 @@ def Mad8ToMadX(inputName) :
         #######################################################################################
         # constant 
         if pl.find('CONSTANT') != -1 : 
-            print pl
+#            print pl
             m = _re.search('(\w+)\s*:\s*CONSTANT\s*=\s*([A-Za-z0-9+-/*.()]+)',pl)
             pl = '   const '+m.group(1)+'='+m.group(2)+';'
             print pl
@@ -121,23 +132,31 @@ def Mad8ToMadX(inputName) :
             m4 = _re.search('K4L\s*=\s*([A-Za-z0-9+-/*.()]+),',pl)
             m5 = _re.search('K5L\s*=\s*([A-Za-z0-9+-/*.()]+),',pl)
             m6 = _re.search('K6L\s*=\s*([A-Za-z0-9+-/*.()]+),',pl)
-            ml  = _re.search('L\s*=\s*([0-9.E+-])',pl)                 # match length
-            mt  = _re.search('TYPE\s*=\s*("(.*?)")',pl)            # match type
-            mr  = _re.search('LRAD\s*=\s*([A-Za-z0-9+-/*.()]+)\s*,',pl)    # match lrad
-            ma  = _re.search('APERTURE\s*=\s*([A-Za-z0-9+-/*.()]+)\s*,',pl)# match aperture
+            mt0 = _re.search('T0\s*=\s*([A-Za-z0-9+-/*.()]+)\s*',pl)       # match t0
+            mt1 = _re.search('T1\s*=\s*([A-Za-z0-9+-/*.()]+)\s*',pl)       # match t1
+            mt2 = _re.search('T2\s*=\s*([A-Za-z0-9+-/*.()]+)\s*',pl)       # match t2
+            mt3 = _re.search('T3\s*=\s*([A-Za-z0-9+-/*.()]+)\s*',pl)       # match t3
+            mt4 = _re.search('T4\s*=\s*([A-Za-z0-9+-/*.()]+)\s*',pl)       # match t4
+            mt5 = _re.search('T5\s*=\s*([A-Za-z0-9+-/*.()]+)\s*',pl)       # match t5
+            mt6 = _re.search('T6\s*=\s*([A-Za-z0-9+-/*.()]+)\s*',pl)       # match t6
+            ml  = _re.search(' L\s*=\s*([0-9.E+-])',pl)                    # match length
 
-            pl = '   '+n.group(1)+' : MULTIPOLE, '
+            mt  = _re.search('TYPE\s*=\s*("(.*?)")',pl)                    # match type
+            mr  = _re.search('LRAD\s*=\s*([A-Za-z0-9+-/*.()]+)\s*',pl)     # match lrad
+            ma  = _re.search('APERTURE\s*=\s*([A-Za-z0-9+-/*.()]+)\s*',pl) # match aperture
+
+            pl = n.group(1)+' : MULTIPOLE '
 
             if ml : 
-                pl = pl+' L='+ml.group(1)
+                pl = pl+', L='+ml.group(1)
 
-            k0l = '0.0'
-            k1l = '0.0'
-            k2l = '0.0'
-            k3l = '0.0'
-            k4l = '0.0'
-            k5l = '0.0'
-            k6l = '0.0'
+            k0l = '0.0'; t0 = '0.0'
+            k1l = '0.0'; t1 = '0.0'
+            k2l = '0.0'; t2 = '0.0'
+            k3l = '0.0'; t3 = '0.0'
+            k4l = '0.0'; t4 = '0.0'
+            k5l = '0.0'; t5 = '0.0'
+            k6l = '0.0'; t6 = '0.0'
                 
             if m0 : 
                 k0l = m0.group(1)
@@ -153,7 +172,22 @@ def Mad8ToMadX(inputName) :
                 k5l = m5.group(1)
             if m6 : 
                 k6l = m6.group(1)
-            
+
+            if mt0 : 
+                t0 = mt0.group(1)
+            if mt1 : 
+                t1 = mt1.group(1)
+            if mt2 : 
+                t2 = mt2.group(1)
+            if mt3 : 
+                t3 = mt3.group(1)
+            if mt4 : 
+                t4 = mt4.group(1)
+            if mt5 : 
+                t5 = mt5.group(1)
+            if mt6 : 
+                t6 = mt6.group(1)            
+
             pl = pl+ ', KNL={'+k0l+','+k1l+','+k2l+','+k3l+','+k4l+','+k5l+','+k6l+'}'
             
             if mt : 
