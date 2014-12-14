@@ -1,14 +1,14 @@
-# pybdsim.Beam - generate BDSIM beam
+# pymadx.Beam - generate MADX beam
 # Version 1.0
-# L. Nevay
-# laurie.nevay@rhul.ac.uk
+# S. T. Boogert
+# stewart.boogert@rhul.ac.uk
 
-BDSIMDistributionTypes = [
+MADXDistributionTypes = [
     'madx',
     'ptc'
 ]
 
-BDSIMParticleTypes = [
+MADXParticleTypes = [
     'e-',
     'e+',
     'proton',
@@ -24,7 +24,7 @@ class Beam(dict):
         
         
     def SetParticleType(self,particletype='e-'):
-        if particletype not in BDSIMParticleTypes:
+        if particletype not in MADXParticleTypes:
             raise ValueError("Unknown particle type: '"+str(particletype)+"'")
         self['particle'] = '"' + str(particletype) + '"'
 
@@ -32,17 +32,23 @@ class Beam(dict):
         self['energy'] = str(energy) + '*' + unitsstring
 
     def SetDistributionType(self,distrtype='reference'):
-        if distrtype not in BDSIMDistributionTypes:
+        if distrtype not in MADXDistributionTypes:
             raise ValueError("Unknown distribution type: '"+str(distrtype)+"'")
         
         self['distrType'] = '"' + distrtype + '"'
         if distrtype == 'reference':
             pass
         elif distrtype == 'madx':
+            setattr(self, 'SetBetaX',      self._SetBetaX)
+            setattr(self, 'SetBetaY',      self._SetBetaY) 
+            setattr(self, 'SetAlphaX',     self._SetAlphaX)
+            setattr(self, 'SetAlphaY',     self._SetAlphaY)
+            setattr(self, 'SetEmittanceX', self._SetEmittanceX) 
+            setattr(self, 'SetEmittanceY', self._SetEmittanceX) 
             setattr(self, 'SetE',          self._SetE)
             setattr(self, 'SetSigmaE',     self._SetSigmaE)
             setattr(self, 'SetSigmaT',     self._SetSigmaT)
-        elif distrtype == 'ptc':
+        elif distrtype == 'ptc':            
             setattr(self, 'SetE',          self._SetE)
             setattr(self, 'SetSigmaE',     self._SetSigmaE)
             setattr(self, 'SetSigmaT',     self._SetSigmaT)
@@ -119,32 +125,4 @@ class Beam(dict):
    
     def _SetEmittanceY(self,emity=1.0,unitsstring='um'):
         self['emity'] = str(emity) + '*' + unitsstring
-
-    def _SetShellX(self,shellx=1.0,unitsstring='m'):
-        self['shellX'] = str(shellx) + '*' + unitsstring
-
-    def _SetShellY(self,shelly=1.0,unitsstring='m'):
-        self['shellY'] = str(shelly) + '*' + unitsstring
-
-    def _SetShellXP(self,shellxp=1.0):
-        self['shellXp'] = shellxp
-
-    def _SetShellYP(self,shellyp=1.0):
-        self['shellYp'] = shellyp
-
-    def _SetRMin(self,rmin=0.9,unitsstring='mm'):
-        if self.has_key('Rmax') == True:
-            if self['Rmax'] < rmin:
-                raise ValueError('Rmax must be > RMin')
-        self['Rmin'] = str(rmin) + '*' + unitsstring
-    
-    def _SetRMax(self,rmax=1.0,unitsstring='mm'):
-        if self.has_key('Rmin') == True:
-            if self['Rmin'] > rmax:
-                raise ValueError('Rmin must be < RMax')
-        self['Rmax'] = str(rmax) + '*' + unitsstring
-
-    
-
-    
 
