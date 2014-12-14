@@ -65,45 +65,14 @@ class Beam(dict):
         st = s3+s4
         return st
 
-    def SetX0(self,x0=0.0,unitsstring='m'):
-        self['X0'] = x0 + '*' + unitsstring
-
-    def SetY0(self,y0=0.0,unitsstring='m'):
-        self['Y0'] = y0 + '*' + unitsstring
-
-    def SetZ0(self,z0=0.0,unitsstring='m'):
-        self['Z0'] = z0 + '*' + unitsstring
-
-    def SetXP0(self,xp0=0.0):
-        self['Xp0'] = xp0
-
-    def SetYP0(self,yp0=0.0):
-        self['Yp0'] = yp0
-
-    def SetZP0(self,zp0=0.0):
-        self['Zp0'] = zp0
-
     def SetT0(self,t0=0.0,unitsstring='s'):
         self['T0'] = t0 + '*' + unitsstring
-
-
-    def _SetSigmaX(self,sigmax=1.0,unitsstring='um'):
-        self['sigmaX'] = str(sigmax) + '*' + unitsstring
-
-    def _SetSigmaY(self,sigmay=1.0,unitsstring='um'):
-        self['sigmaY'] = str(sigmay) + '*' + unitsstring
 
     def _SetSigmaE(self,sigmae=0.001):
         """
         fractional energy spread
         """
         self['sigmaE'] = sigmae
-
-    def _SetSigmaXP(self,sigmaxp=1.0):
-        self['sigmaXp'] = sigmaxp
-
-    def _SetSigmaYP(self,sigmayp=1.0):
-        self['sigmaYp'] = sigmayp
 
     def _SetSigmaT(self,sigmat=1.0,unitsstring='um'):
         self['sigmaT'] = sigmat
