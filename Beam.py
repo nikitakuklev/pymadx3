@@ -9,8 +9,8 @@ MADXDistributionTypes = [
 ]
 
 MADXParticleTypes = [
-    'e-',
-    'e+',
+    'electron',
+    'positron',
     'proton'
 ]
 
@@ -23,12 +23,19 @@ class Beam(dict):
         
         
     def SetParticleType(self,particletype='e-'):
+        if particletype == 'e-' : 
+            particletype = 'electron' 
+        elif particletype == 'e+' : 
+            particletype = 'positron' 
+        elif particletype == 'proton' :
+            particletype = 'proton'
+
         if particletype not in MADXParticleTypes:
             raise ValueError("Unknown particle type: '"+str(particletype)+"'")
         self['particle'] = str(particletype) 
 
     def SetEnergy(self,energy=1.0,unitsstring='GeV'):
-        self['energy'] = str(energy) + '*' + unitsstring
+        self['energy'] = str(energy)
 
     def SetDistributionType(self,distrtype='reference'):
         if distrtype not in MADXDistributionTypes:
@@ -47,16 +54,17 @@ class Beam(dict):
         elif distrtype == 'ptc':            
             setattr(self, 'SetDistribFileName',  self._SetDistribFileName)
     
-    def ReturnBeamString(self):
-        if self['distrType'] == 'ptc' : 
-            s = 'ptc_create_universe;\n' 
-            s+= 'ptc_create_layout,model=2,method=6,nst=10;\n'
-            s+= 'call, file ="'+self['distrFile']+'";\n'
-            s+= 'ptc_align;'
-            return s
-        else : 
-            return '' 
+    
+    def ReturnBeamString(self) :
+        s = 'beam, particle='+self['particle']+', energy='+self['energy']+';\n'
+        return s
 
+    def ReturnPtcString(self) : 
+        s = 'ptc_create_universe;\n' 
+        s+= 'ptc_create_layout,model=2,method=6,nst=10;\n'
+        s+= 'call, file ="'+self['distrFile']+'";\n'
+        s+= 'ptc_align;'
+        return s
 
     def SetT0(self,t0=0.0,unitsstring='s'):
         self['T0'] = t0 + '*' + unitsstring

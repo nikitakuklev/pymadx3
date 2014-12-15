@@ -303,6 +303,7 @@ def WriteLattice(machine, filename, verbose=False):
         ti += 1
     # need to define the period before making sampler planes
     f.write('lattice: line = ('+', '.join(linelist)+');\n')
+    f.write(machine.beam.ReturnBeamString())
     f.write('use, period=lattice;\n')
     f.close()
 
@@ -313,7 +314,8 @@ def WriteLattice(machine, filename, verbose=False):
         f.write(timestring) 
         f.write('! pymadx.Builder \n')
         f.write('! BEAM DEFINITION \n\n')
-        f.write(machine.beam.ReturnBeamString())
+#        f.write(machine.beam.ReturnBeamString())
+        f.write(machine.beam.ReturnPtcString())
 
     #write samplers
     if len(machine.samplers) > 0:

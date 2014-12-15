@@ -12,9 +12,10 @@ Visualisation - visualisation of the loaded lattice
 import Convert
 
 from Tfs import Tfs
+from TfsArray import TfsArray
 from Visualisation import Visualisation
 import Builder
 import Ptc
 from Beam import Beam
 
-__all__ = ['Tfs','Beam','Builder','Visualisation','Ptc']
+__all__ = ['Tfs','TfsArray','Beam','Builder','Visualisation','Ptc']
