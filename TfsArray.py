@@ -1,6 +1,7 @@
 import tarfile 
 from Tfs import Cast 
 import numpy as _numpy
+import copy as _copy
 
 class TfsArray : 
 
@@ -73,12 +74,19 @@ class TfsArray :
         # make numpy array for convenience
         self.dataArray = _numpy.array(self.data)
             
-        def GetColumn(self, colname) : 
-            pass 
+    def GetColumn(self, colname) :
+        colindex = self.columns.index(colname) 
+        return self.dataArray[:,colindex]
 
-        def GetRow(self, rowindex) : 
-            pass 
+    def GetRow(self, rowindex) : 
+        return self.dataArray[rowindex,:]
 
-        def GetSegment(self, segmentindex) : 
-            pass 
-
+    def GetSegment(self, segmentindex) : 
+        segcut = self.dataArray[:,0] == segmentindex
+        c = _copy.deepcopy(self)
+        c.data      = self.data
+        c.dataArray = self.dataArray[segcut,:]
+        c.nitems    = len(c.dataArray)
+        
+        return c
+            
