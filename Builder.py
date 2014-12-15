@@ -306,17 +306,6 @@ def WriteLattice(machine, filename, verbose=False):
     f.write('use, period=lattice;\n')
     f.close()
 
-    #write samplers
-    if len(machine.samplers) > 0:
-        f = open(fn_samplers,'w')
-        files.append(fn_samplers)
-        f.write(timestring)
-        f.write('! pymadx.Builder Lattice \n')
-        f.write('! SAMPLER DEFINITION\n\n')
-        for sampler in machine.samplers:
-            f.write(str(sampler))
-        f.close()
-
     # write beam 
     if machine.beam != None : 
         f = open(fn_beam,'w') 
@@ -326,8 +315,19 @@ def WriteLattice(machine, filename, verbose=False):
         f.write('! BEAM DEFINITION \n\n')
         f.write(machine.beam.ReturnBeamString())
 
-    # WRITE MACHINE OPTIONS
-    # YET TO BE IMPLMENTED
+    #write samplers
+    if len(machine.samplers) > 0:
+        f = open(fn_samplers,'w')
+        files.append(fn_samplers)
+        f.write(timestring)
+        f.write('! pymadx.Builder Lattice \n')
+        f.write('! SAMPLER DEFINITION\n\n')
+        for sampler in machine.samplers:
+            f.write(str(sampler))
+        f.write('ptc_track, element_by_element, dump, turns=1, icase=5, onetable;')
+        f.write('PTC_TRACK_END;')
+        f.write('ptc_end;')
+        f.close()
 
     # write main file
     f = open(fn_main,'w')

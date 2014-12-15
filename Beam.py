@@ -25,7 +25,7 @@ class Beam(dict):
     def SetParticleType(self,particletype='e-'):
         if particletype not in MADXParticleTypes:
             raise ValueError("Unknown particle type: '"+str(particletype)+"'")
-        self['particle'] = '"' + str(particletype) + '"'
+        self['particle'] = str(particletype) 
 
     def SetEnergy(self,energy=1.0,unitsstring='GeV'):
         self['energy'] = str(energy) + '*' + unitsstring
@@ -34,7 +34,7 @@ class Beam(dict):
         if distrtype not in MADXDistributionTypes:
             raise ValueError("Unknown distribution type: '"+str(distrtype)+"'")
         
-        self['distrType'] = '"' + distrtype + '"'
+        self['distrType'] = distrtype 
         if distrtype == 'madx':
             setattr(self, 'SetBetaX',            self._SetBetaX)
             setattr(self, 'SetBetaY',            self._SetBetaY) 
@@ -48,15 +48,15 @@ class Beam(dict):
             setattr(self, 'SetDistribFileName',  self._SetDistribFileName)
     
     def ReturnBeamString(self):
-        s = ''
-        for k,v in self.iteritems():
-            s += ', \n\t'+str(k)+'='+str(v)
-        s += ';'
-        s2 = s.split('\n')
-        s3 = 'beam,\t'+s2[1].replace('\t','').replace('\n','').replace(',','').strip()+',\n'
-        s4 = '\n'.join(s2[2:])
-        st = s3+s4
-        return st
+        if self['distrType'] == 'ptc' : 
+            s = 'ptc_create_universe;\n' 
+            s+= 'ptc_create_layout,model=2,method=6,nst=10;\n'
+            s+= 'call, file ="'+self['distrFile']+'";\n'
+            s+= 'ptc_align;'
+            return s
+        else : 
+            return '' 
+
 
     def SetT0(self,t0=0.0,unitsstring='s'):
         self['T0'] = t0 + '*' + unitsstring
@@ -89,4 +89,4 @@ class Beam(dict):
         self['emity'] = str(emity) + '*' + unitsstring
 
     def _SetDistribFileName(self, fileName) :
-        self['distrFile'] = '"'+fileName+'"'
+        self['distrFile'] = fileName
