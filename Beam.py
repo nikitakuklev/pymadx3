@@ -11,8 +11,7 @@ MADXDistributionTypes = [
 MADXParticleTypes = [
     'e-',
     'e+',
-    'proton',
-    'gamma',
+    'proton'
 ]
 
 class Beam(dict):
@@ -36,23 +35,21 @@ class Beam(dict):
             raise ValueError("Unknown distribution type: '"+str(distrtype)+"'")
         
         self['distrType'] = '"' + distrtype + '"'
-        if distrtype == 'reference':
-            pass
-        elif distrtype == 'madx':
-            setattr(self, 'SetBetaX',      self._SetBetaX)
-            setattr(self, 'SetBetaY',      self._SetBetaY) 
-            setattr(self, 'SetAlphaX',     self._SetAlphaX)
-            setattr(self, 'SetAlphaY',     self._SetAlphaY)
-            setattr(self, 'SetEmittanceX', self._SetEmittanceX) 
-            setattr(self, 'SetEmittanceY', self._SetEmittanceX) 
-            setattr(self, 'SetE',          self._SetE)
-            setattr(self, 'SetSigmaE',     self._SetSigmaE)
-            setattr(self, 'SetSigmaT',     self._SetSigmaT)
+        if distrtype == 'madx':
+            setattr(self, 'SetBetaX',           self._SetBetaX)
+            setattr(self, 'SetBetaY',            self._SetBetaY) 
+            setattr(self, 'SetAlphaX',           self._SetAlphaX)
+            setattr(self, 'SetAlphaY',           self._SetAlphaY)
+            setattr(self, 'SetEmittanceX',       self._SetEmittanceX) 
+            setattr(self, 'SetEmittanceY',       self._SetEmittanceX) 
+            setattr(self, 'SetE',                self._SetE)
+            setattr(self, 'SetSigmaE',           self._SetSigmaE)
+            setattr(self, 'SetSigmaT',           self._SetSigmaT)
         elif distrtype == 'ptc':            
-            setattr(self, 'SetE',          self._SetE)
-            setattr(self, 'SetSigmaE',     self._SetSigmaE)
-            setattr(self, 'SetSigmaT',     self._SetSigmaT)
-            setattr(self, 'SetPtcInrayFileName',      self._SetPtcInrayFileName)
+            setattr(self, 'SetE',                self._SetE)
+            setattr(self, 'SetSigmaE',           self._SetSigmaE)
+            setattr(self, 'SetSigmaT',           self._SetSigmaT)
+            setattr(self, 'SetPtcInrayFileName', self._SetPtcInrayFileName)
     
     def ReturnBeamString(self):
         s = ''
