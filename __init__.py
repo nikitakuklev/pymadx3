@@ -16,6 +16,8 @@ from TfsArray import TfsArray
 from Visualisation import Visualisation
 import Builder
 import Ptc
+from PtcAnalysis import PtcAnalysis 
+from PtcPlot import PtcPlot 
 from Beam import Beam
 
-__all__ = ['Tfs','TfsArray','Beam','Builder','Visualisation','Ptc']
+__all__ = ['Tfs','TfsArray','Beam','Builder','Visualisation','Ptc','PtcPlot','PtcAnalysis']

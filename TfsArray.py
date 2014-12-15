@@ -40,7 +40,7 @@ class TfsArray :
             f = open(filename)
 
 
-        isegment = -1
+        self.isegment = -1
         self.columns.append('SEGMENT')
         self.formats.append('%d')
 
@@ -53,20 +53,20 @@ class TfsArray :
             elif line[0] == '*' : 
                 # column name 
                 # print 'pymadx.TfsArray> columns',line 
-                self.columns.extend(sl[2:]) #miss * and NAMES                
+                self.columns.extend(sl[1:]) #miss *                
             elif line[0] == '$' : 
                 # column type
                 # print 'pymadx.TfsArray> type',line 
-                self.formats.extend(sl[2:]) #miss $ and NAMES                
+                self.formats.extend(sl[1:]) #miss $              
             elif sl[0] == '#segment' : 
                 # entry marker 
                 # print 'pymadx.TfsArray> marker',line, self.nitems,isegment
-                isegment=isegment+1
+                self.isegment=self.isegment+1
                 
             else :                 
                 # data
                 d = [Cast(item) for item in sl]
-                d.insert(0,isegment) 
+                d.insert(0,self.isegment) 
                 self.data.append(d)    # put in data dict by name
                 self.nitems += 1 # keep tally of number of items                
 
@@ -86,7 +86,6 @@ class TfsArray :
         c = _copy.deepcopy(self)
         c.data      = self.data
         c.dataArray = self.dataArray[segcut,:]
-        c.nitems    = len(c.dataArray)
-        
+        c.nitems    = len(c.dataArray)        
         return c
             
