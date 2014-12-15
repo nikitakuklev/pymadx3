@@ -15,3 +15,6 @@ from Tfs import Tfs
 from Visualisation import Visualisation
 import Builder
 import Ptc
+from Beam import Beam
+
+__all__ = ['Tfs','Beam','Builder','Visualisation','Ptc']

@@ -214,7 +214,8 @@ class Machine :
                     raise ValueError(elementname+" is not a valid element in this machine")
                 else:
                     self.samplers.append(Sampler(element))
-
+    def AddBeam(self, beam=None) : 
+        self.beam = beam
 
 # General scripts below this point
 

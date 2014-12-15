@@ -36,20 +36,16 @@ class Beam(dict):
         
         self['distrType'] = '"' + distrtype + '"'
         if distrtype == 'madx':
-            setattr(self, 'SetBetaX',           self._SetBetaX)
+            setattr(self, 'SetBetaX',            self._SetBetaX)
             setattr(self, 'SetBetaY',            self._SetBetaY) 
             setattr(self, 'SetAlphaX',           self._SetAlphaX)
             setattr(self, 'SetAlphaY',           self._SetAlphaY)
             setattr(self, 'SetEmittanceX',       self._SetEmittanceX) 
             setattr(self, 'SetEmittanceY',       self._SetEmittanceX) 
-            setattr(self, 'SetE',                self._SetE)
             setattr(self, 'SetSigmaE',           self._SetSigmaE)
             setattr(self, 'SetSigmaT',           self._SetSigmaT)
         elif distrtype == 'ptc':            
-            setattr(self, 'SetE',                self._SetE)
-            setattr(self, 'SetSigmaE',           self._SetSigmaE)
-            setattr(self, 'SetSigmaT',           self._SetSigmaT)
-            setattr(self, 'SetPtcInrayFileName', self._SetPtcInrayFileName)
+            setattr(self, 'SetDistribFileName',  self._SetDistribFileName)
     
     def ReturnBeamString(self):
         s = ''
@@ -92,3 +88,5 @@ class Beam(dict):
     def _SetEmittanceY(self,emity=1.0,unitsstring='um'):
         self['emity'] = str(emity) + '*' + unitsstring
 
+    def _SetDistribFileName(self, fileName) :
+        self['distrFile'] = '"'+fileName+'"'

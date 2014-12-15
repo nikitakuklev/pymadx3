@@ -1,5 +1,7 @@
+import numpy as _np
 import re as _re
 import pylab as _pl
+from numpy.random import multivariate_normal as _multivariate_normal
 
 #***********************************************************************************************    
 class Inrays : 
@@ -8,8 +10,8 @@ class Inrays :
     px : horizontal canonical momentum p_x/p_0 
     y  : vertical position [m]
     py : vertical canonical momentum p_y/p_0
-    t  : c*(t-t0)
-    pt : (delta-E)/(pc)
+    t  : c*(t-t0) [m]
+    pt : (delta-E)/(pc) 
     '''
 
     def __init__(self) :
@@ -136,7 +138,7 @@ class Generator :
     def __init__(self,
                  gemx = 1e-8, betax = 0.1, alfx = 0.0 , 
                  gemy = 1e-8, betay = 0.1, alfy = 0.0,
-                 sigmat = 1e-6, sigmapt= 1e-6) : 
+                 sigmat = 1e-12, sigmapt= 1e-12) : 
         '''Simple gaussian beam
         gemx   : x geometric emittance 
         betax  : x beta function
@@ -151,20 +153,52 @@ class Generator :
         self.gemx    = gemx
         self.betax   = betax
         self.alfx    = alfx
+
         self.gemy    = gemy
         self.betay   = betay
         self.alfy    = alfy 
+
         self.sigmat  = sigmat 
         self.sigmapt = sigmapt
 
-    def __repr__(self) : 
-        return ""
+        self.gamx    = (1.0+self.alfx**2)/self.betax    
+        self.gamy    = (1.0+self.alfy**2)/self.betay
 
-    def generate(self, nToGenerate) : 
+        # Generate sigma matrix
+        self.means  = _np.zeros(6)
+        self.sigmas = _np.zeros((6,6)) 
+        
+        self.sigmas[0][0] =  self.gemx*self.betax
+        self.sigmas[0][1] = -self.gemx*self.alfx
+        self.sigmas[1][0] = -self.gemx*self.alfx
+        self.sigmas[1][1] =  self.gemy*self.gamy
+        self.sigmas[2][2] = -self.gemy*self.alfy
+        self.sigmas[2][3] = -self.gemy*self.alfy
+        self.sigmas[3][2] =  self.gemy*self.gamy
+        self.sigmas[3][3] =  self.gemy*self.gamy
+        self.sigmas[4][4] =  self.sigmat**2
+        self.sigmas[5][5] =  self.sigmapt**2
+        
+        # Create n-dim gaussian generator
+        
+        
+
+    def __repr__(self) : 
+        s = 'ex : '+str(self.gemx)+' bx : '+str(self.betax)+' ax : '+str(self.alfx)+' gx : '+str(self.gamx)+'\n'
+        s+= 'ey : '+str(self.gemy)+' bx : '+str(self.betay)+' ax : '+str(self.alfy)+' gy : '+str(self.gamy)+'\n'
+        s+= 'sT : '+str(self.sigmat)+' spt : '+str(self.sigmapt)
+        return s
+
+    def generate(self, nToGenerate = 1000, fileName = 'inrays.madx') : 
         ''' returns a Inrays structure''' 
         i = Inrays()
         
         for c in range(0,nToGenerate,1) : 
-            i.AddParticle() 
+            rv = _multivariate_normal(self.means,self.sigmas,1)[0]
+            i.addParticle(rv[0],rv[1],rv[2],rv[3],rv[4],rv[5]) 
+
+        WriteInrays(fileName,i)
 
         return i
+
+    
