@@ -136,8 +136,8 @@ class Generator :
     '''Simple ptx inray file generator'''
     
     def __init__(self,
-                 gemx = 1e-8, betax = 0.1, alfx = 0.0 , 
-                 gemy = 1e-8, betay = 0.1, alfy = 0.0,
+                 gemx = 1e-10, betax = 0.1, alfx = 0.0 , 
+                 gemy = 1e-10, betay = 0.1, alfy = 0.0,
                  sigmat = 1e-12, sigmapt= 1e-12) : 
         '''Simple gaussian beam
         gemx   : x geometric emittance 
@@ -171,18 +171,14 @@ class Generator :
         self.sigmas[0][0] =  self.gemx*self.betax
         self.sigmas[0][1] = -self.gemx*self.alfx
         self.sigmas[1][0] = -self.gemx*self.alfx
-        self.sigmas[1][1] =  self.gemy*self.gamy
-        self.sigmas[2][2] = -self.gemy*self.alfy
+        self.sigmas[1][1] =  self.gemx*self.gamx
+        self.sigmas[2][2] =  self.gemy*self.betay
         self.sigmas[2][3] = -self.gemy*self.alfy
-        self.sigmas[3][2] =  self.gemy*self.gamy
+        self.sigmas[3][2] = -self.gemy*self.alfy
         self.sigmas[3][3] =  self.gemy*self.gamy
         self.sigmas[4][4] =  self.sigmat**2
         self.sigmas[5][5] =  self.sigmapt**2
         
-        # Create n-dim gaussian generator
-        
-        
-
     def __repr__(self) : 
         s = 'ex : '+str(self.gemx)+' bx : '+str(self.betax)+' ax : '+str(self.alfx)+' gx : '+str(self.gamx)+'\n'
         s+= 'ey : '+str(self.gemy)+' bx : '+str(self.betay)+' ax : '+str(self.alfy)+' gy : '+str(self.gamy)+'\n'
@@ -196,6 +192,7 @@ class Generator :
         for c in range(0,nToGenerate,1) : 
             rv = _multivariate_normal(self.means,self.sigmas,1)[0]
             i.addParticle(rv[0],rv[1],rv[2],rv[3],rv[4],rv[5]) 
+#            i.addParticle(0,1e-6,0,0,0,0)
 
         WriteInrays(fileName,i)
 
