@@ -22,9 +22,10 @@ Machine - a list of elements
 
 """
 
-bdsimcategories = [
+madxcategories = [
     'drift',
     'quadrupole',
+    'sextupole'
     ]
 
 #*************************************************************************************************
@@ -43,8 +44,8 @@ class Element(dict) :
     decimal places are used. 
     """
     def __init__(self, name, category, **kwargs):
-        if category not in bdsimcategories:
-            raise ValueError("Not a valid BDSIM element type")
+        if category not in madxcategories:
+            raise ValueError("Not a valid MADX element type")
         self.name     = str(name)
         self.category = str(category)
         self.length      = 0.0 #for bookeeping only
@@ -198,6 +199,9 @@ class Machine :
     def AddQuadrupole(self, name='qd', length=0.1, k1=0.0, **kwargs):
         self.Append(Element(name,'quadrupole',l=length,k1=k1,**kwargs))
 
+    def AddSextupole(self, name='sd', length=0.1,k2=0.0, **kwargs) : 
+        self.Append(Element(name,'sextupole',l=length,k2=k2,**kwargs))
+
     def AddSampler(self,*elementnames):
         if elementnames[0] == 'all':
             for element in self.elements:
@@ -256,7 +260,7 @@ def WriteLattice(machine, filename, verbose=False):
     if not isinstance(machine,Machine):
         raise TypeError("Not machine instance")
     
-    elementsperline = 100 #number of machine elements per bdsim line (not text line)
+    elementsperline = 100 #number of machine elements per madx line (not text line)
     
     #check filename
     if filename[-5:] != '.madx':
