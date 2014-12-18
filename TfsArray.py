@@ -73,6 +73,51 @@ class TfsArray :
             
         # make numpy array for convenience
         self.dataArray = _numpy.array(self.data)
+
+    def __repr__(self):
+        s =  ''
+        s += 'pymadx.TfsArray instance\n'
+        s += str(self.nitems) + ' items in lattice\n'
+        return s
+
+    def __iter__(self):
+        self._iterindex = -1
+        return self
+
+    def next(self):
+        if self._iterindex == len(self.sequence)-1:
+            raise StopIteration
+        self._iterindex += 1
+        return self.GetRow(self._iterindex)
+
+    def __getitem__(self,index):
+        #return single item or slice of lattice
+        if type(index) == slice:
+            #prepare step integer - allow reverse stepping too
+            if index.stop > index.start:
+                index = slice(index.start,index.stop,1)
+            else:
+                index = slice(index.start,index.stop,-1)
+            return [self.GetRow(i) for i in range(index.start,index.stop,index.step)]
+        elif type(index) == int:
+            return self.GetRow(index)
+        else:
+            raise ValueError("argument not an index or a slice")
+
+    def ColumnIndex(self,columnstring):
+        """
+        ColumnIndex(columnname):
+        
+        return the index to the column matching the name
+        
+        REMEMBER: excludes the first column NAME
+        0 counting
+
+        """
+        return self.columns.index(columnstring)
+
+    def NameFromIndex(self,index):
+        return self.dataArray[index,self.columns.index['NAME']]
             
     def GetColumn(self, colname) :
         colindex = self.columns.index(colname) 
@@ -88,4 +133,46 @@ class TfsArray :
         c.dataArray = self.dataArray[segcut,:]
         c.nitems    = len(c.dataArray)        
         return c
-            
+
+    def InterrogateItem(self,index):
+        """
+        InterrogateItem(index)
+        
+        Print out all the parameters and their
+        names for a particlular element in the 
+        sequence identified by name
+        """
+        for i,parameter in enumerate(self.columns):
+            print parameter.ljust(10,'.'),self.dataArray[index,i]
+
+    def GetElementsOfType(self,typename) :
+        """
+        GetElementsOfType(typename) 
+        
+        Returns a list of the names of elements of a certain type
+
+        typename can be a single string or a tuple or list of strings
+
+        ie 
+        GetElementsOfType('SBEND')
+        GetElementsOfType(['SBEND','RBEND'])
+        GetElementsOfType(('SBEND','RBEND','QUADRUPOLE'))
+
+        """        
+        i = self.ColumnIndex('KEYWORD')
+        types = self.GetColumn('KEYWORD')
+        return [t for t in types if t in typename]
+
+    def ReportPopulations(self):
+        """
+        Print out all the population of each type of
+        element in the beam line (sequence)
+        """
+        print 'Filename > ',self.filename
+        print 'Total number of items > ',self.nitems
+        i = self.ColumnIndex('KEYWORD')
+        types = set(self.GetColumn('KEYWORD'))
+        populations = [(len(self.GetElementsOfType(key)),key) for key in types]
+        print 'Type'.ljust(15,'.'),'Population'
+        for item in sorted(populations)[::-1]:
+            print item[1].ljust(15,'.'),item[0]
