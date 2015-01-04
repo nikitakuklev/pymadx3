@@ -130,8 +130,7 @@ class Tfs(object):
                     name = self.nitems
                 self.sequence.append(name) # keep the name in sequence
                 self.data[name] = d        # put in data dict by name
-                #self.databyindex[self.nitems] = d
-                self.nitems += 1 # keep tally of number of items
+                self.nitems += 1           # keep tally of number of items
         f.close()
 
         self.index = range(0,len(self.data),1)
