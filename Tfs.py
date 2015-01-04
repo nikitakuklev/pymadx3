@@ -1,33 +1,42 @@
 import tarfile
 
-class Tfs:
+#object inheritance is only for type comparison
+
+class Tfs(object):
     """
     MADX Tfs file reader
 
     a = Tfs()
     a.Load('myfile.tfs')
-    a.Load('myfile.tar') -> extracts from tar file
+    a.Load('myfile.tar.gz') -> extracts from tar file
+
+    or 
+
+    a = Tfs("myfile.tfs")
 
     a has data members:
-    
-    header  - dictionary of header items
-    columns - list of column names
-    formats - list of format strings for each column
-    data    - dictionary of entries in tfs file by name string
-
-    NOTE: this assumes NAME is the first column
-
-    databyindex - dictionary by integer index in sequence
+    header      - dictionary of header items
+    columns     - list of column names
+    formats     - list of format strings for each column
+    data        - dictionary of entries in tfs file by name string
     sequence    - list of names in the order they appear in the file
     nitems      - number of items in sequence
 
+    NOTE: if no column "NAME" is found, integer indices are used instead
+
+    See the various methods inside a to get different bits of information:
+    
+    a.ReportPopulations?
+
     Examples:
 
-    a.data['IP.1'] #returns all entries (minus the name) for element IP.1
-    a.databyindex[321] #returns item number 321 from beamline (0 counting)
-
+    a.['IP.1'] #returns dict for element named "IP.1"
+    a[:30]     #returns list of dicts for elements up to number 30
+    a[345]     #returns dict for element number 345 in sequence
+    
     """
     def __init__(self,filename=None):
+        object.__init__(self) #this allows type comparison for this class
         self.index       = []
         self.header      = {}
         self.columns     = []
