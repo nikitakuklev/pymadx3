@@ -1,5 +1,6 @@
 import Ptc as _Ptc 
 from TfsArray import TfsArray as _TfsArray
+from Tfs import Tfs as _Tfs
 
 class PtcAnalysis(object) : 
     def __init__(self,ptcInput = None, ptcOutput = None) : 
@@ -13,12 +14,15 @@ class PtcAnalysis(object) :
         # Load output rays 
         if type(ptcOutput) == str : 
             self.ptcOutput = _TfsArray(ptcOutput)
+            #self.ptcOutput = _Tfs(ptcOutput)
         else : 
             self.ptcOutput = ptcOutput
     
-    def SamplerLoop(self) : 
-        for isampler in (0,self.ptcOutput.isegment,1) : 
-            samplerData = self.ptcOutput.GetSegment(isampler) 
+    def SamplerLoop(self):
+        #for segment in ptcOutput.segments:
+        for isampler in (0,self.ptcOutput.isegment,1):
+            #samplerData = self.ptcOutput.GetSegment(segment)
+            samplerData = self.ptcOutput.GetSegment(isampler)
             
             xrms  = samplerData.GetColumn('X').std()
             yrms  = samplerData.GetColumn('Y').std()
