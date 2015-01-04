@@ -115,14 +115,28 @@ class Tfs(object):
     def __getitem__(self,index):
         #return single item or slice of lattice
         if type(index) == slice:
+            start,stop,step = index.start, index.stop, index.step #note slices are immutable
+            #test values incase of ':' use
+            if start == None:
+                start = 0
+            if stop  == None:
+                stop = len(self)
             #prepare step integer - allow reverse stepping too
-            if index.stop > index.start:
-                index = slice(index.start,index.stop,1)
-            else:
-                index = slice(index.start,index.stop,-1)
-            return [self.GetElementDict(self.sequence[i]) for i in range(index.start,index.stop,index.step)]
+            if (step == None) and (stop > start):
+                step = 1
+            elif (step == None) and (start > stop):
+                step = -1
+            index = slice(start,stop,step)
+            #construct and return a new instance of the class
+            a = Tfs()
+            a._CopyMetaData(self) #UNFINISHED - slice should return class instance (for iteration)
+            f = [a._AppendDataEntry(self.sequence[i],self.data[self.sequence[i]]) for i in range(index.start,index.stop,index.step)]
+            del f
+            return a
         elif type(index) == int:
             return self.GetElementDict(self.sequence[index])
+        elif type(index) == str:
+            return self.GetElementDict(index)
         else:
             raise ValueError("argument not an index or a slice")
     
