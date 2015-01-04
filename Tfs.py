@@ -116,7 +116,10 @@ class Tfs(object):
         f.close()
 
         self.index = range(0,len(self.data),1)
-        self.smax  = self[-1]['S']
+        if 'S' in self.columns:
+            self.smax = self[-1]['S']
+        else:
+            self.smax = 0
 
     def __repr__(self):
         s =  ''
