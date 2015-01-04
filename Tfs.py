@@ -45,6 +45,7 @@ class Tfs(object):
         self.sequence    = []
         self.nitems      = 0
         self.nsegments   = 0
+        self.segments    = []
         self.filename    = filename
         if type(filename) == str:
             self.Load(filename)
@@ -116,6 +117,7 @@ class Tfs(object):
                 segment_i    = d[0]
                 segment_name = d[-1]
                 self.nsegments += 1 # keep tally of number of segments
+                self.segments.append(segment_name)
             else:
                 #data
                 d = [Cast(item) for item in sl]
