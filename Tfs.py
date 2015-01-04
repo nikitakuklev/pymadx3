@@ -88,6 +88,9 @@ class Tfs:
         s += str(self.nitems) + ' items in lattice\n'
         return s
 
+    def __len__(self):
+        return len(self.sequence)
+
     def __iter__(self):
         self._iterindex = -1
         return self
