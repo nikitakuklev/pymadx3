@@ -1,4 +1,5 @@
 import tarfile
+import numpy as _np
 
 #object inheritance is only for type comparison
 
@@ -156,7 +157,7 @@ class Tfs(object):
         if self._iterindex == len(self.sequence)-1:
             raise StopIteration
         self._iterindex += 1
-        return self.GetElementDict(self.sequence[self._iterindex])
+        return self.GetRowDict(self.sequence[self._iterindex])
 
     def __getitem__(self,index):
         #return single item or slice of lattice
@@ -180,9 +181,9 @@ class Tfs(object):
             del f
             return a
         elif type(index) == int:
-            return self.GetElementDict(self.sequence[index])
+            return self.GetRowDict(self.sequence[index])
         elif type(index) == str:
-            return self.GetElementDict(index)
+            return self.GetRowDict(index)
         else:
             raise ValueError("argument not an index or a slice")
     
@@ -242,7 +243,7 @@ class Tfs(object):
 
         return the index of the beamline element clostest to S 
         """
-        s = self.ColumnByIndex('S')
+        s = self.GetColumn('S')
 
         #iterate over beamline and record element if S is between the
         #sposition of that element and then next one
@@ -276,29 +277,37 @@ class Tfs(object):
         """
         return self.columns.index(columnstring)
 
-    def ColumnByName(self,columnstring):
+    def GetColumn(self,columnstring):
         """
-        Column(columnstring)
-        return all data from one column
+        GetColumn(columnstring)
+        return a numpy array of the values in columnstring in order
+        as they appear in the beamline
+        """
+        i = self.ColumnIndex(columnstring)
+        return _np.array([self.data[name][i] for name in self.sequence])
 
-        returns a dictionary by name of item
+    def GetColumnDict(self,columnstring):
+        """
+        GetColumnDict(columnstring)
+        return all data from one column in a dictionary
+
+        note not in order
         """
         i = self.ColumnIndex(columnstring)
         d = {k:v[i] for (k,v) in self.data.iteritems()}
         return d
 
-    def ColumnByIndex(self,columnstring):
+    def GetRow(self,elementname):
         """
-        ColumnByIndex(columnstring)
-        
-        returns a list of the values in columnstring in order
-        as they appear in the beamline
+        GetRow(elementname)
+        return all data from one row as a list
 
+        note
         """
-        i = self.ColumnIndex(columnstring)
-        return [self.data[name][i] for name in self.sequence]
-
-    def GetElementDict(self,elementname):
+        d = self[elementname]
+        return [d[key] for key in self.columns]
+    
+    def GetRowDict(self,elementname):
         """
         ElementDict(elementname)
         return a dictionary of all parameters for a specifc element
