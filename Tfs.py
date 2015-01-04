@@ -84,6 +84,15 @@ class Tfs(object):
         self.columns =  [] #reset columns for proper data read in
         f.seek(0) #reset file back to the beginning for reading in data
 
+        #segment specific stuff
+        segment_i = 0 #actual segment number in data may not be zero counting - use this variable
+        segment_name = 'NA'
+        #always include segments - put as first column in data
+        self.columns.append("SEGMENT")
+        self.formats.extend("%d")
+        self.columns.append("SEGMENTNAME")
+        self.formats.extend("%s")
+
         namecolumnindex = 0
         
         #read in data
@@ -101,10 +110,17 @@ class Tfs(object):
             elif line[0] == '$':
                 #format
                 self.formats.extend(sl[1:]) #miss $
+            elif '#' in line[0]:
+                #segment line
+                d = [Cast(item) for item in sl[1:]]
+                segment_i    = d[0]
+                segment_name = d[-1]
+                self.nsegments += 1 # keep tally of number of segments
             else:
                 #data
                 d = [Cast(item) for item in sl]
-                name = self._CheckName(d[0])
+                d.insert(0,segment_name) #prepend segment info
+                d.insert(0,segment_i) #this one becomes the first item matching the column index
                 if usename:
                     name = self._CheckName(d[namecolumnindex])
                 else:
@@ -289,6 +305,16 @@ class Tfs(object):
         """
         i = self.ColumnIndex(columnstring)
         return [self.data[name][i] for name in self.sequence]
+
+    def GetSegment(self,segmentnumber):
+        a = Tfs()
+        a._CopyMetaData(self)
+        segmentindex = self.columns.index('SEGMENT')
+        hasname = 'NAME' in self.columns
+        for key in self.sequence:
+            if self.data[key][segmentindex] == segmentnumber:
+                a._AppendDataEntry(key,self.data[key])
+        return a
 
     def InterrogateItem(self,itemname):
         """
