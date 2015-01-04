@@ -42,12 +42,14 @@ class Tfs(object):
         self.columns     = []
         self.formats     = []
         self.data        = {}
-        self.databyindex = {}
         self.sequence    = []
         self.nitems      = 0
+        self.nsegments   = 0
         self.filename    = filename
-        if filename != None:
+        if type(filename) == str:
             self.Load(filename)
+        elif type(filename) == Tfs:
+            self.DeepCopy(filename)
         
     def Clear(self):
         self.__init__()
@@ -136,6 +138,26 @@ class Tfs(object):
         else:
             return name
 
+    def _CopyMetaData(self,instance):
+        params = ["header","columns","formats","filename"]
+        for param in params:
+            setattr(self,param,getattr(instance,param))
+
+    def _DeepCopy(self,instance):
+        self._CopyMetaData(instance)
+        params = ["index","data","sequence","nitems","nsegments"]
+        for param in params:
+            setattr(self,param,getattr(instance,param))
+
+    def _AppendDataEntry(self,name,entry):
+        if len(self.index) > 0:                   #check if there's any elements yet
+            self.index.append(self.index[-1] + 1) #create an index
+        else:
+            self.index.append(0)
+        self.sequence.append(name)  #append name to sequence
+        self.nitems    += 1         #increment nitems
+        self.data[name] = entry     #put the data in
+            
     def NameFromIndex(self,index):
         """
         NameFromIndex(integerindex)
