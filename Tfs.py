@@ -287,16 +287,6 @@ class Tfs(object):
         d = {k:v[i] for (k,v) in self.data.iteritems()}
         return d
 
-    def GetElementDict(self,elementname):
-        """
-        ElementDict(elementname)
-        return a dictionary of all parameters for a specifc element
-        given by element name
-
-        """
-        d = {k:v for (k,v) in zip(self.columns,self.data[elementname])}
-        return d
-
     def ColumnByIndex(self,columnstring):
         """
         ColumnByIndex(columnstring)
@@ -307,6 +297,16 @@ class Tfs(object):
         """
         i = self.ColumnIndex(columnstring)
         return [self.data[name][i] for name in self.sequence]
+
+    def GetElementDict(self,elementname):
+        """
+        ElementDict(elementname)
+        return a dictionary of all parameters for a specifc element
+        given by element name
+
+        """
+        d = {k:v for (k,v) in zip(self.columns,self.data[elementname])}
+        return d
 
     def GetSegment(self,segmentnumber):
         a = Tfs()
