@@ -67,7 +67,26 @@ class Tfs(object):
         else:
             print 'pymadx.Tfs.Load> normal file'
             f = open(filename)
+        
+        #first pass at file - need to check if it has 'NAME' column
+        #if it has name, use that, otherwise use an integer
+        #find column names line
+        for line in f:
+            sl = line.strip('\n').split()
+            if line[0] == '*':
+                #name
+                self.columns.extend(sl[1:]) #miss "*" from column names line
+                break
+        if 'NAME' in self.columns:
+            usename = True #use the name
+        else:
+            usename = False #no name column - use an index
+        self.columns =  [] #reset columns for proper data read in
+        f.seek(0) #reset file back to the beginning for reading in data
 
+        namecolumnindex = 0
+        
+        #read in data
         for line in f:
             splitline = line.strip('\n').split()
             sl        = splitline #shortcut
@@ -76,17 +95,23 @@ class Tfs(object):
                 self.header[sl[1]] = sl[-1].replace('"','')
             elif line[0] == '*':
                 #name
-                self.columns.extend(sl[2:]) #miss * and NAMES
+                self.columns.extend(sl[1:]) #miss *
+                if "NAME" in self.columns:
+                    namecolumnindex = self.columns.index("NAME")
             elif line[0] == '$':
                 #format
-                self.formats.extend(sl[2:]) #miss $ and NAMES
+                self.formats.extend(sl[1:]) #miss $
             else:
                 #data
                 d = [Cast(item) for item in sl]
                 name = self._CheckName(d[0])
+                if usename:
+                    name = self._CheckName(d[namecolumnindex])
+                else:
+                    name = self.nitems
                 self.sequence.append(name) # keep the name in sequence
-                self.data[name] = d[1:]    # put in data dict by name
-                self.databyindex[self.nitems] = d
+                self.data[name] = d        # put in data dict by name
+                #self.databyindex[self.nitems] = d
                 self.nitems += 1 # keep tally of number of items
         f.close()
 
