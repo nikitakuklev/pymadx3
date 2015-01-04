@@ -226,9 +226,12 @@ class Tfs(object):
         """
         s = self.ColumnByIndex('S')
 
-        ci = [i for i in self.index[0:-1] if (S > s[i]  and S < s[i+1])] 
-        ci = ci[0]
+        #iterate over beamline and record element if S is between the
+        #sposition of that element and then next one
+        ci = [i for i in self.index[0:-1] if (S > s[i] and S < s[i+1])] 
+        ci = ci[0] #return just the first match - should only be one
 
+        #check the absolute distance to each and return the closest one
         if abs(S-s[ci]) < abs(S-s[ci+1]) : 
             return ci 
         else : 
