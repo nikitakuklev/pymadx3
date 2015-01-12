@@ -13,11 +13,11 @@ import Convert
 
 from Tfs import Tfs
 from TfsArray import TfsArray
-from Visualisation import Visualisation
+import Plot
 import Builder
 import Ptc
 from PtcAnalysis import PtcAnalysis 
 from PtcPlot import PtcPlot 
 from Beam import Beam
 
-__all__ = ['Tfs','TfsArray','Beam','Builder','Visualisation','Ptc','PtcPlot','PtcAnalysis']
+__all__ = ['Tfs','TfsArray','Beam','Builder','Plot','Ptc','PtcPlot','PtcAnalysis']
