@@ -28,7 +28,6 @@ madxcategories = [
     'sextupole'
     ]
 
-#*************************************************************************************************
 class Element(dict) : 
     """
     Element - a beam element class - inherits dict
@@ -91,7 +90,6 @@ class Element(dict) :
         s += ';\n'
         return s
 
-#*************************************************************************************************
 class Line(list):
     def __init__(self,name,*args):
         for item in args[0]:
@@ -117,7 +115,6 @@ class Line(list):
             s += str(item) #uses elements __repr__ function
         return s
 
-#*************************************************************************************************
 class Sampler:
     ''' PTC observe command ''' 
     def __init__(self,name):
@@ -126,7 +123,6 @@ class Sampler:
     def __repr__(self):
         return 'PTC_OBSERVE, place='+self.name+';\n'
 
-#*************************************************************************************************
 class Machine :     
     def __init__(self,verbose=False):
         self.verbose   = verbose
@@ -213,17 +209,17 @@ class Machine :
         elif elementnames[0] == 'last':
             self.samplers.append(Sampler(self.elements[-1].name))
         else:
-            for element in elementnames[0]:
-                if element not in self.elements:
-                    raise ValueError(elementname+" is not a valid element in this machine")
+            for element in elementnames:
+                if element not in self.sequence:
+                    raise ValueError(element+" is not a valid element in this machine")
                 else:
                     self.samplers.append(Sampler(element))
+        
     def AddBeam(self, beam=None) : 
         self.beam = beam
 
 # General scripts below this point
 
-#*************************************************************************************************
 class ParamInput :
     def __init__(self, fileName) : 
         self.fileName = fileName 
