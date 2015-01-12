@@ -154,7 +154,7 @@ def PlotInrays(i):
     
     _plt.subplots_adjust(hspace=0.35,wspace=0.15,top=0.98,right=0.98,left=0.05)
   
-class Generator(object): 
+class GaussGenerator(object): 
     """Simple ptx inray file generator"""
     def __init__(self,
                  gemx = 1e-10, betax = 0.1, alfx = 0.0 , 
@@ -217,4 +217,55 @@ class Generator(object):
         WriteInrays(fileName,i)
         return i
 
-    
+class FlatGenerator(object):
+    """Simple ptc inray file generator - even distribution"""
+    def __init__(self,
+                 mux =0.0, widthx =1e-5,
+                 mupx=0.0, widthpx=1e-5,
+                 muy =0.0, widthy =1e-3,
+                 mupy=0.0, widthpy=1e-3):
+        self.mux     = mux
+        self.muy     = muy
+        self.widthx  = widthx
+        self.widthy  = widthy
+        self.mupx    = mupx
+        self.mupy    = mupy
+        self.widthpx = widthpx
+        self.widthpy = widthpy
+
+    def __repr__(self):
+        s = '' #TBC
+        return s
+
+    def Generate(self,nToGenerate=100, fileName='inrays.madx'):
+        """ returns an Inrays structure""" 
+        i = Inrays()
+
+        nd = 0.0
+        if self.widthx > 0:
+            nd +=1
+        if self.widthy > 0:
+            nd +=1
+        nperdim = int(nToGenerate**(1/nd))
+        print "FlatGenerator> making array square - there'll be ",nperdim**2,'particles'
+
+        xmin = self.mux - self.widthx/2.0
+        xmax = self.mux + self.widthx/2.0
+        ymin = self.muy - self.widthy/2.0
+        ymax = self.muy + self.widthy/2.0
+        pxmin = self.mupx - self.widthpx/2.0
+        pxmax = self.mupx + self.widthpx/2.0
+        pymin = self.mupy - self.widthpy/2.0
+        pymax = self.mupy + self.widthpy/2.0
+
+        def GetX():
+            return zip(_np.linspace(ymin,ymax,nperdim),_np.linspace(pymin,pymax,nperdim))
+
+        def GetY():
+            return zip(_np.linspace(xmin,xmax,nperdim),_np.linspace(pxmin,pxmax,nperdim))
+
+        #we don't actually use 'd' here but just take advantage of list comprehensions
+        d = [i.AddParticle(x=x,px=px,y=y,py=py) for y,py in GetX() for x,px in GetY()]
+
+        WriteInrays(fileName,i)
+        return i
