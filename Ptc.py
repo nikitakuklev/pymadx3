@@ -1,57 +1,74 @@
 import numpy as _np
 import re as _re
-import pylab as _pl
+import matplotlib.pyplot as _plt
 from numpy.random import multivariate_normal as _multivariate_normal
 
-#***********************************************************************************************    
-class Inrays : 
-    '''Class to store madx ptc input rays
+class Inray:
+    """
+    Class for a madx ptc input ray
     x  : horizontal position [m]
     px : horizontal canonical momentum p_x/p_0 
     y  : vertical position [m]
     py : vertical canonical momentum p_y/p_0
     t  : c*(t-t0) [m]
-    pt : (delta-E)/(pc) 
-    '''
+    pt : (delta-E)/(pc)
 
-    def __init__(self) :
-        self.x  = []
-        self.px = [] 
-        self.y  = []
-        self.py = []
-        self.t  = []
-        self.pt = []
-       
-    def addParticle(self,x=0.0,px=0.0,y=0.0,py=0.0,t=0.0,pt=0.0) : 
-        '''Add new particle to internal lists'''
-        self.x.append(x)
-        self.px.append(px)
-        self.y.append(y)
-        self.py.append(py)
-        self.t.append(t)
-        self.pt.append(pt)
+    use str(Inray) to get the representation for file writing
+    """
+    def __init__(self, x=0.0, px=0.0, y=0.0, py=0.0, t=0.0, pt=0.0):
+        self.x  = x
+        self.px = px
+        self.y  = y
+        self.py = py
+        self.t  = t
+        self.pt = pt
 
-    def clear(self) : 
-        '''Empty internal lists'''
-        self.x  = []
-        self.px = []
-        self.y  = [] 
-        self.py = [] 
-        self.t  = []
-        self.pt = []
+    def __repr__(self):
+        s =  'ptc_start'
+        s += ', x='  + str(self.x)
+        s += ', px=' + str(self.px)
+        s += ', y='  + str(self.y)
+        s += ', py=' + str(self.py)
+        s += ', t='  + str(self.t)
+        s += ', pt=' + str(self.pt)
+        s += ';\n'
+        return s
 
-    def nParticles(self) : 
-        '''Gives the number of rays in the structure'''
-        return len(self.x)
-    
-    def stats(self) : 
-        '''Returns moments and beam parameters as quick cross check'''
+class Inrays(list):
+    """
+    Class based on python list for Inray class
+    """
+    def __init__(self):
+        list.__init__(self)
+        variables = ['X','PX','Y','PY','T','PT']
+        for v in variables:
+            self._AddMethod(v)
+
+    def AddParticle(self,x=0.0,px=0.0,y=0.0,py=0.0,t=0.0,pt=0.0):
+        self.append(Inray(x,px,y,py,t,pt))
+
+    def Clear(self):
+        del self[:]
+
+    def Write(self,filename):
+        WriteInrays(filename,self)
+
+    def Plot(self):
+        PlotInrays(self)
+
+    def _AddMethod(self, variablename):
+        """This is used to easily and dynamically add a getter function for a variable name."""
+        def GetAttribute():
+            return _np.array([getattr(p,str.lower(variablename)) for p in self])
+        setattr(self,variablename,GetAttribute)
+
+    def Statistics(self):
+        print 'TBC - will return various moments'
         
-#***********************************************************************************************    
-def LoadInrays(fileName) : 
-    '''Load input rays from file
+def LoadInrays(fileName): 
+    """Load input rays from file
     fileName : inrays.madx 
-    return   : Inrays instance''' 
+    return   : Inrays instance""" 
     i = Inrays()
     
     # open file 
@@ -87,59 +104,63 @@ def LoadInrays(fileName) :
 
         pt = float(inre_pt.group(1))
 
-        i.addParticle(x,px,y,py,t,pt)
-        
+        i.AddParticle(x,px,y,py,t,pt)
 
-    print 'LoadInrays> Loaded ',i.nParticles()
+    print 'LoadInrays> Loaded ',len(i)
     return i
-
-#***********************************************************************************************    
-def WriteInrays(fileName, i) : 
-    
+  
+def WriteInrays(fileName, inrays):
+    print 'pymadx.Ptc> WriteInrays - inrays written to: ',fileName
     f = open(fileName, 'w') 
-    
-    for c in range(0,i.nParticles(),1) : 
-        ptcLine = 'ptc_start, x='+str(i.x[c]) + ', px='+str(i.px[c])+', y='+str(i.y[c])+', py='+str(i.py[c])+', t='+str(i.t[c])+', pt='+str(i.pt[c])+';\n'
-        f.write(ptcLine)
-
+    for particle in inrays:
+        f.write(str(particle))
     f.close()
-
-
-
-#***********************************************************************************************    
-def PlotIntrays(i) : 
-    '''Plot Inrays instance, if input is a sting the instance is created from the file'''    
+   
+def PlotInrays(i): 
+    """Plot Inrays instance, if input is a sting the instance is created from the file"""    
 
     if type(i) == str : 
         i = LoadInrays(i)
         
-    _pl.figure(1) 
-    _pl.clf()
-
-    _pl.subplot(3,2,1)    
-    _pl.hist(i.x,50,histtype='step')
-    _pl.subplot(3,2,2)    
-    _pl.hist(i.px,50,histtype='step')
-
-    _pl.subplot(3,2,3)    
-    _pl.hist(i.y,50,histtype='step')
-    _pl.subplot(3,2,4)    
-    _pl.hist(i.py,50,histtype='step')
-
-    _pl.subplot(3,2,5)    
-    _pl.hist(i.t,50,histtype='step')
-    _pl.subplot(3,2,6)    
-    _pl.hist(i.pt,50,histtype='step')
-
-#***********************************************************************************************    
-class Generator : 
-    '''Simple ptx inray file generator'''
+    f = _plt.figure(1) 
+    f.clf()
     
+    ax = f.add_subplot(3,2,1)    
+    ax.hist(i.X(),50,histtype='step',label='x')
+    ax.text(0.05,0.85,'X',transform=ax.transAxes)
+    ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    ax = f.add_subplot(3,2,2)    
+    ax.hist(i.PX(),50,histtype='step',label='px')
+    ax.text(0.05,0.85,'PX',transform=ax.transAxes)
+    ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    
+    ax = f.add_subplot(3,2,3)    
+    ax.hist(i.Y(),50,histtype='step',label='y')
+    ax.text(0.05,0.85,'Y',transform=ax.transAxes)
+    ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    ax = f.add_subplot(3,2,4)    
+    ax.hist(i.PY(),50,histtype='step',label='py')
+    ax.text(0.05,0.85,'PY',transform=ax.transAxes)
+    ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    
+    ax = f.add_subplot(3,2,5)    
+    ax.hist(i.T(),50,histtype='step',label='t')
+    ax.text(0.05,0.85,'T',transform=ax.transAxes)
+    ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    ax = f.add_subplot(3,2,6)    
+    ax.hist(i.PT(),50,histtype='step',label='pt')
+    ax.text(0.05,0.85,'PT',transform=ax.transAxes)
+    ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    
+    _plt.subplots_adjust(hspace=0.35,wspace=0.15,top=0.98,right=0.98,left=0.05)
+  
+class Generator(object): 
+    """Simple ptx inray file generator"""
     def __init__(self,
                  gemx = 1e-10, betax = 0.1, alfx = 0.0 , 
                  gemy = 1e-10, betay = 0.1, alfy = 0.0,
-                 sigmat = 1e-12, sigmapt= 1e-12) : 
-        '''Simple gaussian beam
+                 sigmat = 1e-12, sigmapt= 1e-12): 
+        """Simple gaussian beam
         gemx   : x geometric emittance 
         betax  : x beta function
         alfx   : x alpha function
@@ -148,7 +169,7 @@ class Generator :
         alfy   : y alpha function 
         sigmat : gaussian spread in time around the reference time 
         sigmapt: gaussian spread in relative energy 
-        '''
+        """
         
         self.gemx    = gemx
         self.betax   = betax
@@ -185,17 +206,15 @@ class Generator :
         s+= 'sT : '+str(self.sigmat)+' spt : '+str(self.sigmapt)
         return s
 
-    def generate(self, nToGenerate = 1000, fileName = 'inrays.madx') : 
-        ''' returns a Inrays structure''' 
+    def Generate(self, nToGenerate=1000, fileName='inrays.madx'): 
+        """ returns an Inrays structure""" 
         i = Inrays()
         
-        for c in range(0,nToGenerate,1) : 
+        for c in range(0,nToGenerate,1):
             rv = _multivariate_normal(self.means,self.sigmas,1)[0]
-            i.addParticle(rv[0],rv[1],rv[2],rv[3],rv[4],rv[5]) 
-#            i.addParticle(0,1e-6,0,0,0,0)
+            i.AddParticle(rv[0],rv[1],rv[2],rv[3],rv[4],rv[5]) 
 
         WriteInrays(fileName,i)
-
         return i
 
     
