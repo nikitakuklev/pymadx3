@@ -8,6 +8,7 @@ General utilities for day to day housekeeping
 """
 
 import os
+import pymadx.Tfs
 
 def CheckFileExists(filename):
     i = 1
@@ -59,3 +60,12 @@ def IndexOfElement(tfsinstance,markername):
         i = 0
         print 'Unknown element name'
     return i
+
+def CheckItsTfs(tfsfile):
+    if type(tfsfile) == str:
+        madx = pymadx.Tfs(tfsfile)
+    elif type(tfsfile) == pymadx.Tfs:
+        madx = tfsfile
+    else:
+        raise IOError("Not pymadx.Tfs file type: "+str(tfsfile))
+    return madx
