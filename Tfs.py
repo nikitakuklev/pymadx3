@@ -1,6 +1,8 @@
 import tarfile
 import numpy as _np
 
+import Plot as _Plot
+
 #object inheritance is only for type comparison
 
 class Tfs(object):
@@ -367,7 +369,12 @@ class Tfs(object):
         print 'Type'.ljust(15,'.'),'Population'
         for item in sorted(populations)[::-1]:
             print item[1].ljust(15,'.'),item[0]
-        
+
+    def Plot(self,filename='optics.pdf'):
+        _Plot.PlotTfsBeta(self,outputfilename=filename)
+
+    def PlotSimple(self,filename='optics.pdf'):
+        _Plot.PlotTfsBetaSimple(self,outputfilename=filename)
 
 
 def Cast(string):
