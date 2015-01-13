@@ -24,6 +24,7 @@ Machine - a list of elements
 
 madxcategories = [
     'drift',
+    'sbend',
     'quadrupole',
     'sextupole'
     ]
@@ -191,7 +192,14 @@ class Machine :
             self.AddMarker(name)
         else:
             self.Append(Element(name,'drift',l=length,**kwargs))
-          
+
+    def AddDipole(self, name='sb', length=0.1, angle=0.001, **kwargs):
+        if self.verbose:
+            print 'AddDipole> ',name,' ',length,' ',kwargs
+        if length < 1e-12:
+            self.AddMarker(name)
+        self.Append(Element(name,'sbend',l=length,angle=angle,**kwargs))
+
     def AddQuadrupole(self, name='qd', length=0.1, k1=0.0, **kwargs):
         self.Append(Element(name,'quadrupole',l=length,k1=k1,**kwargs))
 
@@ -217,6 +225,10 @@ class Machine :
         
     def AddBeam(self, beam=None) : 
         self.beam = beam
+
+    def AddMarker(self):
+        #TBC
+        pass
 
 # General scripts below this point
 
