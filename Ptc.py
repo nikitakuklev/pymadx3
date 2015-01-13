@@ -220,8 +220,8 @@ class GaussGenerator(object):
 class FlatGenerator(object):
     """Simple ptc inray file generator - even distribution"""
     def __init__(self,
-                 mux =0.0, widthx =1e-5,
-                 mupx=0.0, widthpx=1e-5,
+                 mux =0.0, widthx =1e-3,
+                 mupx=0.0, widthpx=1e-3,
                  muy =0.0, widthy =1e-3,
                  mupy=0.0, widthpy=1e-3):
         self.mux     = mux
@@ -247,7 +247,7 @@ class FlatGenerator(object):
         if self.widthy > 0:
             nd +=1
         nperdim = int(nToGenerate**(1/nd))
-        print "FlatGenerator> making array square - there'll be ",nperdim**2,'particles'
+        print "FlatGenerator> making array square - there'll be ",nperdim**nd,'particles'
 
         xmin = self.mux - self.widthx/2.0
         xmax = self.mux + self.widthx/2.0
