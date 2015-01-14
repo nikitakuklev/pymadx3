@@ -246,6 +246,10 @@ class FlatGenerator(object):
             nd +=1
         if self.widthy > 0:
             nd +=1
+        if self.widthpx > 0:
+            nd +=1
+        if self.widthpy > 0:
+            nd +=1
         nperdim = int(nToGenerate**(1/nd))
         print "FlatGenerator> making array square - there'll be ",nperdim**nd,'particles'
 
@@ -259,13 +263,19 @@ class FlatGenerator(object):
         pymax = self.mupy + self.widthpy/2.0
 
         def GetX():
-            return zip(_np.linspace(ymin,ymax,nperdim),_np.linspace(pymin,pymax,nperdim))
+            return _np.linspace(ymin,ymax,nperdim)
 
         def GetY():
-            return zip(_np.linspace(xmin,xmax,nperdim),_np.linspace(pxmin,pxmax,nperdim))
+            return _np.linspace(xmin,xmax,nperdim)
+
+        def GetXp():
+            return _np.linspace(pymin,pymax,nperdim)
+
+        def GetYp():
+            return _np.linspace(pxmin,pxmax,nperdim)
 
         #we don't actually use 'd' here but just take advantage of list comprehensions
-        d = [i.AddParticle(x=x,px=px,y=y,py=py) for y,py in GetX() for x,px in GetY()]
+        d = [i.AddParticle(x=x,px=px,y=y,py=py) for x in GetX() for px in GetXp() for y in GetY() for py in GetYp()]
 
         WriteInrays(fileName,i)
         return i
