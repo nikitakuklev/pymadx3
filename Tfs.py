@@ -245,17 +245,29 @@ class Tfs(object):
         return the index of the beamline element clostest to S 
         """
         s = self.GetColumn('S')
+        l = self.GetColumn('L')
 
         #iterate over beamline and record element if S is between the
         #sposition of that element and then next one
-        ci = [i for i in self.index[0:-1] if (S > s[i] and S < s[i+1])] 
-        ci = ci[0] #return just the first match - should only be one
-
+        #note madx S position is the end of the element by default
+        ci = [i for i in self.index[0:-1] if (S > s[i]-l[i] and S < s[i]+1e-7)]
+        try:
+            ci = ci[0] #return just the first match - should only be one
+        except IndexError:
+            #protect against S positions outside range of machine
+            if S > s[-1]:
+                ci =-1
+            else:
+                ci = 0
         #check the absolute distance to each and return the closest one
-        if abs(S-s[ci]) < abs(S-s[ci+1]) : 
-            return ci 
-        else : 
-            return ci+1 
+        #make robust against s positions outside machine range
+        try:
+            if abs(S-s[ci]) < abs(S-s[ci+1]) : 
+                return ci 
+            else : 
+                return ci+1
+        except IndexError:
+            return ci
 
     def IndexFromName(self,namestring):
         """
