@@ -144,30 +144,31 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     ax  = axesinstance #handy shortcut
     tfs = pymadxtfsobject
 
+    #NOTE madx defines S as the end of the element by default
     #define temporary functions to draw individual objects
     def DrawBend(e,color='b',alpha=1.0):
-        br = _patches.Rectangle((e['S'],-0.1),e['L'],0.2,color=color,alpha=alpha)
+        br = _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color=color,alpha=alpha)
         ax.add_patch(br)
     def DrawQuad(e,color='r',alpha=1.0):
         if e['K1L'] > 0 :
-            qr = _patches.Rectangle((e['S'],0),e['L'],0.2,color=color,alpha=alpha)
+            qr = _patches.Rectangle((e['S']-e['L'],0),e['L'],0.2,color=color,alpha=alpha)
         elif e['K1L'] < 0: 
-            qr = _patches.Rectangle((e['S'],-0.2),e['L'],0.2,color=color,alpha=alpha)
+            qr = _patches.Rectangle((e['S']-e['L'],-0.2),e['L'],0.2,color=color,alpha=alpha)
         else:
             #quadrupole off
-            qr = _patches.Rectangle((e['S'],-0.1),e['L'],0.2,color='#B2B2B2',alpha=0.5) #a nice grey in hex
+            qr = _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color='#B2B2B2',alpha=0.5) #a nice grey in hex
         ax.add_patch(qr)
     def DrawHex(e,color,alpha=1.0):
-        s = e['S']
+        s = e['S']-e['L']
         l = e['L']
         edges = _np.array([[s,-0.1],[s,0.1],[s+l/2.,0.13],[s+l,0.1],[s+l,-0.1],[s+l/2.,-0.13]])
         sr = _patches.Polygon(edges,color=color,fill=True,alpha=alpha)
         ax.add_patch(sr)
     def DrawRect(e,color,alpha=1.0):
-        rect = _patches.Rectangle((e['S'],-0.1),e['L'],0.2,color=color,alpha=alpha)
+        rect = _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color=color,alpha=alpha)
         ax.add_patch(rect)
     def DrawLine(e,color,alpha=1.0):
-        ax.plot([e['S'],e['S']],[-0.2,0.2],'-',color=color,alpha=alpha)
+        ax.plot([e['S']-e['L'],e['S']-e['L']],[-0.2,0.2],'-',color=color,alpha=alpha)
             
     # plot beam line 
     ax.plot([0,tfs.smax],[0,0],'k-',lw=1)
