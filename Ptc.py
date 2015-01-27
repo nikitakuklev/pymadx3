@@ -215,7 +215,7 @@ class GaussGenerator(object):
             i.AddParticle(rv[0],rv[1],rv[2],rv[3],rv[4],rv[5]) 
 
         WriteInrays(fileName,i)
-        return i
+        #return i
 
 class FlatGenerator(object):
     """Simple ptc inray file generator - even distribution"""
@@ -250,7 +250,7 @@ class FlatGenerator(object):
             nd +=1
         if self.widthpy > 0:
             nd +=1
-        nperdim = int(nToGenerate**(1/nd))
+        nperdim = _np.ceil(nToGenerate**(1/nd))
         print "FlatGenerator> making array square - there'll be ",nperdim**nd,'particles'
 
         xmin = self.mux - self.widthx/2.0
@@ -278,4 +278,4 @@ class FlatGenerator(object):
         d = [i.AddParticle(x=x,px=px,y=y,py=py) for x in GetX() for px in GetXp() for y in GetY() for py in GetYp()]
 
         WriteInrays(fileName,i)
-        return i
+        #return i
