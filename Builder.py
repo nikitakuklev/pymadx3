@@ -24,6 +24,7 @@ Machine - a list of elements
 
 madxcategories = [
     'drift',
+    'solenoid',
     'sbend',
     'quadrupole',
     'sextupole'
@@ -229,6 +230,9 @@ class Machine :
     def AddMarker(self):
         #TBC
         pass
+
+    def AddSolenoid(self, name='sl', length=0.1, ks=0.0, **kwargs):
+        self.Append(Element(name,'solenoid',l=length,ks=ks,**kwargs))
 
 # General scripts below this point
 
