@@ -307,7 +307,9 @@ class Tfs(object):
         note not in order
         """
         i = self.ColumnIndex(columnstring)
-        d = {k:v[i] for (k,v) in self.data.iteritems()}
+        d = dict((k,v[i]) for (k,v) in self.data.iteritems())
+        #note we construct the dictionary comprehension in a weird way
+        #here because SL6 uses python2.6 which doesn't have dict comprehension
         return d
 
     def GetRow(self,elementname):
@@ -327,7 +329,8 @@ class Tfs(object):
         given by element name
 
         """
-        d = {k:v for (k,v) in zip(self.columns,self.data[elementname])}
+        #no dictionary comprehension in python2.6 on SL6
+        d = dict(zip(self.columns,self.data[elementname]))
         return d
 
     def GetSegment(self,segmentnumber):
