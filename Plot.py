@@ -16,8 +16,13 @@ from _General import CheckItsTfs as _CheckItsTfs
 import numpy              as _np
 import matplotlib         as _matplotlib
 import matplotlib.patches as _patches
-import matplotlib.pyplot  as _plt
+try:
+    import matplotlib.pyplot  as _plt
+except ImportError:
+    print "pymadx.Plot -> WARNING - plotting will not work on this machine"
+    print "matplotlib.pyplot doesn't exist"
 
+    
 class _My_Axes(_matplotlib.axes.Axes):
     """
     Inherit matplotlib.axes.Axes but override pan action for mouse.
