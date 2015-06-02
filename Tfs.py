@@ -9,33 +9,33 @@ class Tfs(object):
     """
     MADX Tfs file reader
 
-    a = Tfs()
-    a.Load('myfile.tfs')
-    a.Load('myfile.tar.gz') -> extracts from tar file
+    >>> a = Tfs()
+    >>> a.Load('myfile.tfs')
+    >>> a.Load('myfile.tar.gz') -> extracts from tar file
 
     or 
 
-    a = Tfs("myfile.tfs")
+    >>> a = Tfs("myfile.tfs")
 
-    a has data members:
-    header      - dictionary of header items
-    columns     - list of column names
-    formats     - list of format strings for each column
-    data        - dictionary of entries in tfs file by name string
-    sequence    - list of names in the order they appear in the file
-    nitems      - number of items in sequence
+    | `a` has data members:
+    | header      - dictionary of header items
+    | columns     - list of column names
+    | formats     - list of format strings for each column
+    | data        - dictionary of entries in tfs file by name string
+    | sequence    - list of names in the order they appear in the file
+    | nitems      - number of items in sequence
 
     NOTE: if no column "NAME" is found, integer indices are used instead
 
     See the various methods inside a to get different bits of information:
     
-    a.ReportPopulations?
+    >>> a.ReportPopulations?
 
     Examples:
 
-    a.['IP.1'] #returns dict for element named "IP.1"
-    a[:30]     #returns list of dicts for elements up to number 30
-    a[345]     #returns dict for element number 345 in sequence
+    >>> a.['IP.1'] #returns dict for element named "IP.1"
+    >>> a[:30]     #returns list of dicts for elements up to number 30
+    >>> a[345]     #returns dict for element number 345 in sequence
     
     """
     def __init__(self,filename=None):
