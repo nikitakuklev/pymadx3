@@ -105,7 +105,7 @@ class Tfs(object):
             sl        = splitline #shortcut
             if line[0] == '@':
                 #header
-                self.header[sl[1]] = sl[-1].replace('"','')
+                self.header[sl[1]] = Cast(sl[-1])
             elif line[0] == '*':
                 #name
                 self.columns.extend(sl[1:]) #miss *
