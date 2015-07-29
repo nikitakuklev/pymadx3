@@ -19,5 +19,6 @@ import Ptc
 from PtcAnalysis import PtcAnalysis 
 from PtcPlot import PtcPlot 
 from Beam import Beam
+from MadxTfs2Ptc import MadxTfs2Ptc 
 
-__all__ = ['Tfs','TfsArray','Beam','Builder','Plot','Ptc','PtcPlot','PtcAnalysis']
+__all__ = ['Tfs','TfsArray','Beam','Builder','Plot','Ptc','MadxTfs2Ptc','PtcPlot','PtcAnalysis']
