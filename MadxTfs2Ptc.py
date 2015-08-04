@@ -2,7 +2,8 @@ import pymadx as _pymadx
 import numpy as _np
 import re as _re
 
-def MadxTfs2Ptc(input,outputfilename,startname=None,stopname=None,ignorezerolengthitems=True,samplers='all',beampiperadius=0.2,beam=True,usemadxaperture=False) :
+
+def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,ignorezerolengthitems=True,samplers='all',beampiperadius=0.2,beam=True) :
 
     if type(input) == str :
         print 'MadxTfs2Ptc> Loading file using pymadx'
@@ -11,6 +12,8 @@ def MadxTfs2Ptc(input,outputfilename,startname=None,stopname=None,ignorezeroleng
         print 'Already a pymadx instance - proceeding'
         madx   = input
 
+    ptcfilename = ptcfile
+        
     nitems = madx.nitems
     opencollimatorsetting = beampiperadius
 
@@ -91,39 +94,6 @@ def MadxTfs2Ptc(input,outputfilename,startname=None,stopname=None,ignorezeroleng
             continue #this skips the rest of the loop as we're ignoring this item
 
         kws = {} # element-specific keywords
-        """
-        # APERTURE
-        # check if aperture info in tfs file
-        # only use this if aperture info not specified in aperture dict
-        if ( usemadxaperture and (name not in aperturedict) ):
-            if 'APER_1' in madx.columns and 'APER_2' in madx.columns:
-                #elliptical aperture
-                aperX = madx.GetRowDict(name)['APER_1']
-                aperY = madx.GetRowDict(name)['APER_2']
-                if (aperX > 1e-6) and (aperY > 1e-6):
-                    #both apertures must be specified for elliptical
-                    kws['aper1'] = aperX #make sure it's non zero
-                    kws['aper2'] = aperY 
-                elif (aperX > 1e-6):
-                    #resort to circular
-                    kws['aper1'] = aperX #make sure it's non zero
-                else:
-                    pass
-            elif 'APER_1' in madx.columns:
-                #circular aperture
-                aper = madx.GetRowDict(name)['APER_1']
-                if aper > 1e-6:
-                    kws['aper1'] = aper #make sure it's non zero
-
-        # check if aperture info in aperture dict
-        if name in aperturedict:
-            #for now only 1 aperture - circular
-            ap = (aperturedict[name],'m')
-            if ap[0] < 1e-6:
-                ap = (defaultbeampiperadius,'m')
-            if t != 'RCOLLIMATOR':
-                kws['aper'] = ap
-        """
 
         if t == 'DRIFT':
             a.AddDrift(rname,l,**kws)
@@ -144,7 +114,7 @@ def MadxTfs2Ptc(input,outputfilename,startname=None,stopname=None,ignorezeroleng
 
     # Make beam file 
     if beam: 
-        b = MadxTfs2PtcBeam(madx, startname)
+        b = MadxTfs2PtcBeam(madx, ptcfilename, startname)
         a.AddBeam(b)
 
     a.WriteLattice(outputfilename)
@@ -152,7 +122,7 @@ def MadxTfs2Ptc(input,outputfilename,startname=None,stopname=None,ignorezeroleng
     return a
 
 
-def MadxTfs2PtcBeam(tfs, startname=None):
+def MadxTfs2PtcBeam(tfs, ptcfilename,  startname=None):
     if startname == None:
         startindex = 0
     elif type(startname) == int:
@@ -168,8 +138,8 @@ def MadxTfs2PtcBeam(tfs, startname=None):
     
     energy   = float(tfs.header['ENERGY'])
     gamma    = float(tfs.header['GAMMA'])
- #  particle = tfs.header['PARTICLE']      ##FIX THIS STUFF!
-    particle = 'proton' 
+    particle = str.lower(tfs.header['PARTICLE'])      ##FIX THIS STUFF!
+    #particle = 'proton' 
     ex       = tfs.header['EX']
     ey       = tfs.header['EY']
     sigmae   = float(tfs.header['SIGE'])
@@ -177,13 +147,9 @@ def MadxTfs2PtcBeam(tfs, startname=None):
 
     data     = tfs.GetRowDict(tfs.sequence[startindex])
 
-    ptc = _pymadx.Ptc.GaussGenerator(ex,data['BETX'],data['ALFX'],ey,data['BETY'],data['ALFY'],sigmat,sigmae)
-
-    ptc.Generate(1000,'inrays.madx')   ##Fix this thing
-
     beam  = _pymadx.Beam(particle,energy,'ptc')
 
-    beam.SetDistribFileName('inrays.madx') 
+    beam.SetDistribFileName(ptcfilename) 
 
     return beam
 
