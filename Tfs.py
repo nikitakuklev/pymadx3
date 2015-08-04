@@ -204,6 +204,11 @@ class Tfs(object):
         params = ["header","columns","formats","filename"]
         for param in params:
             setattr(self,param,getattr(instance,param))
+        #calculate the maximum s position - could be different based on the slice
+        if 'S' in instance.columns:
+            self.smax = instance[-1]['S']
+        else:
+            self.smax = 0
 
     def _DeepCopy(self,instance):
         self._CopyMetaData(instance)
