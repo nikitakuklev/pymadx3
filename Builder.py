@@ -342,9 +342,9 @@ def WriteLattice(machine, filename, verbose=False):
         f.write('! SAMPLER DEFINITION\n\n')
         for sampler in machine.samplers:
             f.write(str(sampler))
-        f.write('ptc_track, element_by_element, dump, turns=1, icase=5, onetable;')
-        f.write('PTC_TRACK_END;')
-        f.write('ptc_end;')
+        f.write('ptc_track, element_by_element, dump, turns=1, icase=5, onetable;\n')
+        f.write('PTC_TRACK_END;\n')
+        f.write('ptc_end;\n')
         f.close()
 
     # write main file
