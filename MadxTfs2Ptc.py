@@ -103,6 +103,10 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
             k1 = madx.data[name][k1lindex] / l
             a.AddQuadrupole(rname,l,k1=k1,**kws)
 
+        elif t == 'SEXTUPOLE':
+            k2 = madx.data[name][k2lindex] / l
+            a.AddSextupole(rname,l,k2=k2,**kws)
+
         else:
             print 'unknown element type: ',t,' for element named: ',name
             print 'putting drift in instead as it has finite length'
