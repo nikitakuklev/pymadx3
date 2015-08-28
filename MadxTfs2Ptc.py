@@ -1,6 +1,7 @@
 import pymadx as _pymadx
 import numpy as _np
 import re as _re
+import csv
 
 
 def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,ignorezerolengthitems=True,samplers='all',beampiperadius=0.2,beam=True) :
@@ -107,6 +108,14 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
             k2 = madx.data[name][k2lindex] / l
             a.AddSextupole(rname,l,k2=k2,**kws)
 
+        elif t == 'SBEND':
+            angle = madx.data[name][angleindex]
+            a.AddDipole(rname,category='sbend',length=l,angle=angle,**kws)
+
+        elif t == 'RBEND':
+            angle = madx.data[name][angleindex]
+            a.AddDipole(rname,category='rbend',length=l,angle=angle,**kws)
+
         else:
             print 'unknown element type: ',t,' for element named: ',name
             print 'putting drift in instead as it has finite length'
@@ -156,5 +165,8 @@ def MadxTfs2PtcBeam(tfs, ptcfilename,  startname=None):
     beam.SetDistribFileName(ptcfilename) 
 
     return beam
+
+
+  
 
     
