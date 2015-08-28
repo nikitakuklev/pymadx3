@@ -26,6 +26,7 @@ madxcategories = [
     'drift',
     'solenoid',
     'sbend',
+    'rbend',
     'quadrupole',
     'sextupole'
     ]
@@ -194,12 +195,18 @@ class Machine :
         else:
             self.Append(Element(name,'drift',l=length,**kwargs))
 
-    def AddDipole(self, name='sb', length=0.1, angle=0.001, **kwargs):
+    def AddDipole(self, name='dp', category='sbend', length=0.1, angle=0.001, **kwargs):
+        """
+        AddDiople(category='sbend')
+
+        category - 'sbend' or 'rbend' - sector or rectangular bend
+        """
         if self.verbose:
             print 'AddDipole> ',name,' ',length,' ',kwargs
         if length < 1e-12:
             self.AddMarker(name)
-        self.Append(Element(name,'sbend',l=length,angle=angle,**kwargs))
+        self.Append(Element(name,category,l=length,angle=angle,**kwargs))
+
 
     def AddQuadrupole(self, name='qd', length=0.1, k1=0.0, **kwargs):
         self.Append(Element(name,'quadrupole',l=length,k1=k1,**kwargs))
