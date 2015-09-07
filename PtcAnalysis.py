@@ -145,6 +145,7 @@ class PtcAnalysis(object) :
             #Calculate sigmas
             sigma_x_xp = xxp_s - xx_s * xp_s;
             sigma_y_yp = yyp_s - y_s * yp_s;
+            
         
             #Calculate the moments using the sums
             xx_s   -= x_s*x_s
@@ -172,7 +173,6 @@ class PtcAnalysis(object) :
                 disp_y  = (yE_s  - (y_s  * E_s)) / (EE_s - (E_s * E_s))
                 disp_yp = (ypE_s - (yp_s * E_s)) / (EE_s - (E_s * E_s))
 
-            #### error calculations to be added
 
             sampler.append(isampler)
             S.append(s_s)            
@@ -199,7 +199,7 @@ class PtcAnalysis(object) :
             Wgt.append(wgt)
 
         #prepare header    
-        header = ['Segment','S[m]','Beta_x[m]','Beta_y[m]','Alph_x','Aplh_y']
+        header = ['Segment','S[m]','Beta_x[m]','Beta_y[m]','Alph_x','Alph_y']
         header.extend(['Disp_x','Disp_xp','Disp_y','Disp_yp'])
         header.extend(['Emitt_x','Emitt_y'])
         header.extend(['Sigma_x[m]','Sigma_y[m]','Sigma_xp[rad]','Sigma_yp[rad]'])
@@ -209,28 +209,29 @@ class PtcAnalysis(object) :
         #prepare optical function arrays for writing to file
 
         for i in range(len(S)):
-            S[i]=float("{0:.4e}".format(S[i]))
-            betx[i]=float("{0:.4e}".format(betx[i]))
-            bety[i]=float("{0:.4e}".format(bety[i]))
-            alphx[i]=float("{0:.4e}".format(alphx[i]))
-            alphy[i]=float("{0:.4e}".format(alphy[i]))
-            dispx[i]=float("{0:.4e}".format(dispx[i]))
-            dispy[i]=float("{0:.4e}".format(dispy[i]))
-            dispxp[i]=float("{0:.4e}".format(dispxp[i]))
-            dispyp[i]=float("{0:.4e}".format(dispyp[i]))
-            emittx[i]=float("{0:.4e}".format(emittx[i]))
-            emitty[i]=float("{0:.4e}".format(emitty[i]))
-            sigmax[i]=float("{0:.4e}".format(sigmax[i]))
-            sigmay[i]=float("{0:.4e}".format(sigmay[i]))
-            sigmaxp[i]=float("{0:.4e}".format(sigmaxp[i]))
-            sigmayp[i]=float("{0:.4e}".format(sigmayp[i]))
-            sigmaxxp[i]=float("{0:.4e}".format(sigmaxxp[i]))
-            sigmayyp[i]=float("{0:.4e}".format(sigmayyp[i]))
-            meanx[i]=float("{0:.4e}".format(meanx[i]))
-            meany[i]=float("{0:.4e}".format(meany[i]))
-            meanxp[i]=float("{0:.4e}".format(meanxp[i]))
-            meanyp[i]=float("{0:.4e}".format(meanyp[i]))
-            Wgt[i]=float("{0:.4e}".format(Wgt[i]))
+        
+            S[i]=float("{0:.10e}".format(S[i]))
+            betx[i]=float("{0:.10e}".format(betx[i]))
+            bety[i]=float("{0:.10e}".format(bety[i]))
+            alphx[i]=float("{0:.10e}".format(alphx[i]))
+            alphy[i]=float("{0:.10e}".format(alphy[i]))
+            dispx[i]=float("{0:.10e}".format(dispx[i]))
+            dispy[i]=float("{0:.10e}".format(dispy[i]))
+            dispxp[i]=float("{0:.10e}".format(dispxp[i]))
+            dispyp[i]=float("{0:.10e}".format(dispyp[i]))
+            emittx[i]=float("{0:.10e}".format(emittx[i]))
+            emitty[i]=float("{0:.10e}".format(emitty[i]))
+            sigmax[i]=float("{0:.10e}".format(sigmax[i]))
+            sigmay[i]=float("{0:.10e}".format(sigmay[i]))
+            sigmaxp[i]=float("{0:.10e}".format(sigmaxp[i]))
+            sigmayp[i]=float("{0:.10e}".format(sigmayp[i]))
+            sigmaxxp[i]=float("{0:.10e}".format(sigmaxxp[i]))
+            sigmayyp[i]=float("{0:.10e}".format(sigmayyp[i]))
+            meanx[i]=float("{0:.10e}".format(meanx[i]))
+            meany[i]=float("{0:.10e}".format(meany[i]))
+            meanxp[i]=float("{0:.10e}".format(meanxp[i]))
+            meanyp[i]=float("{0:.10e}".format(meanyp[i]))
+            Wgt[i]=float("{0:.10e}".format(Wgt[i]))
 
         with open(output,'w') as ofile:        
             writer=csv.writer(ofile, delimiter='\t',lineterminator='\n',)
