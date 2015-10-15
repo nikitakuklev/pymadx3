@@ -130,7 +130,7 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
         b = MadxTfs2PtcBeam(madx, ptcfilename, startname)
         a.AddBeam(b)
 
-    a.WriteLattice(outputfilename)
+    a.Write(outputfilename)
 
     return a
 
