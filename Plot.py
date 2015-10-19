@@ -180,7 +180,7 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     ax.set_ylim(-0.5,0.5)
  
     # loop over elements and Draw on beamline
-    for element in c :
+    for element in tfs:
         kw = element['KEYWORD']
         if kw == 'QUADRUPOLE': 
             DrawQuad(element)
