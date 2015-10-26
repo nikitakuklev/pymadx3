@@ -85,6 +85,8 @@ class Aperture(_Tfs):
             nonzeros = apervalues > self._tolerance
             nonzero  = nonzeros.any() #if any are true
             if nonzero:
+                if item['APER_1'] < self._tolerance:
+                    continue # aper1 must at least be non zero
                 key = self.sequence[self._iterindex]
                 a._AppendDataEntry(key, self.data[key])
         a._UpdateCache()
