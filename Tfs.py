@@ -372,8 +372,13 @@ class Tfs(object):
         GetElementsOfType(['SBEND','RBEND'])
         GetElementsOfType(('SBEND','RBEND','QUADRUPOLE'))
 
-        """        
-        i = self.ColumnIndex('KEYWORD')
+        """
+        if 'KEYWORD' in self.columns:
+            i = self.ColumnIndex('KEYWORD')
+        elif 'APERTYPE' in self.columns:
+            i = self.ColumnIndex('APERTYPE')
+        else:
+            i = 0
         return [name for name in self.sequence if self.data[name][i] in typename]
 
     def ReportPopulations(self):
@@ -381,9 +386,15 @@ class Tfs(object):
         Print out all the population of each type of
         element in the beam line (sequence)
         """
-        print 'Filename > ',self.filename
-        print 'Total number of items > ',self.nitems
-        i = self.ColumnIndex('KEYWORD')
+        print 'Filename >',self.filename
+        print 'Total number of items >',self.nitems
+        if 'KEYWORD' in self.columns:
+            i = self.ColumnIndex('KEYWORD')
+        elif 'APERTYPE' in self.columns:
+            i = self.ColumnIndex('APERTYPE')
+        else:
+            raise KeyError("No keyword or apertype columns in this Tfs file")
+        
         keys = set([self.data[name][i] for name in self.sequence])
         populations = [(len(self.GetElementsOfType(key)),key) for key in keys]
         print 'Type'.ljust(15,'.'),'Population'
