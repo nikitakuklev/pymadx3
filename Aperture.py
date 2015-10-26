@@ -66,6 +66,8 @@ class Aperture(_Tfs):
         for key in aperkeystocheck:
             if key in self.columns:
                 aperkeys.append(key)
+            else:
+                print key,' will be ignored as not in this aperture Tfs file'
         if len(aperkeys) == 0:
             raise KeyError("This file does not contain APER_1,2,3 or 4 - required!")
 
