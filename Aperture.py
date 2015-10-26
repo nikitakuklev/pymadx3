@@ -20,7 +20,7 @@ class Aperture(_Tfs):
         else:
             self.debug = False
         # the tolerance below which, the aperture is considered 0
-        self._tolerance = 1e-10
+        self._tolerance = 1e-6
         self._UpdateCache()
         
     def _UpdateCache(self):
@@ -54,6 +54,12 @@ class Aperture(_Tfs):
             #self._aper4 = self.GetColumn('APER_4')  
         except ValueError:
             pass
+
+    def SetZeroTolerance(self, tolerance):
+        """
+        Set the value below which aperture values are considered 0.
+        """
+        self._tolerance = tolerance
 
     def GetNonZeroItems(self):
         """
