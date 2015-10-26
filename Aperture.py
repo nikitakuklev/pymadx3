@@ -84,6 +84,36 @@ class Aperture(_Tfs):
         a._UpdateCache()
         return a
 
+    def RemoveAboveValue(self, limits=8, keys='all'):
+        if keys == 'all':
+            aperkeystocheck = ['APER_%s' %n for n in [1,2,3,4]]
+        elif type(keys) in (float, int):
+            aperkeystocheck = [keys]
+        elif type(keys) in (list, tuple):
+            aperkeystocheck = list(keys)
+
+        limitvals = _np.array(limits) # works for single value, list or tuple in comparison
+
+        # check validity of the supplied keys
+        aperkeys = []
+        for key in aperkeystocheck:
+            if key in self.columns:
+                aperkeys.append(key)
+            else:
+                print key,' will be ignored as not in this aperture Tfs file'
+
+        a = Aperture()
+        a._CopyMetaData(self)
+        for item in self:
+            apervals = _np.array([item[key] for key in aperkeys])
+            abovelimit = apervals > limitvals
+            abovelimittotal = abovelimit.any() # if any are true
+            if not abovelimittotal:
+                key = self.sequence[self._iterindex]
+                a._AppendDataEntry(key, self.data[key])
+        a._UpdateCache()
+        return a
+
     def _GetIndexInCacheOfS(self, sposition):
         index = _bisect(self._ssorted, sposition)
         if index > 0:
