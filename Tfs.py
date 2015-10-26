@@ -162,7 +162,6 @@ class Tfs(object):
 
     def __getitem__(self,index):
         #return single item or slice of lattice
-        print index
         if type(index) == slice:
             start,stop,step = index.start, index.stop, index.step #note slices are immutable
             #test values incase of ':' use
@@ -183,6 +182,10 @@ class Tfs(object):
                 start = start
                 stop  = len(self)
                 step  = 1
+            elif start != None and stop == None and step < 0:
+                start = start
+                stop  = -1
+                step  = step
             elif start == None and stop != None and step > 0:
                 # [:stop:step]
                 start = 0
@@ -199,7 +202,6 @@ class Tfs(object):
                 stop  = stop
                 step  = step
             index = slice(start,stop,step)
-            print index
             #construct and return a new instance of the class
             a = Tfs()
             a._CopyMetaData(self)
