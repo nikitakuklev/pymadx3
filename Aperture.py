@@ -142,6 +142,17 @@ class Aperture(_Tfs):
         """
         return self.GetRow(name)
 
+    def ReplaceType(self, existingType, replacementType):
+        et = existingType    #shortcut
+        rt = replacementType #shortcut
+        index = self.columns.index('APERTYPE')
+        for item in self:
+            try:
+                if item['APERTYPE'] == et:
+                    self.data[item['NAME']][index] = rt
+            except KeyError:
+                return
+
     def ShouldSplit(self, rowDictionary):
         """
         Suggest whether a given element should be split as the aperture information
