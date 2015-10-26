@@ -4,6 +4,15 @@ import numpy as _np
 
 
 class Aperture(_Tfs):
+    """
+    A class based on (which inherits) the Tfs class for reading aperture information.
+    This allows madx aperture information in Tfs format to be loaded, filtered and 
+    queried. This also provides the ability to suggest whether an element should be
+    split and therefore what the aperture should be.
+
+    This class maintains a cache of aperture information as a function of S position.
+
+    """
     def __init__(self, *args, **kwargs):
         _Tfs.__init__(self, *args, **kwargs)
         if 'debug' in kwargs:
@@ -47,6 +56,10 @@ class Aperture(_Tfs):
             pass
 
     def GetNonZeroItems(self):
+        """
+        Return a copy of this class with all non-zero items removed.
+
+        """
         # prepare list of relevant aperture keys to check
         aperkeys = []
         aperkeystocheck = ['APER_%s' %n for n in [1,2,3,4]]
@@ -77,12 +90,32 @@ class Aperture(_Tfs):
             return index
 
     def GetApertureAtS(self, sposition):
+        """
+        Return a dictionary of the aperture information specified at the closest
+        S position to that requested - may be before or after that point.
+        """
         return self[self._GetIndexInCacheOfS(sposition)]
         
     def GetApertureForElementNamed(self, name):
+        """
+        Return a dictionary of the aperture information by the name of the element.
+        """
         return self.GetRow(name)
 
     def ShouldSplit(self, rowDictionary):
+        """
+        Suggest whether a given element should be split as the aperture information
+        in this class suggests multiple aperture changes within the element.
+
+        Returns bool, [], []
+        
+        which are in order:
+
+        bool - whether to split or not
+        []   - list of lengths of each suggested split
+        []   - list of the aperture dictionaries for each one
+
+        """
         l      = rowDictionary['L']
         sEnd   = rowDictionary['S']
         sStart = sEnd -l
