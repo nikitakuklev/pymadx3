@@ -165,42 +165,46 @@ class Tfs(object):
         if type(index) == slice:
             start,stop,step = index.start, index.stop, index.step #note slices are immutable
             #test values incase of ':' use
+            if step != None and type(step) != int:
+                raise ValueError("Invalid step "+step)
             if start != None and stop != None and step != None:
                 # [start:stop:step]
-                pass
+                start = self._EnsureItsAnIndex(start)
+                stop  = self._EnsureItsAnIndex(stop)
+            elif start != None and stop != None and step == None:
+                # [start:stop]
+                start = self._EnsureItsAnIndex(start)
+                stop  = self._EnsureItsAnIndex(stop)
+                step  = 1
             elif start == None and stop == None and step < 0:
                 # [::-step]
                 start = len(self) - 1
                 stop  = -1 # range limit needs to be past 0
             elif start != None and stop == None and step > 0:
                 # [start::step]
-                start = start
+                start = self._EnsureItsAnIndex(start)
                 stop  = len(self)
-                step  = step
             elif start != None and stop == None and step == None:
                 # [start::]
-                start = start
+                start = self._EnsureItsAnIndex(start)
                 stop  = len(self)
                 step  = 1
             elif start != None and stop == None and step < 0:
-                start = start
+                start = self._EnsureItsAnIndex(start)
                 stop  = -1
-                step  = step
             elif start == None and stop != None and step > 0:
                 # [:stop:step]
                 start = 0
-                stop  = stop
-                step  = step
+                stop  = self._EnsureItsAnIndex(stop)
             elif start == None and stop != None and step == None:
                 # [:stop]
                 start = 0
-                stop  = stop
+                stop  = self._EnsureItsAnIndex(stop)
                 step  = 1
             elif start == None and stop != None and step < 0:
                 # [:stop:-step]
                 start = 0
-                stop  = stop
-                step  = step
+                stop  = self._EnsureItsAnIndex(stop)
             index = slice(start,stop,step)
             #construct and return a new instance of the class
             a = Tfs()
@@ -300,6 +304,12 @@ class Tfs(object):
                 return ci+1
         except IndexError:
             return ci
+
+    def _EnsureItsAnIndex(self, value):
+        if type(value) == str:
+            return self.IndexFromName(value)
+        else:
+            return value
 
     def IndexFromName(self,namestring):
         """
