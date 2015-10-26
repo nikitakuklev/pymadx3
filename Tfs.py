@@ -162,22 +162,47 @@ class Tfs(object):
 
     def __getitem__(self,index):
         #return single item or slice of lattice
+        print index
         if type(index) == slice:
             start,stop,step = index.start, index.stop, index.step #note slices are immutable
             #test values incase of ':' use
-            if start == None:
+            if start != None and stop != None and step != None:
+                # [start:stop:step]
+                pass
+            elif start == None and stop == None and step < 0:
+                # [::-step]
+                start = len(self) - 1
+                stop  = -1 # range limit needs to be past 0
+            elif start != None and stop == None and step > 0:
+                # [start::step]
+                start = start
+                stop  = len(self)
+                step  = step
+            elif start != None and stop == None and step == None:
+                # [start::]
+                start = start
+                stop  = len(self)
+                step  = 1
+            elif start == None and stop != None and step > 0:
+                # [:stop:step]
                 start = 0
-            if stop  == None:
-                stop = len(self)
-            #prepare step integer - allow reverse stepping too
-            if (step == None) and (stop > start):
-                step = 1
-            elif (step == None) and (start > stop):
-                step = -1
+                stop  = stop
+                step  = step
+            elif start == None and stop != None and step == None:
+                # [:stop]
+                start = 0
+                stop  = stop
+                step  = 1
+            elif start == None and stop != None and step < 0:
+                # [:stop:-step]
+                start = 0
+                stop  = stop
+                step  = step
             index = slice(start,stop,step)
+            print index
             #construct and return a new instance of the class
             a = Tfs()
-            a._CopyMetaData(self) #UNFINISHED - slice should return class instance (for iteration)
+            a._CopyMetaData(self)
             f = [a._AppendDataEntry(self.sequence[i],self.data[self.sequence[i]]) for i in range(index.start,index.stop,index.step)]
             del f
             return a
