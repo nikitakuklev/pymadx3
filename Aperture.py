@@ -66,6 +66,7 @@ class Aperture(_Tfs):
         Return a copy of this class with all non-zero items removed.
 
         """
+        print 'Aperture> removing zero aperture items'
         # prepare list of relevant aperture keys to check
         aperkeys = []
         aperkeystocheck = ['APER_%s' %n for n in [1,2,3,4]]
@@ -93,6 +94,7 @@ class Aperture(_Tfs):
         return a
 
     def RemoveAboveValue(self, limits=8, keys='all'):
+        print 'Aperture> removing any aperture entries above',limits
         if keys == 'all':
             aperkeystocheck = ['APER_%s' %n for n in [1,2,3,4]]
         elif type(keys) in (float, int):
@@ -143,6 +145,7 @@ class Aperture(_Tfs):
         return self.GetRow(name)
 
     def ReplaceType(self, existingType, replacementType):
+        print 'Aperture> replacing ',existingType,'with',replacementType
         et = existingType    #shortcut
         rt = replacementType #shortcut
         index = self.columns.index('APERTYPE')
