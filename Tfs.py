@@ -176,7 +176,8 @@ class Tfs(object):
                 start = self._EnsureItsAnIndex(start)
                 stop  = self._EnsureItsAnIndex(stop)
                 step  = 1
-            elif start == None and stop == None and step > 1:
+            elif start == None and stop == None and step > 0:
+                # [::step]
                 start = 0
                 stop  = len(self)
             elif start == None and stop == None and step < 0:
@@ -193,6 +194,7 @@ class Tfs(object):
                 stop  = len(self)
                 step  = 1
             elif start != None and stop == None and step < 0:
+                # [start::-step]
                 start = self._EnsureItsAnIndex(start)
                 stop  = -1
             elif start == None and stop != None and step > 0:
