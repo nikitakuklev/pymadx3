@@ -148,7 +148,11 @@ class Aperture(_Tfs):
         print 'Aperture> replacing ',existingType,'with',replacementType
         et = existingType    #shortcut
         rt = replacementType #shortcut
-        index = self.columns.index('APERTYPE')
+        try:
+            index = self.columns.index('APERTYPE')
+        except ValueError:
+            print 'No apertype column, therefore no type to replace'
+            return
         for item in self:
             try:
                 if item['APERTYPE'] == et:
