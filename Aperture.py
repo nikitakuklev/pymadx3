@@ -145,7 +145,7 @@ class Aperture(_Tfs):
         return self.GetRow(name)
 
     def ReplaceType(self, existingType, replacementType):
-        print 'Aperture> replacing ',existingType,'with',replacementType
+        print 'Aperture> replacing',existingType,'with',replacementType
         et = existingType    #shortcut
         rt = replacementType #shortcut
         try:
