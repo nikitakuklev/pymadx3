@@ -195,7 +195,9 @@ class Aperture(_Tfs):
         shouldSplit = _np.array([bdA1, bdA2, bdA3, bdA4]).any()    
 
         if not shouldSplit:
-            return False, [], []
+            # return false and the aperture model to be use for the whole item
+            sMid = (sEnd - sStart) / 2
+            return False, [l], [self.GetApertureAtS(sMid)]
         else:
             if self.debug:
                 print 'Recommend splitting element'
