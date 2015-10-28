@@ -182,10 +182,10 @@ class Aperture(_Tfs):
 
         # calculate differentials of aperture values in range of the element
         # test if any are non-zero
-        bdA1 = _np.diff(self._aper1[indexStart:indexEnd]) != 0
-        bdA2 = _np.diff(self._aper2[indexStart:indexEnd]) != 0
-        bdA3 = _np.diff(self._aper3[indexStart:indexEnd]) != 0
-        bdA4 = _np.diff(self._aper4[indexStart:indexEnd]) != 0
+        bdA1 = _np.diff(self._aper_1[indexStart:indexEnd]) != 0
+        bdA2 = _np.diff(self._aper_2[indexStart:indexEnd]) != 0
+        bdA3 = _np.diff(self._aper_3[indexStart:indexEnd]) != 0
+        bdA4 = _np.diff(self._aper_4[indexStart:indexEnd]) != 0
         
         # find if there are any changes in aperture for any parameter
         shouldSplit = _np.array([bdA1, bdA2, bdA3, bdA4]).any()    
