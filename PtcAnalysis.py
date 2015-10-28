@@ -265,8 +265,8 @@ class PtcAnalysis(object) :
             sigma_beta_y = _np.sqrt(var_beta_y)
 
             d_alx_d_xx   = -(xxp_s*xpxp_s)/(2*(xx_s*xpxp_s - xxp_s*xxp_s)**(3./2.))
-            d_alx_d_xxp  = -(xx_s*xxp_s)/((xx_s*xpxp_s - xxp_s*xxp_s)**(3./2.))
-            d_alx_d_xpxp = (xx_s*xpxp_s)/(2*(xx_s*xpxp_s - xxp_s*xxp_s)**(3./2.))
+            d_alx_d_xxp  = (xx_s*xpxp_s)/((xx_s*xpxp_s - xxp_s*xxp_s)**(3./2.))
+            d_alx_d_xpxp = -(xx_s*xxp_s)/(2*(xx_s*xpxp_s - xxp_s*xxp_s)**(3./2.))
 
             var_alph_x = (d_alx_d_xx)**2*cov_vv_x+(d_alx_d_xxp)**2*cov_cc_xxp_xxp+(d_alx_d_xpxp)**2*cov_vv_xp
             var_alph_x+= 2*(d_alx_d_xx*d_alx_d_xxp)*cov_vc_x_xxp+2*(d_alx_d_xx*d_alx_d_xpxp)*cov_vv_x_xp
@@ -276,15 +276,16 @@ class PtcAnalysis(object) :
 
             
             d_aly_d_yy   = -(yyp_s*ypyp_s)/(2*(yy_s*ypyp_s - yyp_s*yyp_s)**(3./2.))
-            d_aly_d_yyp  = -(yy_s*yyp_s)/((yy_s*ypyp_s - yyp_s*yyp_s)**(3./2.))
-            d_aly_d_ypyp = (yy_s*ypyp_s)/(2*(yy_s*ypyp_s - yyp_s*yyp_s)**(3./2.))
+            d_aly_d_yyp  = (yy_s*ypyp_s)/((yy_s*ypyp_s - yyp_s*yyp_s)**(3./2.))
+            d_aly_d_ypyp = -(yy_s*yyp_s)/(2*(yy_s*ypyp_s - yyp_s*yyp_s)**(3./2.))
 
             var_alph_y = (d_aly_d_yy)**2*cov_vv_y+(d_aly_d_yyp)**2*cov_cc_yyp_yyp+(d_aly_d_ypyp)**2*cov_vv_yp
             var_alph_y+= 2*(d_aly_d_yy*d_aly_d_yyp)*cov_vc_y_yyp+2*(d_aly_d_yy*d_aly_d_ypyp)*cov_vv_y_yp
             var_alph_y+= 2*(d_aly_d_yyp*d_aly_d_ypyp)*cov_vc_yp_yyp
             
             sigma_alph_y = _np.sqrt(var_alph_y)
-
+            
+            """
             print "mx_2_0= ",mx_2_0,", mx_0_2= ",mx_0_2,", mx_1_1= ",mx_1_1
             print "mx_4_0= ",mx_4_0,", mx_0_4= ",mx_0_4
             print "mx_3_1= ",mx_3_1,", mx_1_3= ",mx_1_3,", mx_2_2= ",mx_2_2
@@ -305,7 +306,7 @@ class PtcAnalysis(object) :
             print "Emiitance_x= ",emitt_x," Sigma_Emittance_x = ",sigma_emitt_x, " Frac error= ", sigma_emitt_x/emitt_x 
             print "Beta_x= ",beta_x," Sigma_Beta_x = ",sigma_beta_x, " Frac error= ", sigma_beta_x/beta_x
             print "Alpha_x= ",alph_x," Sigma_Alpha_x = ",sigma_alph_x, " Frac error= ", sigma_alph_x/alph_x
-
+            """
 
             sampler.append(isampler)
             S.append(s_s)            
