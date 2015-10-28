@@ -48,10 +48,6 @@ class Aperture(_Tfs):
         try:
             for key in ['APER_1', 'APER_2', 'APER_3', 'APER_4']:
                 setattr(self, '_'+str.lower(key), self.GetColumn(key))
-                #self._aper1 = self.GetColumn('APER_1')
-            #self._aper2 = self.GetColumn('APER_2')
-            #self._aper3 = self.GetColumn('APER_3')
-            #self._aper4 = self.GetColumn('APER_4')  
         except ValueError:
             pass
 
