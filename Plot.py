@@ -105,8 +105,8 @@ def PlotTfsBeta(tfsfile, title='',outputfilename=None):
 def AddMachineLatticeToFigure(figure,tfsfile):
     tfs = _CheckItsTfs(tfsfile) #load the machine description
 
-    axs = figure.get_axes() #get the existing graph
-    axoptics = axs[0]  #get the only presumed axes from the figure
+    axs = figure.get_axes() # get the existing graph
+    axoptics = axs[0]       # get the only presumed axes from the figure
 
     #adjust existing plot to make way for machine lattice
     #iterate over axes incase there's dual plots

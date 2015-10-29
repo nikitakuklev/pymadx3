@@ -181,11 +181,12 @@ class Machine :
         self.sequence.append(object.name)
         self.length += object.length
 
-    def WriteLattice(self,filename,verbose=False):
-        if self.verbose or verbose:
-            WriteLattice(self,filename,True)
-        else:
-            WriteLattice(self,filename,False)
+    def Write(self,filename,verbose=False):
+        """
+        Write the machine to a series of gmad files.
+        """
+        verboseresult = verbose or self.verbose
+        WriteMachine(self,filename,verboseresult)
 
     def AddDrift(self, name='dr', length=0.1, **kwargs):
         if self.verbose:
@@ -259,9 +260,9 @@ class ParamInput :
         for l in f : 
             pass
 
-def WriteLattice(machine, filename, verbose=False):
+def WriteMachine(machine, filename, verbose=False):
     """
-    WriteLattice(machine(machine),filename(string),verbose(bool))
+    WriteMachine(machine(machine),filename(string),verbose(bool))
 
     Write a lattice to disk. This writes several files to make the
     machine, namely:
@@ -305,7 +306,7 @@ def WriteLattice(machine, filename, verbose=False):
     f = open(fn_components,'w')
     files.append(fn_components)
     f.write(timestring)
-    f.write('! pymadx.Builder Lattice \n')
+    f.write('! pymadx.Builder Machine \n')
     f.write('! COMPONENT DEFINITION\n\n')
     for element in machine.elements:
         f.write(str(element))
@@ -315,7 +316,7 @@ def WriteLattice(machine, filename, verbose=False):
     f = open(fn_sequence,'w')
     files.append(fn_sequence)
     f.write(timestring)
-    f.write('! pymadx.Builder Lattice \n')
+    f.write('! pymadx.Builder Machine \n')
     f.write('! LATTICE SEQUENCE DEFINITION\n\n')
     sequencechunks = _General.Chunks(machine.sequence,elementsperline)
     linelist = []
@@ -345,7 +346,7 @@ def WriteLattice(machine, filename, verbose=False):
         f = open(fn_samplers,'w')
         files.append(fn_samplers)
         f.write(timestring)
-        f.write('! pymadx.Builder Lattice \n')
+        f.write('! pymadx.Builder Machine \n')
         f.write('! SAMPLER DEFINITION\n\n')
         for sampler in machine.samplers:
             f.write(str(sampler))
@@ -357,7 +358,7 @@ def WriteLattice(machine, filename, verbose=False):
     # write main file
     f = open(fn_main,'w')
     f.write(timestring)
-    f.write('! pymadx.Builder Lattice \n')
+    f.write('! pymadx.Builder Machine \n')
     f.write('! number of elements = ' + str(len(machine.elements)) + '\n')
     f.write('! total length       = ' + str(machine.length) + ' m\n\n')
     
@@ -367,7 +368,7 @@ def WriteLattice(machine, filename, verbose=False):
     f.close()
 
     #user feedback
-    print 'Lattice written to:'
+    print 'Machine written to:'
     for fn in files:
         print(fn)
     print 'All included in main file: \n',fn_main

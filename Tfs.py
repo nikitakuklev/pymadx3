@@ -165,19 +165,55 @@ class Tfs(object):
         if type(index) == slice:
             start,stop,step = index.start, index.stop, index.step #note slices are immutable
             #test values incase of ':' use
-            if start == None:
+            if step != None and type(step) != int:
+                raise ValueError("Invalid step "+step)
+            if start != None and stop != None and step != None:
+                # [start:stop:step]
+                start = self._EnsureItsAnIndex(start)
+                stop  = self._EnsureItsAnIndex(stop)
+            elif start != None and stop != None and step == None:
+                # [start:stop]
+                start = self._EnsureItsAnIndex(start)
+                stop  = self._EnsureItsAnIndex(stop)
+                step  = 1
+            elif start == None and stop == None and step > 0:
+                # [::step]
                 start = 0
-            if stop  == None:
-                stop = len(self)
-            #prepare step integer - allow reverse stepping too
-            if (step == None) and (stop > start):
-                step = 1
-            elif (step == None) and (start > stop):
-                step = -1
+                stop  = len(self)
+            elif start == None and stop == None and step < 0:
+                # [::-step]
+                start = len(self) - 1
+                stop  = -1 # range limit needs to be past 0
+            elif start != None and stop == None and step > 0:
+                # [start::step]
+                start = self._EnsureItsAnIndex(start)
+                stop  = len(self)
+            elif start != None and stop == None and step == None:
+                # [start::]
+                start = self._EnsureItsAnIndex(start)
+                stop  = len(self)
+                step  = 1
+            elif start != None and stop == None and step < 0:
+                # [start::-step]
+                start = self._EnsureItsAnIndex(start)
+                stop  = -1
+            elif start == None and stop != None and step > 0:
+                # [:stop:step]
+                start = 0
+                stop  = self._EnsureItsAnIndex(stop)
+            elif start == None and stop != None and step == None:
+                # [:stop]
+                start = 0
+                stop  = self._EnsureItsAnIndex(stop)
+                step  = 1
+            elif start == None and stop != None and step < 0:
+                # [:stop:-step]
+                start = 0
+                stop  = self._EnsureItsAnIndex(stop)
             index = slice(start,stop,step)
             #construct and return a new instance of the class
             a = Tfs()
-            a._CopyMetaData(self) #UNFINISHED - slice should return class instance (for iteration)
+            a._CopyMetaData(self)
             f = [a._AppendDataEntry(self.sequence[i],self.data[self.sequence[i]]) for i in range(index.start,index.stop,index.step)]
             del f
             return a
@@ -273,6 +309,12 @@ class Tfs(object):
                 return ci+1
         except IndexError:
             return ci
+
+    def _EnsureItsAnIndex(self, value):
+        if type(value) == str:
+            return self.IndexFromName(value)
+        else:
+            return value
 
     def IndexFromName(self,namestring):
         """
@@ -372,8 +414,13 @@ class Tfs(object):
         GetElementsOfType(['SBEND','RBEND'])
         GetElementsOfType(('SBEND','RBEND','QUADRUPOLE'))
 
-        """        
-        i = self.ColumnIndex('KEYWORD')
+        """
+        if 'KEYWORD' in self.columns:
+            i = self.ColumnIndex('KEYWORD')
+        elif 'APERTYPE' in self.columns:
+            i = self.ColumnIndex('APERTYPE')
+        else:
+            i = 0
         return [name for name in self.sequence if self.data[name][i] in typename]
 
     def ReportPopulations(self):
@@ -381,9 +428,15 @@ class Tfs(object):
         Print out all the population of each type of
         element in the beam line (sequence)
         """
-        print 'Filename > ',self.filename
-        print 'Total number of items > ',self.nitems
-        i = self.ColumnIndex('KEYWORD')
+        print 'Filename >',self.filename
+        print 'Total number of items >',self.nitems
+        if 'KEYWORD' in self.columns:
+            i = self.ColumnIndex('KEYWORD')
+        elif 'APERTYPE' in self.columns:
+            i = self.ColumnIndex('APERTYPE')
+        else:
+            raise KeyError("No keyword or apertype columns in this Tfs file")
+        
         keys = set([self.data[name][i] for name in self.sequence])
         populations = [(len(self.GetElementsOfType(key)),key) for key in keys]
         print 'Type'.ljust(15,'.'),'Population'

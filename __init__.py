@@ -12,6 +12,7 @@ Visualisation - visualisation of the loaded lattice
 import Convert
 
 from Tfs import Tfs
+from Aperture import Aperture
 from TfsArray import TfsArray
 import Plot
 import Builder
