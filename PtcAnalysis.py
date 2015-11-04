@@ -190,11 +190,6 @@ class PtcAnalysis(object) :
             cov_vc_y_yyp   = -((-3+wgt)*my_1_1*my_2_0)/((-1+wgt)*wgt)+my_3_1/wgt
             cov_vc_yp_yyp  = -((-3+wgt)*my_1_1*my_0_2)/((-1+wgt)*wgt)+my_1_3/wgt
             cov_vv_y_yp    = (2*my_1_1**2)/((-1+wgt)*wgt)-(my_0_2*my_2_0)/wgt+my_2_2/wgt
-
-            print "cov_vv_x= ", cov_vv_x,", cov_vv_xp= ",cov_vv_xp,", cov_cc_xxp_xxp= ",cov_cc_xxp_xxp
-            print "cov_vc_x_xxp= ",cov_vc_x_xxp,", cov_vc_xp_xxp= ",cov_vc_xp_xxp,", cov_vv_x_xp=",cov_vv_x_xp
-            print "cov_vv_y= ",cov_vv_y,", cov_vv_yp= ",cov_vv_yp,", cov_cc_yyp_yyp= ",cov_cc_yyp_yyp
-            print "cov_vc_y_yyp= ",cov_vc_y_yyp,", cov_vc_yp_yyp= ",cov_vc_yp_yyp,", cov_vv_y_yp=",cov_vv_y_yp
  
             #Calculate the moments using the sums
             xx_s   -= x_s*x_s
@@ -292,7 +287,12 @@ class PtcAnalysis(object) :
             print "my_2_0= ",my_2_0,", my_0_2= ",my_0_2,", my_1_1= ",my_1_1
             print "my_4_0= ",my_4_0,", my_0_4= ",my_0_4
             print "my_3_1= ",my_3_1,", my_1_3= ",my_1_3,", my_2_2= ",my_2_2
-            
+
+            print "cov_vv_x= ", cov_vv_x,", cov_vv_xp= ",cov_vv_xp,", cov_cc_xxp_xxp= ",cov_cc_xxp_xxp
+            print "cov_vc_x_xxp= ",cov_vc_x_xxp,", cov_vc_xp_xxp= ",cov_vc_xp_xxp,", cov_vv_x_xp=",cov_vv_x_xp
+            print "cov_vv_y= ",cov_vv_y,", cov_vv_yp= ",cov_vv_yp,", cov_cc_yyp_yyp= ",cov_cc_yyp_yyp
+            print "cov_vc_y_yyp= ",cov_vc_y_yyp,", cov_vc_yp_yyp= ",cov_vc_yp_yyp,", cov_vv_y_yp=",cov_vv_y_yp
+           
             print "dedx= ",d_emx_d_xx," ,dedxp= ",d_emx_d_xpxp,", dedxxp= ",d_emx_d_xxp
             print "dbdx= ",d_btx_d_xx,",dbdxp= ",d_btx_d_xpxp,", dbdxxp= ",d_btx_d_xxp
             print "dadx= ",d_alx_d_xx,",dadxp= ",d_alx_d_xpxp,", dadxxp= ",d_alx_d_xxp
