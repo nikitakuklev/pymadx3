@@ -204,18 +204,27 @@ class Aperture(_Tfs):
             # of nonzero differential vs aperture parameter
             bdA = _np.array([bdA1, bdA2, bdA3, bdA4])
             # get the a unique set of the indices where any aperture changes
-            indices = _np.array(list(set(bdA.nonzero()[1])))
+            # nonzero->bool array, take only which items (rows) have nonzero diffs, take set of to remove duplication
+            indices = _np.array(list(set(bdA.nonzero()[1]))) 
             indices += indexStart # add on offset to get index for whole data
-            print indices
-            sSplits = _np.array([self._ssorted[x] for x in indices])
+            if self.debug:
+                print indices
+            sSplits = _np.array([self._ssorted[x] for x in indices]) # s positions of aperture changes
+            while sSplits[0] < sStart:
+                sSplits = sSplits[1:] # remove any elements before the start position of this element
             sSplitStart = _np.array(sSplits) #copy the starts
-            sSplitStart = _np.insert(sSplitStart, 0, sStart)
+            sSplitStart = _np.insert(sSplitStart, 0, sStart) # prepend s of first element
             # work out the length of each section
             lSplits = sSplits - sStart
-            print lSplits
+            if (lSplits < 0).any():
+                print 'WARNING - negative lengths determined!'
+                return #wrong return number of arguments so will bomb here
+            if self.debug:
+                print lSplits
             lSplits = _np.insert(lSplits, 0, 0)
             lSplits = _np.append(lSplits, l) # make length last one
-            print lSplits
+            if self.debug:
+                print lSplits
             lSplits = _np.diff(lSplits)
 
             # paranoid checks - trim / adjust last element to conserve length accurately
