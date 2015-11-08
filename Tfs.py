@@ -56,13 +56,18 @@ class Tfs(object):
             self.DeepCopy(filename)
         
     def Clear(self):
+        """
+        Empties all data structures in this instance.
+        """
         self.__init__()
     
     def Load(self,filename):
         """
-        Load('filename.tfs')
+        >>> a = Tfs()
+        >>> a.Load('filename.tfs')
         
-        read the tfs file and prepare data structures
+        Read the tfs file and prepare data structures. If 'tar' or 'gz are in 
+        the filename, the file will be opened still compressed.
         """
         if ('tar' in filename) or ('gz' in filename):
             print 'pymadx.Tfs.Load> zipped file'
@@ -318,18 +323,14 @@ class Tfs(object):
 
     def IndexFromName(self,namestring):
         """
-        IndexFromName(namestring)
-
-        return the index of the element named namestring
+        Return the index of the element named namestring
 
         """
         return self.sequence.index(namestring)
 
     def ColumnIndex(self,columnstring):
         """
-        ColumnIndex(columnname):
-        
-        return the index to the column matching the name
+        Return the index to the column matching the name
         
         REMEMBER: excludes the first column NAME
         0 counting
@@ -339,8 +340,7 @@ class Tfs(object):
 
     def GetColumn(self,columnstring):
         """
-        GetColumn(columnstring)
-        return a numpy array of the values in columnstring in order
+        Return a numpy array of the values in columnstring in order
         as they appear in the beamline
         """
         i = self.ColumnIndex(columnstring)
@@ -361,20 +361,17 @@ class Tfs(object):
 
     def GetRow(self,elementname):
         """
-        GetRow(elementname)
-        return all data from one row as a list
-
-        note
+        Return all data from one row as a list
         """
         d = self[elementname]
         return [d[key] for key in self.columns]
     
     def GetRowDict(self,elementname):
         """
-        ElementDict(elementname)
-        return a dictionary of all parameters for a specifc element
-        given by element name
+        Return a dictionary of all parameters for a specifc element
+        given by element name.
 
+        note not in order
         """
         #no dictionary comprehension in python2.6 on SL6
         d = dict(zip(self.columns,self.data[elementname]))
@@ -394,25 +391,23 @@ class Tfs(object):
         """
         InterrogateItem(itemname)
         
-        Print out all the parameters and their
-        names for a particlular element in the 
-        sequence identified by name
+        Print out all the parameters and their names for a 
+        particlular element in the sequence identified by name.
         """
         for i,parameter in enumerate(self.columns):
             print parameter.ljust(10,'.'),self.data[itemname][i]
 
-    def GetElementsOfType(self,typename) :
+    def GetElementsOfType(self,typename):
         """
         GetElementsOfType(typename) 
         
-        Returns a list of the names of elements of a certain type
+        Returns a list of the names of elements of a certain type. Typename can 
+        be a single string or a tuple or list of strings
 
-        typename can be a single string or a tuple or list of strings
-
-        ie 
-        GetElementsOfType('SBEND')
-        GetElementsOfType(['SBEND','RBEND'])
-        GetElementsOfType(('SBEND','RBEND','QUADRUPOLE'))
+        Examples: 
+        >>> GetElementsOfType('SBEND')
+        >>> GetElementsOfType(['SBEND','RBEND'])
+        >>> GetElementsOfType(('SBEND','RBEND','QUADRUPOLE'))
 
         """
         if 'KEYWORD' in self.columns:
@@ -454,7 +449,7 @@ def Cast(string):
     """
     Cast(string)
     
-    tries to cast to a (python)float and if it doesn't work, 
+    tries to cast to a (python) float and if it doesn't work, 
     returns a string
 
     """
