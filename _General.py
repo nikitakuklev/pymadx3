@@ -62,6 +62,12 @@ def IndexOfElement(tfsinstance,markername):
     return i
 
 def CheckItsTfs(tfsfile):
+    """
+    Ensure the provided file is a Tfs instance.  If it's a string, ie path to
+    a tfs file, open it and return the Tfs instance.
+    
+    tfsfile can be either a tfs instance or a string.
+    """
     if type(tfsfile) == str:
         madx = pymadx.Tfs(tfsfile)
     elif type(tfsfile) == pymadx.Tfs:
