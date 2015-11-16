@@ -194,7 +194,15 @@ class Aperture(_Tfs):
         bdA4 = _np.diff(self._aper_4[indexStart:indexEnd]) != 0
         
         # find if there are any changes in aperture for any parameter
-        shouldSplit = _np.array([bdA1, bdA2, bdA3, bdA4]).any()    
+        shouldSplit = _np.array([bdA1, bdA2, bdA3, bdA4]).any()
+
+        if self.debug:
+            print 'length: ',l,', S (start): ',sStart,', S (end): ',sEnd
+            print 'Index (start): ',indexStart,', Index(end): ',indexEnd
+            print 'Any difference in aper1: ',bdA1
+            print 'Any difference in aper2: ',bdA2
+            print 'Any difference in aper3: ',bdA3
+            print 'Any difference in aper4: ',bdA4
 
         if not shouldSplit:
             # return false and the aperture model to be use for the whole item
