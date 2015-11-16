@@ -120,6 +120,28 @@ class Aperture(_Tfs):
         a._UpdateCache()
         return a
 
+    def GetUniqueSPositions(self):
+        return self.RemoveDuplicateSPositions()
+
+    def RemoveDuplicateSPositions(self):
+        """
+        Takes the first aperture value for entries with degenerate S positions and
+        removes the others.
+        """
+        # check if required at all
+        if len(self) == len(self._ssorted):
+            # no duplicates!
+            return self
+        
+        a = Aperture()
+        a._CopyMetaData(self)
+        u,indices = _np.unique(self.GetColumn('S'), return_index=True)
+        for ind in indices:
+            key = self.sequence[ind]
+            a._AppendDataEntry(key, self.data[key])
+        a._UpdateCache()
+        return a
+
     def _GetIndexInCacheOfS(self, sposition):
         index = _bisect(self._ssorted, sposition)
         if index > 0:
