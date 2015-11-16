@@ -224,8 +224,9 @@ class Aperture(_Tfs):
             if self.debug:
                 print indices
             sSplits = _np.array([self._ssorted[x] for x in indices]) # s positions of aperture changes
-            while sSplits[0] < sStart:
-                sSplits = sSplits[1:] # remove any elements before the start position of this element
+            if len(sSplits) > 1:
+                while sSplits[0] < sStart:
+                    sSplits = sSplits[1:] # remove any elements before the start position of this element
             sSplitStart = _np.array(sSplits) #copy the starts
             sSplitStart = _np.insert(sSplitStart, 0, sStart) # prepend s of first element
             # work out the length of each section
