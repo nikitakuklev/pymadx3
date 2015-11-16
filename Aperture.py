@@ -89,6 +89,9 @@ class Aperture(_Tfs):
         a._UpdateCache()
         return a
 
+    def GetEntriesBelow(self, value=8, keys='all'):
+        return self.RemoveAboveValue(value,keys)
+    
     def RemoveAboveValue(self, limits=8, keys='all'):
         print 'Aperture> removing any aperture entries above',limits
         if keys == 'all':
