@@ -38,7 +38,7 @@ class Tfs(object):
     >>> a[345]     #returns dict for element number 345 in sequence
     
     """
-    def __init__(self,filename=None):
+    def __init__(self,filename=None,**kwargs):
         object.__init__(self) #this allows type comparison for this class
         self.index       = []
         self.header      = {}
@@ -363,7 +363,11 @@ class Tfs(object):
         """
         Return all data from one row as a list
         """
-        d = self[elementname]
+        try:
+            d = self[elementname]
+        except KeyError:
+            print 'No such item',elementname,' in this tfs file'
+            return None
         return [d[key] for key in self.columns]
     
     def GetRowDict(self,elementname):
