@@ -15,10 +15,10 @@ class Aperture(_Tfs):
     """
     def __init__(self, *args, **kwargs):
         _Tfs.__init__(self, *args, **kwargs)
+        self.debug = False
         if 'debug' in kwargs:
             self.debug = kwargs['debug']
-        else:
-            self.debug = False
+            
         # the tolerance below which, the aperture is considered 0
         self._tolerance = 1e-6
         self._UpdateCache()
@@ -75,7 +75,7 @@ class Aperture(_Tfs):
             raise KeyError("This file does not contain APER_1,2,3 or 4 - required!")
 
         # prepare resultant tfs instance
-        a = Aperture()
+        a = Aperture(debug=self.debug)
         a._CopyMetaData(self)
         for item in self:
             apervalues = _np.array([item[key] for key in aperkeys])
@@ -111,7 +111,7 @@ class Aperture(_Tfs):
             else:
                 print key,' will be ignored as not in this aperture Tfs file'
 
-        a = Aperture()
+        a = Aperture(debug=self.debug)
         a._CopyMetaData(self)
         for item in self:
             apervals = _np.array([item[key] for key in aperkeys])
@@ -137,7 +137,7 @@ class Aperture(_Tfs):
             # no duplicates!
             return self
         
-        a = Aperture()
+        a = Aperture(debug=self.debug)
         a._CopyMetaData(self)
         u,indices = _np.unique(self.GetColumn('S'), return_index=True)
         for ind in indices:
@@ -165,16 +165,6 @@ class Aperture(_Tfs):
         Return a dictionary of the aperture information by the name of the element.
         """
         return self.GetRow(name)
-
-    def GetRow(self, key):
-        """
-        Get a single entry / row in the Tfs file as a list.
-        """
-        try:
-            _Tfs.GetRow(self,key)
-        except KeyError:
-            print 'No such key',key,' in this aperture file'
-            return None
 
     def ReplaceType(self, existingType, replacementType):
         print 'Aperture> replacing',existingType,'with',replacementType
@@ -264,27 +254,27 @@ class Aperture(_Tfs):
 
             # replace any <0 lengths ie nearest aperture definition behind start of this object
             # ignore these and only take aperture definitions in front of the element
-            lSplits = lSplits[lSplits > 0]
+            lSplits     = lSplits[lSplits > 0]
             
             if self.debug:
-                print lSplits
+                print 'Aperture> length of splits: ',lSplits
 
             # lSplits is just the length of the proposed split points from the start
             # make them a local S within the element by prepending 0 and appending L(ength)
             lSplits = _np.insert(lSplits, 0, 0)
             lSplits = _np.append(lSplits, l) # make length last one
             
-            if self.debug:
-                print lSplits
-            
             lSplits = _np.diff(lSplits)
+
+            if self.debug:
+                print 'Aperture> length of splits after checks: ',lSplits
 
             # paranoid checks - trim / adjust last element to conserve length accurately
             if lSplits.sum() != l:
                 lSplits[-1] = lSplits[-1] + (l - lSplits.sum())
 
             # get the mid point of each split segment for asking what the aperture should be
-            sSplitMid = sSplitStart + lSplits*0.5
+            sSplitMid = sStart + lSplits*0.5
             apertures = [self.GetApertureAtS(s) for s in sSplitMid]
 
             # check result of attempted splitting
