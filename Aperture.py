@@ -131,6 +131,7 @@ class Aperture(_Tfs):
         Takes the first aperture value for entries with degenerate S positions and
         removes the others.
         """
+        print 'Aperture> removing entries with duplicate S positions'
         # check if required at all
         if len(self) == len(self._ssorted):
             # no duplicates!
@@ -166,9 +167,13 @@ class Aperture(_Tfs):
         return self.GetRow(name)
 
     def GetRow(self, key):
+        """
+        Get a single entry / row in the Tfs file as a list.
+        """
         try:
             _Tfs.GetRow(self,key)
         except KeyError:
+            print 'No such key',key,' in this aperture file'
             return None
 
     def ReplaceType(self, existingType, replacementType):
