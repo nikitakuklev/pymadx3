@@ -261,25 +261,38 @@ class Aperture(_Tfs):
             sSplitStart = _np.insert(sSplitStart, 0, sStart) # prepend s of first element
             # work out the length of each section
             lSplits = sSplits - sStart
-            if (lSplits < 0).any():
-                print 'WARNING - negative lengths determined!'
-                return #wrong return number of arguments so will bomb here
+
+            # replace any <0 lengths ie nearest aperture definition behind start of this object
+            # ignore these and only take aperture definitions in front of the element
+            lSplits = lSplits[lSplits > 0]
+            
             if self.debug:
                 print lSplits
+
+            # lSplits is just the length of the proposed split points from the start
+            # make them a local S within the element by prepending 0 and appending L(ength)
             lSplits = _np.insert(lSplits, 0, 0)
             lSplits = _np.append(lSplits, l) # make length last one
+            
             if self.debug:
                 print lSplits
+            
             lSplits = _np.diff(lSplits)
 
             # paranoid checks - trim / adjust last element to conserve length accurately
             if lSplits.sum() != l:
                 lSplits[-1] = lSplits[-1] + (l - lSplits.sum())
 
+            # get the mid point of each split segment for asking what the aperture should be
             sSplitMid = sSplitStart + lSplits*0.5
             apertures = [self.GetApertureAtS(s) for s in sSplitMid]
+
+            # check result of attempted splitting
+            result = True if len(sSplits)>1 else False
+            if len(apertures) > len(sSplits):
+                apertures = apertures[:len(sSplits)] #should index 1 ahead - counteracts 0 counting
             
-            return True, lSplits, apertures
+            return result, lSplits, apertures
 
 
 def NonZeroAperture(item):
