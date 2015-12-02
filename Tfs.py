@@ -3,6 +3,8 @@ import numpy as _np
 
 import Plot as _Plot
 
+from copy import deepcopy
+
 #object inheritance is only for type comparison
 
 class Tfs(object):
@@ -252,6 +254,7 @@ class Tfs(object):
             self.smax = 0
 
     def _DeepCopy(self,instance):
+        #return type(self)(deepcopy(instance))
         self._CopyMetaData(instance)
         params = ["index","data","sequence","nitems","nsegments"]
         for param in params:
