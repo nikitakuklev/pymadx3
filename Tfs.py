@@ -53,7 +53,7 @@ class Tfs(object):
         if type(filename) == str:
             self.Load(filename)
         elif type(filename) == Tfs:
-            self.DeepCopy(filename)
+            self._DeepCopy(filename)
         
     def Clear(self):
         """
