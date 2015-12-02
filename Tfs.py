@@ -265,6 +265,13 @@ class Tfs(object):
         self.sequence.append(name)  #append name to sequence
         self.nitems    += 1         #increment nitems
         self.data[name] = entry     #put the data in
+
+    def __iadd__(self, other):
+        self._CopyMetaData(other) #fill in any data from other instance
+        for i in range(len(other)):
+            key = other.sequence[i]
+            self._AppendDataEntry(key,other.data[key])
+        return self
             
     def NameFromIndex(self,index):
         """
