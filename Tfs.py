@@ -411,12 +411,12 @@ class Tfs(object):
         for i,parameter in enumerate(self.columns):
             print parameter.ljust(10,'.'),self.data[itemname][i]
 
-    def GetElementsOfType(self,typename):
+    def GetElementNamesOfType(self,typename):
         """
-        GetElementsOfType(typename) 
+        GetElementNamesOfType(typename) 
         
         Returns a list of the names of elements of a certain type. Typename can 
-        be a single string or a tuple or list of strings
+        be a single string or a tuple or list of strings.
 
         Examples: 
         >>> GetElementsOfType('SBEND')
@@ -431,6 +431,20 @@ class Tfs(object):
         else:
             i = 0
         return [name for name in self.sequence if self.data[name][i] in typename]
+
+    def GetElementsOfType(self,typename):
+        """
+        Returns a Tfs instance containing only the elements of a certain type.
+        Typename can be a sintlge string or a tuple or list of strings.
+
+        This returns a Tfs instance with all the same capabilities as this one.
+        """
+        names = self.GetElementNamesOfType(typename)
+        a = Tfs()
+        a._CopyMetaData(self)
+        for key in names:
+            a._AppendDataEntry(key,self.data[key])
+        return a
 
     def ReportPopulations(self):
         """
