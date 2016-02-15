@@ -8,6 +8,8 @@ from   _General import IsFloat as _IsFloat
 from   decimal import Decimal as _Decimal
 import time
 
+from Beam import Beam
+
 """
 Builder
 
@@ -135,7 +137,7 @@ class Machine :
         self.samplers  = []
         self.length    = 0.0
         self.angint    = 0.0
-        self.beam      = None
+        self.beam      = Beam()
 
     def __repr__(self):
         s = ''
@@ -327,19 +329,18 @@ def WriteMachine(machine, filename, verbose=False):
         ti += 1
     # need to define the period before making sampler planes
     f.write('lattice: line = ('+', '.join(linelist)+');\n')
-    f.write(machine.beam.ReturnBeamString())
+#    f.write(machine.beam.ReturnBeamString())
     f.write('use, period=lattice;\n')
     f.close()
 
     # write beam 
-    if machine.beam != None : 
+    if machine.beam != None: 
         f = open(fn_beam,'w') 
         files.append(fn_beam)
         f.write(timestring) 
         f.write('! pymadx.Builder \n')
         f.write('! BEAM DEFINITION \n\n')
-#        f.write(machine.beam.ReturnBeamString())
-        f.write(machine.beam.ReturnPtcString())
+        f.write(str(machine.beam))
 
     #write samplers
     if len(machine.samplers) > 0:
