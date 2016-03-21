@@ -65,7 +65,7 @@ def PlotTfsBetaSimple(tfsfile, title='', outputfilename=None):
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
-def PlotTfsBeta(tfsfile, title='',outputfilename=None):
+def PlotTfsBeta(tfsfile, title='',outputfilename=None, dispersion=False):
     """
     Plot sqrt(beta x,y) as a function of S as well as the horizontal dispersion.
 
@@ -81,15 +81,17 @@ def PlotTfsBeta(tfsfile, title='',outputfilename=None):
     #optics plots
     axoptics.plot(d['s'],_np.sqrt(d['betx']),'b-', label=r'$\sqrt{\beta_{x}}$')
     axoptics.plot(d['s'],_np.sqrt(d['bety']),'g-', label=r'$\sqrt{\beta_{y}}$')
-    axoptics.plot(-100,-100,'r--', label=r'$\mathrm{D}(x)$') #fake plot for legend
+    if dispersion:
+        axoptics.plot(-100,-100,'r--', label=r'$\mathrm{D}(x)$') #fake plot for legend
     axoptics.set_xlabel('S (m)')
     axoptics.set_ylabel(r'$\sqrt{\beta_{x,y}}$ ($\sqrt{\mathrm{m}}$)')
     axoptics.legend(loc=0,fontsize='small') #best position
 
     #plot dispersion - only in horizontal
-    ax2 = axoptics.twinx()
-    ax2.plot(d['s'],d['dispx'],'r--')
-    ax2.set_ylabel('Dispersion (m)')
+    if dispersion:
+        ax2 = axoptics.twinx()
+        ax2.plot(d['s'],d['dispx'],'r--')
+        ax2.set_ylabel('Dispersion (m)')
 
     #add lattice to plot
     AddMachineLatticeToFigure(f,madx)
