@@ -244,6 +244,9 @@ class Machine :
     def AddSolenoid(self, name='sl', length=0.1, ks=0.0, **kwargs):
         self.Append(Element(name,'solenoid',l=length,ks=ks,**kwargs))
 
+    def AddOptions(self,*args,**kwargs):
+        pass
+
 # General scripts below this point
 
 class ParamInput :
