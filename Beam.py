@@ -18,6 +18,7 @@ MADXParticleTypes = [
 class Beam(dict):
     def __init__(self,particletype='e-',energy=1.0,distrtype='reference',*args,**kwargs):
         dict.__init__(self,*args,**kwargs)
+        self.isPTCDistribution = False
         self.SetParticleType(particletype)
         self.SetEnergy(energy)
         self.SetDistributionType(distrtype)
@@ -54,7 +55,8 @@ class Beam(dict):
             setattr(self, 'SetEmittanceY',       self._SetEmittanceX) 
             setattr(self, 'SetSigmaE',           self._SetSigmaE)
             setattr(self, 'SetSigmaT',           self._SetSigmaT)
-        elif distrtype == 'ptc':            
+        elif distrtype == 'ptc':
+            self.isPTCDistribution = True
             setattr(self, 'SetDistribFileName',  self._SetDistribFileName)
         
     def ReturnBeamString(self):

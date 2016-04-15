@@ -137,7 +137,7 @@ class Machine :
         self.samplers  = []
         self.length    = 0.0
         self.angint    = 0.0
-        self.beam      = Beam()
+        self.beam      = Beam() # always construct at least default beam
 
     def __repr__(self):
         s = ''
@@ -302,10 +302,18 @@ def WriteMachine(machine, filename, verbose=False):
     fn_main       = basefilename + '.madx'
     fn_components = basefilename + '_components.madx'
     fn_sequence   = basefilename + '_sequence.madx'
-    fn_samplers   = basefilename + '_samplers.madx'
     fn_beam       = basefilename + '_beam.madx'
     fn_options    = basefilename + '_options.madx'
+    fn_ptc        = basefilename + '_ptcjob.madx'
     timestring = '! ' + time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()) + '\n'
+
+    # write beam 
+    f = open(fn_beam,'w') 
+    files.append(fn_beam)
+    f.write(timestring) 
+    f.write('! pymadx.Builder \n')
+    f.write('! BEAM DEFINITION \n\n')
+    f.write(str(machine.beam))
     
     #write component files
     f = open(fn_components,'w')
@@ -332,31 +340,26 @@ def WriteMachine(machine, filename, verbose=False):
         ti += 1
     # need to define the period before making sampler planes
     f.write('lattice: line = ('+', '.join(linelist)+');\n')
-#    f.write(machine.beam.ReturnBeamString())
     f.write('use, period=lattice;\n')
     f.close()
 
-    # write beam 
-    if machine.beam != None: 
-        f = open(fn_beam,'w') 
-        files.append(fn_beam)
-        f.write(timestring) 
-        f.write('! pymadx.Builder \n')
-        f.write('! BEAM DEFINITION \n\n')
-        f.write(str(machine.beam))
-
-    #write samplers
-    if len(machine.samplers) > 0:
-        f = open(fn_samplers,'w')
-        files.append(fn_samplers)
+    # optionally write start of ptc job / inialise the universe
+    if machine.beam['distrType'] == 'ptc':
+        f = open(fn_ptc,'w')
+        files.append(fn_ptc)
         f.write(timestring)
         f.write('! pymadx.Builder Machine \n')
-        f.write('! SAMPLER DEFINITION\n\n')
-        for sampler in machine.samplers:
-            f.write(str(sampler))
-        f.write('ptc_track, element_by_element, dump, turns=1, icase=5, onetable;\n')
-        f.write('PTC_TRACK_END;\n')
-        f.write('ptc_end;\n')
+        f.write('! PTC JOB SPECIFICATION\n\n')
+        f.write(machine.beam.ReturnPtcString())
+
+        #write samplers - only for PTC jobs
+        if len(machine.samplers) > 0:
+            f.write('\n! SAMPLER DEFINITION\n\n')
+            for sampler in machine.samplers:
+                f.write(str(sampler))
+            f.write('ptc_track, element_by_element, dump, turns=1, icase=5, onetable;\n')
+            f.write('PTC_TRACK_END;\n')
+            f.write('ptc_end;\n')
         f.close()
 
     # write main file
