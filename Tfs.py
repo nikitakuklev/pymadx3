@@ -113,6 +113,9 @@ class Tfs(object):
             if line[0] == '@':
                 #header
                 self.header[sl[1]] = Cast(sl[-1])
+                # ratio of v to c needed for dispersion scaling
+                if sl[1] == 'GAMMA':
+                    self.header['BETA'] = _np.sqrt(1.0 - (1.0/(self.header['GAMMA']**2)))
             elif line[0] == '*':
                 #name
                 self.columns.extend(sl[1:]) #miss *
@@ -140,7 +143,17 @@ class Tfs(object):
                 self.sequence.append(name) # keep the name in sequence
                 self.data[name] = d        # put in data dict by name
                 self.nitems += 1           # keep tally of number of items
+                
+                #Beam size calculations (using relation deltaE/E = beta^2 * deltaP/P)
+                xdispersionterm = (d[self.ColumnIndex('DX')]*self.header['SIGE']/self.header['BETA'])**2
+                ydispersionterm = (d[self.ColumnIndex('DY')]*self.header['SIGE']/self.header['BETA'])**2
+                sigx = _np.sqrt((d[self.ColumnIndex('BETX')]*self.header['EX']) + xdispersionterm)
+                sigy = _np.sqrt((d[self.ColumnIndex('BETY')]*self.header['EY']) + ydispersionterm)
+                self.data[name].append(sigx)
+                self.data[name].append(sigy)
         f.close()
+        self.columns.append("SIGX")
+        self.columns.append("SIGY")
 
         self.index = range(0,len(self.data),1)
         if 'S' in self.columns:
