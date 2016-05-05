@@ -313,7 +313,8 @@ def WriteMachine(machine, filename, verbose=False):
     f.write(timestring) 
     f.write('! pymadx.Builder \n')
     f.write('! BEAM DEFINITION \n\n')
-    f.write(str(machine.beam))
+    f.write(machine.beam.ReturnBeamString())
+    f.close()
     
     #write component files
     f = open(fn_components,'w')

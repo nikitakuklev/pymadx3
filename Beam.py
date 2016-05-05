@@ -60,7 +60,8 @@ class Beam(dict):
             setattr(self, 'SetDistribFileName',  self._SetDistribFileName)
         
     def ReturnBeamString(self):
-        s = 'beam, particle='+self['particle']+', energy='+self['energy']+';\n'
+        s = 'beam, particle='+self['particle']+', energy='+self['energy']
+        s += ', ex=' + self['emitx'] + ', ey=' + self['emity'] +';\n'
         return s
 
     def ReturnPtcString(self) : 
