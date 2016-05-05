@@ -151,9 +151,19 @@ class Tfs(object):
                 sigy = _np.sqrt((d[self.ColumnIndex('BETY')]*self.header['EY']) + ydispersionterm)
                 self.data[name].append(sigx)
                 self.data[name].append(sigy)
+
+                #Beam divergences (using relation x',y' = sqrt(gamma_x,y * emittance_x,y))
+                gammax = (1.0 + d[self.ColumnIndex('ALFX')]**2) / d[self.ColumnIndex('BETX')]
+                gammay = (1.0 + d[self.ColumnIndex('ALFY')]**2) / d[self.ColumnIndex('BETY')]
+                sigxp = _np.sqrt(gammax * self.header['EX'])
+                sigyp = _np.sqrt(gammay * self.header['EY'])
+                self.data[name].append(sigxp)
+                self.data[name].append(sigyp)
         f.close()
         self.columns.append("SIGX")
         self.columns.append("SIGY")
+        self.columns.append("SIGXP")
+        self.columns.append("SIGYP")
 
         self.index = range(0,len(self.data),1)
         if 'S' in self.columns:
