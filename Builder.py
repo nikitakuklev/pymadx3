@@ -373,6 +373,12 @@ def WriteMachine(machine, filename, verbose=False):
     for fn in files:
         fn = fn.split('/')[-1]
         f.write("call, file='"+fn+"';\n")
+
+    # line in main file for outputting twiss params to .tfs file
+    f.write('\n')
+    f.write(machine.beam.ReturnTwissString(basefilename))
+
+
     f.close()
 
     #user feedback

@@ -70,6 +70,12 @@ class Beam(dict):
         s+= 'call, file ="'+self['distrFile']+'";\n'
         s+= 'ptc_align;'
         return s
+    
+    def ReturnTwissString(self,basefilename='output'):
+        s = 'twiss, save, '
+        s += 'betx=' + self['betx'] + ', bety=' + self['bety']
+        s += ', file=' + basefilename+'.tfs;'
+        return s
 
     def SetT0(self,t0=0.0,unitsstring='s'):
         self['T0'] = t0 + '*' + unitsstring
