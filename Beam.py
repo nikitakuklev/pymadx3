@@ -52,7 +52,7 @@ class Beam(dict):
             setattr(self, 'SetAlphaX',           self._SetAlphaX)
             setattr(self, 'SetAlphaY',           self._SetAlphaY)
             setattr(self, 'SetEmittanceX',       self._SetEmittanceX) 
-            setattr(self, 'SetEmittanceY',       self._SetEmittanceX) 
+            setattr(self, 'SetEmittanceY',       self._SetEmittanceY)
             setattr(self, 'SetSigmaE',           self._SetSigmaE)
             setattr(self, 'SetSigmaT',           self._SetSigmaT)
         elif distrtype == 'ptc':
@@ -83,22 +83,22 @@ class Beam(dict):
         self['sigmaT'] = sigmat
 
     def _SetBetaX(self,betx=1.0,unitsstring='m'):
-        self['betx'] = str(betx) + '*' + unitsstring
+        self['betx'] = str(betx)# + '*' + unitsstring
 
     def _SetBetaY(self,bety=1.0,unitsstring='m'):
-        self['bety'] = str(bety) + '*' + unitsstring
+        self['bety'] = str(bety)# + '*' + unitsstring
 
     def _SetAlphaX(self,alphax=1.0,unitsstring='m'):
-        self['alfx'] = str(alphax) + '*' + unitsstring
+        self['alfx'] = str(alphax)# + '*' + unitsstring
 
     def _SetAlphaY(self,alphay=1.0,unitsstring='m'):
-        self['alfy'] = str(alphay) + '*' + unitsstring
+        self['alfy'] = str(alphay)# + '*' + unitsstring
 
     def _SetEmittanceX(self,emitx=1.0,unitsstring='um'):
-        self['emitx'] = str(emitx) + '*' + unitsstring
+        self['emitx'] = str(emitx)# + '*' + unitsstring
    
     def _SetEmittanceY(self,emity=1.0,unitsstring='um'):
-        self['emity'] = str(emity) + '*' + unitsstring
+        self['emity'] = str(emity)# + '*' + unitsstring
 
     def _SetDistribFileName(self, fileName) :
         self['distrFile'] = fileName
