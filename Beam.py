@@ -61,7 +61,11 @@ class Beam(dict):
         
     def ReturnBeamString(self):
         s = 'beam, particle='+self['particle']+', energy='+self['energy']
-        s += ', ex=' + self['emitx'] + ', ey=' + self['emity'] +';\n'
+        s += ', ex=' + self['emitx'] + ', ey=' + self['emity']
+        if self.has_key('sigmaE'):
+            s += ', sige=' + str(self['sigmaE'])+';\n'
+        else:
+            s += ';\n'
         return s
 
     def ReturnPtcString(self) : 
