@@ -42,6 +42,8 @@ def _GetOpticalDataFromTfs(tfsobject):
     d['bety']  = tfsobject.GetColumn('BETY')
     d['dispx'] = tfsobject.GetColumn('DX')
     d['dispy'] = tfsobject.GetColumn('DY')
+    d['x']     = tfsobject.GetColumn('X')
+    d['y']     = tfsobject.GetColumn('Y')
     return d
 
 def PlotTfsBetaSimple(tfsfile, title='', outputfilename=None):
@@ -118,7 +120,7 @@ def AddMachineLatticeToFigure(figure,tfsfile):
     gs = _plt.GridSpec(nAxesNewX,1,height_ratios=tuple(ratios))
     # apparently, gridspec is like a list but doesn't implement len or shape
     # and it's in reverse order compared to the axes from a figure - it's bad
-    for i,ax in enumerate(axs[::-1]):
+    for i,ax in enumerate(axs):
         gsindex = i+1
         ax.set_position(gs[gsindex].get_position(figure))
         ax.set_subplotspec(gs[gsindex])
