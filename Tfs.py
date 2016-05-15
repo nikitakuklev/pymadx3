@@ -113,9 +113,6 @@ class Tfs(object):
             if line[0] == '@':
                 #header
                 self.header[sl[1]] = Cast(sl[-1])
-                # ratio of v to c needed for dispersion scaling
-                if sl[1] == 'GAMMA':
-                    self.header['BETA'] = _np.sqrt(1.0 - (1.0/(self.header['GAMMA']**2)))
             elif line[0] == '*':
                 #name
                 self.columns.extend(sl[1:]) #miss *
@@ -165,11 +162,16 @@ class Tfs(object):
         self.columns.append("SIGXP")
         self.columns.append("SIGYP")
 
+        #additional processing
         self.index = range(0,len(self.data),1)
         if 'S' in self.columns:
             self.smax = self[-1]['S']
         else:
             self.smax = 0
+
+        # ratio of v to c needed for dispersion scaling
+        if 'GAMMA' in self.header:
+            self.header['BETA'] = _np.sqrt(1.0 - (1.0/(self.header['GAMMA']**2)))
 
     def __repr__(self):
         s =  ''
