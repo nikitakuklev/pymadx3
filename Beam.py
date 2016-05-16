@@ -52,7 +52,7 @@ class Beam(dict):
             setattr(self, 'SetAlphaX',           self._SetAlphaX)
             setattr(self, 'SetAlphaY',           self._SetAlphaY)
             setattr(self, 'SetEmittanceX',       self._SetEmittanceX) 
-            setattr(self, 'SetEmittanceY',       self._SetEmittanceX) 
+            setattr(self, 'SetEmittanceY',       self._SetEmittanceY)
             setattr(self, 'SetSigmaE',           self._SetSigmaE)
             setattr(self, 'SetSigmaT',           self._SetSigmaT)
         elif distrtype == 'ptc':
@@ -60,7 +60,12 @@ class Beam(dict):
             setattr(self, 'SetDistribFileName',  self._SetDistribFileName)
         
     def ReturnBeamString(self):
-        s = 'beam, particle='+self['particle']+', energy='+self['energy']+';\n'
+        s = 'beam, particle='+self['particle']+', energy='+self['energy']
+        s += ', ex=' + self['emitx'] + ', ey=' + self['emity']
+        if self.has_key('sigmaE'):
+            s += ', sige=' + str(self['sigmaE'])+';\n'
+        else:
+            s += ';\n'
         return s
 
     def ReturnPtcString(self) : 
@@ -68,6 +73,12 @@ class Beam(dict):
         s+= 'ptc_create_layout,model=2,method=6,nst=10;\n'
         s+= 'call, file ="'+self['distrFile']+'";\n'
         s+= 'ptc_align;'
+        return s
+    
+    def ReturnTwissString(self,basefilename='output'):
+        s = 'twiss, save, '
+        s += 'betx=' + self['betx'] + ', bety=' + self['bety']
+        s += ', file=' + basefilename+'.tfs;'
         return s
 
     def SetT0(self,t0=0.0,unitsstring='s'):
@@ -83,22 +94,22 @@ class Beam(dict):
         self['sigmaT'] = sigmat
 
     def _SetBetaX(self,betx=1.0,unitsstring='m'):
-        self['betx'] = str(betx) + '*' + unitsstring
+        self['betx'] = str(betx)# + '*' + unitsstring
 
     def _SetBetaY(self,bety=1.0,unitsstring='m'):
-        self['bety'] = str(bety) + '*' + unitsstring
+        self['bety'] = str(bety)# + '*' + unitsstring
 
     def _SetAlphaX(self,alphax=1.0,unitsstring='m'):
-        self['alfx'] = str(alphax) + '*' + unitsstring
+        self['alfx'] = str(alphax)# + '*' + unitsstring
 
     def _SetAlphaY(self,alphay=1.0,unitsstring='m'):
-        self['alfy'] = str(alphay) + '*' + unitsstring
+        self['alfy'] = str(alphay)# + '*' + unitsstring
 
     def _SetEmittanceX(self,emitx=1.0,unitsstring='um'):
-        self['emitx'] = str(emitx) + '*' + unitsstring
+        self['emitx'] = str(emitx)# + '*' + unitsstring
    
     def _SetEmittanceY(self,emity=1.0,unitsstring='um'):
-        self['emity'] = str(emity) + '*' + unitsstring
+        self['emity'] = str(emity)# + '*' + unitsstring
 
     def _SetDistribFileName(self, fileName) :
         self['distrFile'] = fileName
