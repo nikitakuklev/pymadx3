@@ -106,6 +106,9 @@ class Tfs(object):
 
         namecolumnindex = 0
         
+        #Boolean for if beam sigmas have been calculated
+        beamsigmas = False
+        
         #read in data
         for line in f:
             splitline = line.strip('\n').split()
@@ -144,37 +147,41 @@ class Tfs(object):
                 self.data[name] = d        # put in data dict by name
                 self.nitems += 1           # keep tally of number of items
                 
-                #Beam size calculations (using relation deltaE/E = beta^2 * deltaP/P)
-                xdispersionterm = (d[self.ColumnIndex('DX')]*self.header['SIGE']/self.header['BETA'])**2
-                ydispersionterm = (d[self.ColumnIndex('DY')]*self.header['SIGE']/self.header['BETA'])**2
-                sigx = _np.sqrt((d[self.ColumnIndex('BETX')]*self.header['EX']) + xdispersionterm)
-                sigy = _np.sqrt((d[self.ColumnIndex('BETY')]*self.header['EY']) + ydispersionterm)
-                self.data[name].append(sigx)
-                self.data[name].append(sigy)
+                #Calculate beam size only if certain keys / params exist
+                if self.header.has_key('SIGE') and self.header.has_key('BETA') and self.header.has_key('EX') and self.header.has_key('EY'):
+                    try:
+                        #Beam size calculations (using relation deltaE/E = beta^2 * deltaP/P)
+                        xdispersionterm = (d[self.ColumnIndex('DX')]*self.header['SIGE']/self.header['BETA'])**2
+                        ydispersionterm = (d[self.ColumnIndex('DY')]*self.header['SIGE']/self.header['BETA'])**2
+                        sigx = _np.sqrt((d[self.ColumnIndex('BETX')]*self.header['EX']) + xdispersionterm)
+                        sigy = _np.sqrt((d[self.ColumnIndex('BETY')]*self.header['EY']) + ydispersionterm)
+                        self.data[name].append(sigx)
+                        self.data[name].append(sigy)
 
-                #Beam divergences (using relation x',y' = sqrt(gamma_x,y * emittance_x,y))
-                gammax = (1.0 + d[self.ColumnIndex('ALFX')]**2) / d[self.ColumnIndex('BETX')]
-                gammay = (1.0 + d[self.ColumnIndex('ALFY')]**2) / d[self.ColumnIndex('BETY')]
-                sigxp = _np.sqrt(gammax * self.header['EX'])
-                sigyp = _np.sqrt(gammay * self.header['EY'])
-                self.data[name].append(sigxp)
-                self.data[name].append(sigyp)
+                        #Beam divergences (using relation x',y' = sqrt(gamma_x,y * emittance_x,y))
+                        gammax = (1.0 + d[self.ColumnIndex('ALFX')]**2) / d[self.ColumnIndex('BETX')]
+                        gammay = (1.0 + d[self.ColumnIndex('ALFY')]**2) / d[self.ColumnIndex('BETY')]
+                        sigxp = _np.sqrt(gammax * self.header['EX'])
+                        sigyp = _np.sqrt(gammay * self.header['EY'])
+                        self.data[name].append(sigxp)
+                        self.data[name].append(sigyp)
+                    
+                        beamsigmas = True
+                    except ValueError:
+                        pass
         f.close()
-        self.columns.append("SIGX")
-        self.columns.append("SIGY")
-        self.columns.append("SIGXP")
-        self.columns.append("SIGYP")
+        
+        if beamsigmas:
+            self.columns.append("SIGX")
+            self.columns.append("SIGY")
+            self.columns.append("SIGXP")
+            self.columns.append("SIGYP")
 
-        #additional processing
         self.index = range(0,len(self.data),1)
         if 'S' in self.columns:
             self.smax = self[-1]['S']
         else:
             self.smax = 0
-
-        # ratio of v to c needed for dispersion scaling
-        if 'GAMMA' in self.header:
-            self.header['BETA'] = _np.sqrt(1.0 - (1.0/(self.header['GAMMA']**2)))
 
     def __repr__(self):
         s =  ''
