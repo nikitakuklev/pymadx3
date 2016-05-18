@@ -113,6 +113,9 @@ class Tfs(object):
             if line[0] == '@':
                 #header
                 self.header[sl[1]] = Cast(sl[-1])
+                # ratio of v to c needed for dispersion scaling
+                if (sl[1] == 'GAMMA') and not self.header.has_key('BETA'):
+                    self.header['BETA'] = _np.sqrt(1.0 - (1.0/(self.header['GAMMA']**2)))
             elif line[0] == '*':
                 #name
                 self.columns.extend(sl[1:]) #miss *
