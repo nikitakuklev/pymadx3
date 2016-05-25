@@ -141,26 +141,7 @@ class Tfs(object):
                 self.data[name] = d        # put in data dict by name
                 self.nitems += 1           # keep tally of number of items
                 
-                #Beam size calculations (using relation deltaE/E = beta^2 * deltaP/P)
-                xdispersionterm = (d[self.ColumnIndex('DX')]*self.header['SIGE']/self.header['BETA'])**2
-                ydispersionterm = (d[self.ColumnIndex('DY')]*self.header['SIGE']/self.header['BETA'])**2
-                sigx = _np.sqrt((d[self.ColumnIndex('BETX')]*self.header['EX']) + xdispersionterm)
-                sigy = _np.sqrt((d[self.ColumnIndex('BETY')]*self.header['EY']) + ydispersionterm)
-                self.data[name].append(sigx)
-                self.data[name].append(sigy)
-
-                #Beam divergences (using relation x',y' = sqrt(gamma_x,y * emittance_x,y))
-                gammax = (1.0 + d[self.ColumnIndex('ALFX')]**2) / d[self.ColumnIndex('BETX')]
-                gammay = (1.0 + d[self.ColumnIndex('ALFY')]**2) / d[self.ColumnIndex('BETY')]
-                sigxp = _np.sqrt(gammax * self.header['EX'])
-                sigyp = _np.sqrt(gammay * self.header['EY'])
-                self.data[name].append(sigxp)
-                self.data[name].append(sigyp)
         f.close()
-        self.columns.append("SIGX")
-        self.columns.append("SIGY")
-        self.columns.append("SIGXP")
-        self.columns.append("SIGYP")
 
         #additional processing
         self.index = range(0,len(self.data),1)
@@ -173,9 +154,54 @@ class Tfs(object):
         else:
             self.smax = 0
 
-        # ratio of v to c needed for dispersion scaling
-        if 'GAMMA' in self.header:
+        self._CalculateSigma()
+
+    def _CalculateSigma(self):
+        if 'GAMMA' not in self.header:
+            self.header['BETA'] = 1.0 # assume super relativistic
+        else:
             self.header['BETA'] = _np.sqrt(1.0 - (1.0/(self.header['GAMMA']**2)))
+
+        # check this file has the appropriate variables else, return without calculating
+        # use a set to check if all variables are in a given list easily
+        requiredVariablesB = set(['DX', 'DY', 'ALFX', 'ALFY', 'BETX', 'BETY'])
+        if not requiredVariablesB.issubset(self.columns):
+            return
+        requiredVariablesH = set(['SIGE', 'EX', 'EY'])
+        if not requiredVariablesH.issubset(self.header.keys()):
+            return
+        
+        # get indices to the columns we'll need in the data
+        dxindex   = self.ColumnIndex('DX')
+        dyindex   = self.ColumnIndex('DY')
+        alfxindex = self.ColumnIndex('ALFX')
+        alfyindex = self.ColumnIndex('ALFY')
+        betxindex = self.ColumnIndex('BETX')
+        betyindex = self.ColumnIndex('BETY')
+
+        # constants
+        sige = self.header['SIGE']
+        beta = self.header['BETA'] # relativistic beta
+        ex   = self.header['EX']
+        ey   = self.header['EY']
+        self.columns.extend(['SIGMAX', 'SIGMAY', 'SIGMAXP', 'SIGMAYP'])
+        for elementname in self.sequence:
+            # beam size calculations (using relation deltaE/E = beta^2 * deltaP/P)
+            d = self.data[elementname]
+            xdispersionterm = (d[dxindex] * sige / beta)**2
+            ydispersionterm = (d[dyindex] * sige / beta)**2
+            sigx = _np.sqrt((d[betxindex] * ex) + xdispersionterm)
+            sigy = _np.sqrt((d[betyindex] * ey) + ydispersionterm)
+            d.append(sigx)
+            d.append(sigy)
+
+            # beam divergences (using relation x',y' = sqrt(gamma_x,y * emittance_x,y))
+            gammax = (1.0 + d[alfxindex]**2) / d[betxindex] # twiss gamma
+            gammay = (1.0 + d[alfyindex]**2) / d[betyindex]
+            sigxp  = _np.sqrt(gammax * ex)
+            sigyp  = _np.sqrt(gammay * ey)
+            d.append(sigxp)
+            d.append(sigyp)
 
     def __repr__(self):
         s =  ''
