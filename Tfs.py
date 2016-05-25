@@ -166,6 +166,10 @@ class Tfs(object):
         self.index = range(0,len(self.data),1)
         if 'S' in self.columns:
             self.smax = self[-1]['S']
+            sindex = self.ColumnIndex('S')
+            for name in self.sequence:
+                self.data[name].append(self.data[name][sindex]) # copy S to SORIGINAL
+            self.columns.append('SORIGINAL')
         else:
             self.smax = 0
 
@@ -193,6 +197,7 @@ class Tfs(object):
         return self.GetRowDict(self.sequence[self._iterindex])
 
     def __getitem__(self,index):
+        #index can be a slice object, string or integer - deal with in this order
         #return single item or slice of lattice
         if type(index) == slice:
             start,stop,step = index.start, index.stop, index.step #note slices are immutable
@@ -246,9 +251,24 @@ class Tfs(object):
             #construct and return a new instance of the class
             a = Tfs()
             a._CopyMetaData(self)
-            f = [a._AppendDataEntry(self.sequence[i],self.data[self.sequence[i]]) for i in range(index.start,index.stop,index.step)]
-            del f
+
+            # whether to prepare new s coordinates as extra entry
+            prepareNewS = False
+            sOffset     = 0
+            if start > 0 and 'S' in self.columns:
+                prepareNewS = True
+                # note S is at the end of an element, so take the element before for offset ( start - 1 )
+                # if 'S' is in the columns, 'SORIGINAL' will be too
+                sOffset = self.GetRowDict(self.sequence[start-1])['SORIGINAL']
+            # prepare S coordinate and append to each list per element
+            for i in range(index.start,index.stop,index.step):
+                elementlist = list(self.data[self.sequence[i]]) # copy instead of modify existing
+                if prepareNewS:
+                    # maintain the original s from the original data
+                    elementlist[self.ColumnIndex('S')] = elementlist[self.ColumnIndex('SORIGINAL')] - sOffset
+                a._AppendDataEntry(self.sequence[i], elementlist)                
             return a
+        
         elif type(index) == int:
             return self.GetRowDict(self.sequence[index])
         elif type(index) == str:
