@@ -1,7 +1,10 @@
 import tarfile
 import numpy as _np
 
-import Plot as _Plot
+try:
+    import Plot as _Plot
+except ImportError:
+    pass
 
 from copy import deepcopy
 

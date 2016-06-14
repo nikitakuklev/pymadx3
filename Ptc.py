@@ -1,6 +1,9 @@
 import numpy as _np
 import re as _re
-import matplotlib.pyplot as _plt
+try:
+    import matplotlib.pyplot as _plt
+except ImportError:
+    pass
 from numpy.random import multivariate_normal as _multivariate_normal
 
 class Inray:

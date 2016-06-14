@@ -14,13 +14,18 @@ import Convert
 from Tfs import Tfs
 from Aperture import Aperture
 from TfsArray import TfsArray
-import Plot
 import Builder
 import Ptc
 from PtcAnalysis import PtcAnalysis 
-from PtcPlot import PtcPlot 
 from Beam import Beam
 from MadxTfs2Ptc import MadxTfs2Ptc
+
+# things the depend on matplotlib (optional)
+try:
+    import Plot
+    from PtcPlot import PtcPlot
+except ImportError:
+    pass
 
 from _General import CheckItsTfs
 
