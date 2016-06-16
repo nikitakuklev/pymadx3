@@ -1,7 +1,5 @@
 # pymadx.Builder - tools to build madx lattices
 # Version 1.0
-# S. T. Boogert
-# stewart.boogert@rhul.ac.uk
 
 import _General
 from   _General import IsFloat as _IsFloat
