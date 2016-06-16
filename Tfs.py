@@ -142,18 +142,22 @@ class Tfs(object):
                 self.nitems += 1           # keep tally of number of items
                 
         f.close()
-
+        
         #additional processing
         self.index = range(0,len(self.data),1)
         if 'S' in self.columns:
             self.smax = self[-1]['S']
             sindex = self.ColumnIndex('S')
-            for name in self.sequence:
+            sEnd = self.GetColumn('S')  #calculating the mid points as the element
+            sMid = (send[:-1] + send[1:])/2
+            for name, i in enumerate(self.sequence):
                 self.data[name].append(self.data[name][sindex]) # copy S to SORIGINAL
+                self.data[name].append(sMid[i])
             self.columns.append('SORIGINAL')
+            self.columns.append('SMID')
         else:
             self.smax = 0
-
+            
         self._CalculateSigma()
 
     def _CalculateSigma(self):
@@ -310,6 +314,7 @@ class Tfs(object):
             while self.data.has_key(name):
                 name = basename+'_'+str(i)
                 i = i + 1
+            print name
             return name
         else:
             return name
@@ -371,30 +376,9 @@ class Tfs(object):
 
         return the index of the beamline element clostest to S 
         """
-        s = self.GetColumn('S')
-        l = self.GetColumn('L')
-
-        #iterate over beamline and record element if S is between the
-        #sposition of that element and then next one
-        #note madx S position is the end of the element by default
-        ci = [i for i in self.index[0:-1] if (S > s[i]-l[i] and S < s[i]+1e-7)]
-        try:
-            ci = ci[0] #return just the first match - should only be one
-        except IndexError:
-            #protect against S positions outside range of machine
-            if S > s[-1]:
-                ci =-1
-            else:
-                ci = 0
-        #check the absolute distance to each and return the closest one
-        #make robust against s positions outside machine range
-        try:
-            if abs(S-s[ci]) < abs(S-s[ci+1]) : 
-                return ci 
-            else : 
-                return ci+1
-        except IndexError:
-            return ci
+        sMid = self.GetColumn('SMID')
+        a = min(sMid, key=lambda x:abs(x-S))
+        return positions.index(a)
 
     def _EnsureItsAnIndex(self, value):
         if type(value) == str:
