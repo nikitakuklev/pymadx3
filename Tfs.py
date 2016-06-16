@@ -152,8 +152,10 @@ class Tfs(object):
             self.smax = self[-1]['S']
             sindex = self.ColumnIndex('S')
             sEnd = self.GetColumn('S')  #calculating the mid points as the element
-            sMid = (send[:-1] + send[1:])/2
-            for name, i in enumerate(self.sequence):
+            sEnd = _np.insert(sEnd,0,0)
+            sMid = (sEnd[:-1] + sEnd[1:])/2
+
+            for i, name in enumerate(self.sequence):
                 self.data[name].append(self.data[name][sindex]) # copy S to SORIGINAL
                 self.data[name].append(sMid[i])
             self.columns.append('SORIGINAL')
@@ -317,7 +319,6 @@ class Tfs(object):
             while self.data.has_key(name):
                 name = basename+'_'+str(i)
                 i = i + 1
-            print name
             return name
         else:
             return name
