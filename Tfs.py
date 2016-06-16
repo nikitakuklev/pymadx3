@@ -382,7 +382,7 @@ class Tfs(object):
         """
         sMid = self.GetColumn('SMID')
         a = min(sMid, key=lambda x:abs(x-S))
-        return positions.index(a)
+        return sMid.index(a)
 
     def _EnsureItsAnIndex(self, value):
         if type(value) == str:
