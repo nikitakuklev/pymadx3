@@ -164,6 +164,7 @@ class Tfs(object):
             self.smax = 0
             
         self._CalculateSigma()
+        self.names = self.columns
 
     def _CalculateSigma(self):
         if 'GAMMA' not in self.header:
