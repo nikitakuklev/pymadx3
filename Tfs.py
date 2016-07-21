@@ -300,12 +300,14 @@ class Tfs(object):
                 # note S is at the end of an element, so take the element before for offset ( start - 1 )
                 # if 'S' is in the columns, 'SORIGINAL' will be too
                 sOffset = self.GetRowDict(self.sequence[start-1])['SORIGINAL']
+                sOffsetMid = self.GetRowDict(self.sequence[start-1])['SMID']
             # prepare S coordinate and append to each list per element
             for i in range(index.start,index.stop,index.step):
                 elementlist = list(self.data[self.sequence[i]]) # copy instead of modify existing
                 if prepareNewS:
                     # maintain the original s from the original data
                     elementlist[self.ColumnIndex('S')] = elementlist[self.ColumnIndex('SORIGINAL')] - sOffset
+                    elementlist[self.ColumnIndex('SMID')] = elementlist[self.ColumnIndex('SMID')] - sOffsetMid
                 a._AppendDataEntry(self.sequence[i], elementlist)                
             return a
         
