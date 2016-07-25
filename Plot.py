@@ -36,6 +36,9 @@ class _My_Axes(_matplotlib.axes.Axes):
 _matplotlib.projections.register_projection(_My_Axes)
 
 def _GetOpticalDataFromTfs(tfsobject):
+    """
+    Utility to pull out the relevant optical functions into a simple dictionary.
+    """
     d = {}
     d['s']     = tfsobject.GetColumn('S')
     d['betx']  = tfsobject.GetColumn('BETX')
@@ -46,32 +49,43 @@ def _GetOpticalDataFromTfs(tfsobject):
     d['y']     = tfsobject.GetColumn('Y')
     return d
 
-def PlotTfsBetaSimple(tfsfile, title='', outputfilename=None):
-    """
-    Plot the sqrt(beta x,y) as a function of S
-    """
+def PlotTfsCentroids(tfsfile, title='', outputfilename=None, machine=True):
     madx = _CheckItsTfs(tfsfile)
     d    = _GetOpticalDataFromTfs(madx)
+    smax = madx.smax
 
-    _plt.figure()
-    _plt.plot(d['s'],_np.sqrt(d['betx']),'b-', label=r'$\sqrt{\beta_{x}}$')
-    _plt.plot(d['s'],_np.sqrt(d['bety']),'g-', label=r'$\sqrt{\beta_{y}}$')
-    _plt.xlabel(r'$\mathrm{S (m)}$')
-    _plt.ylabel(r'$\sqrt{\beta_{x,y}}$ $\sqrt{\mathrm{m}}$')
-    _plt.legend(loc=0) #best position
-    _plt.title(title)
+    f    = _plt.figure(figsize=(11,5))
+    axoptics = f.add_subplot(111)
 
+    #optics plots
+    axoptics.plot(d['s'],d['x'],'b-', label=r'$\mu_{x}$')
+    axoptics.plot(d['s'],d['y'],'g-', label=r'$\mu_{y}$')
+    axoptics.set_xlabel('S (m)')
+    axoptics.set_ylabel(r'$\mu_{(x,y)}$ (m)')
+    axoptics.legend(loc=0,fontsize='small') #best position
+
+    #add lattice to plot
+    if machine:
+        AddMachineLatticeToFigure(f,madx)
+
+    _plt.suptitle(title,size='x-large')
+    _plt.tight_layout()
+    
     if outputfilename != None:
         if '.' in outputfilename:
             outputfilename = outputfilename.split('.')[0]
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
-def PlotTfsBeta(tfsfile, title='',outputfilename=None, dispersion=False):
-    """
-    Plot sqrt(beta x,y) as a function of S as well as the horizontal dispersion.
 
-    Also adds machine lattice at the top of the plot
+def PlotTfsBeta(tfsfile, title='',outputfilename=None, machine=True, dispersion=False):
+    """
+    Plot sqrt(beta x,y) as a function of S. By default, a machine diagram is shown at
+    the top of the plot.
+
+    Optionally set dispersion=True to plot x dispersion as second axis.
+    Optionally turn off machine overlay at top with machine=False
+    Specify outputfilename (without extension) to save the plot as both pdf and png.
     """
     madx = _CheckItsTfs(tfsfile)
     d    = _GetOpticalDataFromTfs(madx)
@@ -96,9 +110,12 @@ def PlotTfsBeta(tfsfile, title='',outputfilename=None, dispersion=False):
         ax2.set_ylabel('Dispersion (m)')
 
     #add lattice to plot
-    AddMachineLatticeToFigure(f,madx)
+    if machine:
+        AddMachineLatticeToFigure(f,madx)
 
     _plt.suptitle(title,size='x-large')
+
+    _plt.tight_layout()
     
     if outputfilename != None:
         if '.' in outputfilename:
@@ -107,7 +124,27 @@ def PlotTfsBeta(tfsfile, title='',outputfilename=None, dispersion=False):
         _plt.savefig(outputfilename+'.png')
 
 def AddMachineLatticeToFigure(figure,tfsfile):
+    """
+    Add a diagram above the current graph in the figure that represents the
+    accelerator based on a madx twiss file in tfs format.
+    
+    Note you can use matplotlib's gcf() 'get current figure' as an argument.
+
+    AddMachineLatticeToFigure(gcf(), 'afile.tfs')
+
+    A pymadx.Tfs class instance or a string specifying a tfs file can be
+    supplied as the second argument interchangeably.
+
+    """
     tfs = _CheckItsTfs(tfsfile) #load the machine description
+
+    #check required keys
+    requiredKeys = ['KEYWORD', 'S', 'L', 'K1L']
+    okToProceed = all([key in tfs.columns for key in requiredKeys])
+    if not okToProceed:
+        print "The required columns aren't present in this tfs file"
+        print "The required columns are: ", requiredKeys
+        raise IOError
 
     axs = figure.get_axes() # get the existing graph
     axoptics = axs[0]       # get the only presumed axes from the figure
@@ -161,7 +198,7 @@ def AddMachineLatticeToFigure(figure,tfsfile):
 def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     ax  = axesinstance #handy shortcut
     tfs = pymadxtfsobject
-
+    
     #NOTE madx defines S as the end of the element by default
     #define temporary functions to draw individual objects
     def DrawBend(e,color='b',alpha=1.0):

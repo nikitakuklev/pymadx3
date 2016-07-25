@@ -179,6 +179,7 @@ class Tfs(object):
 
 
         self._CalculateSigma()
+        self.names = self.columns
 
     def _CalculateSigma(self):
         if 'GAMMA' not in self.header:
@@ -188,7 +189,7 @@ class Tfs(object):
 
         # check this file has the appropriate variables else, return without calculating
         # use a set to check if all variables are in a given list easily
-        requiredVariablesB = set(['DX', 'DY', 'ALFX', 'ALFY', 'BETX', 'BETY'])
+        requiredVariablesB = set(['DX', 'DY', 'DPX', 'DPY', 'ALFX', 'ALFY', 'BETX', 'BETY'])
         if not requiredVariablesB.issubset(self.columns):
             return
         requiredVariablesH = set(['SIGE', 'EX', 'EY'])
@@ -198,6 +199,8 @@ class Tfs(object):
         # get indices to the columns we'll need in the data
         dxindex   = self.ColumnIndex('DX')
         dyindex   = self.ColumnIndex('DY')
+        dpxindex  = self.ColumnIndex('DPX')
+        dpyindex  = self.ColumnIndex('DPY')
         alfxindex = self.ColumnIndex('ALFX')
         alfyindex = self.ColumnIndex('ALFY')
         betxindex = self.ColumnIndex('BETX')
@@ -222,8 +225,10 @@ class Tfs(object):
             # beam divergences (using relation x',y' = sqrt(gamma_x,y * emittance_x,y))
             gammax = (1.0 + d[alfxindex]**2) / d[betxindex] # twiss gamma
             gammay = (1.0 + d[alfyindex]**2) / d[betyindex]
-            sigxp  = _np.sqrt(gammax * ex)
-            sigyp  = _np.sqrt(gammay * ey)
+            xdispersionterm = (d[dpxindex] * sige / beta)**2
+            ydispersionterm = (d[dpyindex] * sige / beta)**2
+            sigxp  = _np.sqrt((gammax * ex) + xdispersionterm)
+            sigyp  = _np.sqrt((gammay * ey) + ydispersionterm)
             d.append(sigxp)
             d.append(sigyp)
 
@@ -310,12 +315,14 @@ class Tfs(object):
                 # note S is at the end of an element, so take the element before for offset ( start - 1 )
                 # if 'S' is in the columns, 'SORIGINAL' will be too
                 sOffset = self.GetRowDict(self.sequence[start-1])['SORIGINAL']
+                sOffsetMid = self.GetRowDict(self.sequence[start-1])['SMID']
             # prepare S coordinate and append to each list per element
             for i in range(index.start,index.stop,index.step):
                 elementlist = list(self.data[self.sequence[i]]) # copy instead of modify existing
                 if prepareNewS:
                     # maintain the original s from the original data
                     elementlist[self.ColumnIndex('S')] = elementlist[self.ColumnIndex('SORIGINAL')] - sOffset
+                    elementlist[self.ColumnIndex('SMID')] = elementlist[self.ColumnIndex('SMID')] - sOffsetMid
                 a._AppendDataEntry(self.sequence[i], elementlist)                
             return a
         
