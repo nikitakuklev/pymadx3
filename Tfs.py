@@ -162,7 +162,22 @@ class Tfs(object):
             self.columns.append('SMID')
         else:
             self.smax = 0
-            
+
+        #Check to see if input Tfs is Sixtrack style (i.e no APERTYPE, and is instead implicit)
+        if 'APER_1' in self.columns and 'APERTYPE' not in self.columns:
+            self.columns.append('APERTYPE')
+
+            for key, element in self.data.iteritems():
+                aper1 = element[self.columns.index('APER_1')]
+                aper2 = element[self.columns.index('APER_2')]
+                aper3 = element[self.columns.index('APER_3')]
+                aper4 = element[self.columns.index('APER_4')]
+                apertype = GetSixTrackAperType(aper1,aper2,aper3,aper4)
+
+                element.append(apertype)
+
+
+
         self._CalculateSigma()
 
     def _CalculateSigma(self):
@@ -544,3 +559,21 @@ def Cast(string):
         return float(string)
     except ValueError:
         return string.replace('"','')
+
+def GetSixTrackAperType(aper1,aper2,aper3,aper4):
+
+    if aper1 == 0 and aper2 == 0 and aper3 == 0 and aper4== 0:
+        return ''
+    elif aper1 == aper3 and aper2 == aper4:
+        return 'ELLIPSE'
+    elif aper1 == aper3 and aper2 < aper4:
+        return 'LHCSCREEN'
+    elif aper1 < aper3 and aper2 == aper4:
+        return 'LHCSCREEN'
+    elif aper1 == 0 and aper2 == 0:
+        return 'RACETRACK'
+    elif aper3 == 0:
+        return 'RECTANGLE'
+    else:
+        print "WARNING: The given aperture is not classified among the known types"
+        print "A1=" + str(aper1) + " A2=" +  str(aper2) + " A3=" + str(aper3) + " A4=" + str(aper4)
