@@ -1,5 +1,6 @@
 import tarfile
 import numpy as _np
+import copy as _copy
 
 try:
     import Plot as _Plot
@@ -360,7 +361,7 @@ class Tfs(object):
         self._CopyMetaData(instance)
         params = ["index","data","sequence","nitems","nsegments"]
         for param in params:
-            setattr(self,param,getattr(instance,param))
+            setattr(self,param,_copy.deepcopy(getattr(instance,param)))
 
     def _AppendDataEntry(self,name,entry):
         if len(self.index) > 0:                   #check if there's any elements yet
