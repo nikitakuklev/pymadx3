@@ -585,6 +585,26 @@ class Tfs(object):
         else:
             raise ValueError(gmadname + ' not found in list')
 
+    @staticmethod
+    def GetSixTrackAperType(aper1,aper2,aper3,aper4):
+
+        if aper1 == 0 and aper2 == 0 and aper3 == 0 and aper4== 0:
+            return ''
+        elif aper1 == aper3 and aper2 == aper4:
+            return 'ELLIPSE'
+        elif aper1 == aper3 and aper2 < aper4:
+            return 'LHCSCREEN'
+        elif aper1 < aper3 and aper2 == aper4:
+            return 'LHCSCREEN'
+        elif aper1 == 0 and aper2 == 0:
+            return 'RACETRACK'
+        elif aper3 == 0:
+            return 'RECTANGLE'
+        else:
+            print "WARNING: The given aperture is not classified among the known types"
+            print "A1=" + str(aper1) + " A2=" +  str(aper2) + " A3=" + str(aper3) + " A4=" + str(aper4)
+
+
 def Cast(string):
     """
     Cast(string)
@@ -597,21 +617,3 @@ def Cast(string):
         return float(string)
     except ValueError:
         return string.replace('"','')
-
-def GetSixTrackAperType(aper1,aper2,aper3,aper4):
-
-    if aper1 == 0 and aper2 == 0 and aper3 == 0 and aper4== 0:
-        return ''
-    elif aper1 == aper3 and aper2 == aper4:
-        return 'ELLIPSE'
-    elif aper1 == aper3 and aper2 < aper4:
-        return 'LHCSCREEN'
-    elif aper1 < aper3 and aper2 == aper4:
-        return 'LHCSCREEN'
-    elif aper1 == 0 and aper2 == 0:
-        return 'RACETRACK'
-    elif aper3 == 0:
-        return 'RECTANGLE'
-    else:
-        print "WARNING: The given aperture is not classified among the known types"
-        print "A1=" + str(aper1) + " A2=" +  str(aper2) + " A3=" + str(aper3) + " A4=" + str(aper4)
