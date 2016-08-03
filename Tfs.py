@@ -1,6 +1,8 @@
 import tarfile
 import numpy as _np
 import copy as _copy
+import string as _string
+import re as _re
 
 try:
     import Plot as _Plot
@@ -554,6 +556,34 @@ class Tfs(object):
     def PlotSimple(self,filename='optics.pdf'):
         _Plot.PlotTfsBetaSimple(self,outputfilename=filename)
 
+    def IndexFromGmadName(self, gmadname, verbose=False):
+        '''
+        Returns the indices of elements which match the supplied gmad name.
+        Useful because tfs2gmad strips punctuation from the component names, and irritating otherwise to work back.
+        When multiple elements of the name match, returns the indices of all the components in a list.
+        Arguments:
+        gmadname     :    The gmad name of a component to search for.
+        verbose      :    prints out matching name indices and S locations.  Useful for discriminating between identical names.
+        '''
+        indices = []
+        #Because underscores are allowed in gmad names:
+        punctuation = _string.punctuation.replace('_', '')
+        for index, element in enumerate(self):
+            #translate nothing to nothing and delete all forbidden chars from name.
+            name = element['NAME']
+            strippedName = name.translate(_string.maketrans("",""), punctuation)
+            if _re.match(gmadname + "_?[0-9]*", strippedName):
+                indices.append(index)
+        if verbose:
+            for index in indices:
+                sPos = self.data[self.NameFromIndex(index)][self.ColumnIndex('S')]
+                print " matches at S =", sPos, "@index", index
+        if len(indices) == 1:
+            return indices[0]
+        elif len(indices) > 1:
+            return indices
+        else:
+            raise ValueError(gmadname + ' not found in list')
 
 def Cast(string):
     """
