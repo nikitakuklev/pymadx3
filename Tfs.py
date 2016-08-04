@@ -175,7 +175,7 @@ class Tfs(object):
                 aper2 = element[self.columns.index('APER_2')]
                 aper3 = element[self.columns.index('APER_3')]
                 aper4 = element[self.columns.index('APER_4')]
-                apertype = GetSixTrackAperType(aper1,aper2,aper3,aper4)
+                apertype = self.GetSixTrackAperType(aper1,aper2,aper3,aper4)
 
                 element.append(apertype)
 
