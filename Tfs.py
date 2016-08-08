@@ -554,7 +554,7 @@ class Tfs(object):
         _Plot.PlotTfsBeta(self,outputfilename=filename)
 
     def PlotSimple(self,filename='optics.pdf'):
-        _Plot.PlotTfsBetaSimple(self,outputfilename=filename)
+        _Plot.PlotTfsBeta(self,outputfilename=filename,machine=False)
 
     def IndexFromGmadName(self, gmadname, verbose=False):
         '''
