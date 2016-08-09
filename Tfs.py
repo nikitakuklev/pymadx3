@@ -1,5 +1,8 @@
 import tarfile
 import numpy as _np
+import copy as _copy
+import string as _string
+import re as _re
 
 try:
     import Plot as _Plot
@@ -163,7 +166,22 @@ class Tfs(object):
             self.columns.append('SMID')
         else:
             self.smax = 0
-            
+
+        #Check to see if input Tfs is Sixtrack style (i.e no APERTYPE, and is instead implicit)
+        if 'APER_1' in self.columns and 'APERTYPE' not in self.columns:
+            self.columns.append('APERTYPE')
+
+            for key, element in self.data.iteritems():
+                aper1 = element[self.columns.index('APER_1')]
+                aper2 = element[self.columns.index('APER_2')]
+                aper3 = element[self.columns.index('APER_3')]
+                aper4 = element[self.columns.index('APER_4')]
+                apertype = self.GetSixTrackAperType(aper1,aper2,aper3,aper4)
+
+                element.append(apertype)
+
+
+
         self._CalculateSigma()
         self.names = self.columns
 
@@ -346,7 +364,7 @@ class Tfs(object):
         self._CopyMetaData(instance)
         params = ["index","data","sequence","nitems","nsegments"]
         for param in params:
-            setattr(self,param,getattr(instance,param))
+            setattr(self,param,_copy.deepcopy(getattr(instance,param)))
 
     def _AppendDataEntry(self,name,entry):
         if len(self.index) > 0:                   #check if there's any elements yet
@@ -538,7 +556,55 @@ class Tfs(object):
         _Plot.PlotTfsBeta(self,outputfilename=filename)
 
     def PlotSimple(self,filename='optics.pdf'):
-        _Plot.PlotTfsBetaSimple(self,outputfilename=filename)
+        _Plot.PlotTfsBeta(self,outputfilename=filename,machine=False)
+
+    def IndexFromGmadName(self, gmadname, verbose=False):
+        '''
+        Returns the indices of elements which match the supplied gmad name.
+        Useful because tfs2gmad strips punctuation from the component names, and irritating otherwise to work back.
+        When multiple elements of the name match, returns the indices of all the components in a list.
+        Arguments:
+        gmadname     :    The gmad name of a component to search for.
+        verbose      :    prints out matching name indices and S locations.  Useful for discriminating between identical names.
+        '''
+        indices = []
+        #Because underscores are allowed in gmad names:
+        punctuation = _string.punctuation.replace('_', '')
+        for index, element in enumerate(self):
+            #translate nothing to nothing and delete all forbidden chars from name.
+            name = element['NAME']
+            strippedName = name.translate(_string.maketrans("",""), punctuation)
+            if _re.match(gmadname + "_?[0-9]*", strippedName):
+                indices.append(index)
+        if verbose:
+            for index in indices:
+                sPos = self.data[self.NameFromIndex(index)][self.ColumnIndex('S')]
+                print " matches at S =", sPos, "@index", index
+        if len(indices) == 1:
+            return indices[0]
+        elif len(indices) > 1:
+            return indices
+        else:
+            raise ValueError(gmadname + ' not found in list')
+
+    @staticmethod
+    def GetSixTrackAperType(aper1,aper2,aper3,aper4):
+
+        if aper1 == 0 and aper2 == 0 and aper3 == 0 and aper4== 0:
+            return ''
+        elif aper1 == aper3 and aper2 == aper4:
+            return 'ELLIPSE'
+        elif aper1 == aper3 and aper2 < aper4:
+            return 'LHCSCREEN'
+        elif aper1 < aper3 and aper2 == aper4:
+            return 'LHCSCREEN'
+        elif aper1 == 0 and aper2 == 0:
+            return 'RACETRACK'
+        elif aper3 == 0:
+            return 'RECTANGLE'
+        else:
+            print "WARNING: The given aperture is not classified among the known types"
+            print "A1=" + str(aper1) + " A2=" +  str(aper2) + " A3=" + str(aper3) + " A4=" + str(aper4)
 
 
 def Cast(string):
