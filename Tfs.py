@@ -21,6 +21,7 @@ class Tfs(object):
     or 
 
     >>> a = Tfs("myfile.tfs")
+    >>> b = Tfs("myfile.tar.gz")
 
     | `a` has data members:
     | header      - dictionary of header items
@@ -484,7 +485,8 @@ class Tfs(object):
         Returns a list of the names of elements of a certain type. Typename can 
         be a single string or a tuple or list of strings.
 
-        Examples: 
+        Examples:
+        
         >>> GetElementsOfType('SBEND')
         >>> GetElementsOfType(['SBEND','RBEND'])
         >>> GetElementsOfType(('SBEND','RBEND','QUADRUPOLE'))
