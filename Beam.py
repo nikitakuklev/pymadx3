@@ -25,6 +25,9 @@ class Beam(dict):
 
     def __repr__(self):
         return self.ReturnBeamString()
+
+    def GetItemStr(self, key):
+        return str(self[key])
         
     def SetParticleType(self,particletype='e-'):
         if particletype == 'e-' : 
@@ -61,9 +64,9 @@ class Beam(dict):
         
     def ReturnBeamString(self):
         s = 'beam, particle='+self['particle']+', energy='+self['energy']
-        s += ', ex=' + self['emitx'] + ', ey=' + self['emity']
+        s += ', ex=' + self.GetItemStr('emitx') + ', ey=' + self.GetItemStr('emity')
         if self.has_key('sigmaE'):
-            s += ', sige=' + str(self['sigmaE'])+';\n'
+            s += ', sige=' + self.GetItemStr('sigmaE')+';\n'
         else:
             s += ';\n'
         return s
