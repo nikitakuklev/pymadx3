@@ -587,6 +587,52 @@ class Tfs(object):
         else:
             raise ValueError(gmadname + ' not found in list')
 
+    def ComponentPerturbs(self, componentName, terse=False):
+        '''
+        Returns names of variables which would perturb a particle.
+        Some components written out in TFS are redundant,
+        so it's useful to know which components perturb a particle's motion.
+        This is likely not an exhaustive check so refer to source if unsure.
+
+        Checks integrated stengths (but not if L=0), HKICK and VKICK
+
+        componentName    --  Name of component to be checked
+        terse            --  Print out the parameters which perturb if True
+        '''
+
+        component = self[componentName]
+        if isinstance(componentName, str):
+            componentIndex = self.IndexFromName(componentName)
+        elif isinstance(componentName, int):
+            componentIndex = componentName
+            componentName = self[componentName]['NAME']
+
+        greZero = []  # list of perturbing params which are abs>0
+
+        # these checks may be incomplete..  just the ones i know of.
+
+        # check the kls..  if length is zero then kls don't matter.
+        if component['L'] > 0:
+           for variable in component.keys():
+               kls = _re.compile(r'K[0-9]*S?L') # matches all integrated strengths.
+               if (_re.match(kls, variable) and
+                   abs(component[variable]) > 0):
+                   greZero.append(variable)
+
+        #check the kick angles.
+        if abs(component['VKICK']) > 0:
+            greZero.append('VKICK')
+        if abs(component['HKICK']) > 0:
+            greZero.append('HKICK')
+
+        if terse == False:
+            if greZero:
+                print "--Element: " + componentName + " @ index " + str(componentIndex) + " parameters:"
+                for variable in greZero:
+                    print variable + "= ", component[variable]
+
+        return greZero
+
     @staticmethod
     def GetSixTrackAperType(aper1,aper2,aper3,aper4):
 
