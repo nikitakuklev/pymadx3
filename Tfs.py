@@ -587,6 +587,116 @@ class Tfs(object):
         else:
             raise ValueError(gmadname + ' not found in list')
 
+    def ExpandThinMagnets(self):
+        '''
+        expand hkickers and vkickers.  not particularly useful or dynamic,
+        but does work for expanding thin h/vkickers
+        so long as they are adjacent to either a thick kicker or a drift.
+        Not bothered to make robust as once the arbitrary thin multipole
+        is introduced in BDSIM this will likely be redundant anyway.
+        '''
+
+        def FindFirstThickElement(startindex, direction):
+            if direction == '+':
+                indicex = range(startindex, len(self) + 1)
+            elif direction == '-':
+                indices = range(startindex, -1, -1)
+            for index in indices:
+                if self[index]['L'] > 0:
+                    return index
+
+        def InsertThickenedKicker(ele, kicker, thickness=0.002):
+
+            if (ele['KEYWORD'] != 'DRIFT' and
+                ele['KEYWORD'] != 'HKICKER' and
+                ele['KEYWORD'] != 'VKICKER'):
+                raise KeyError("""Can currently only insert thick elements
+                by reducing either a drift or another kicker""")
+
+            # the logic in this function is to try and stick a kicker
+            # into the nearest thick element.  This is assumed to be
+            # either a kicker or a drift.  This makes it easier as
+            # no integrated strengths need to be adjusted when shortening
+            # a component to make room for thickening a kicker.
+            # From experience HKICKERs and VKICKERs seem to be often
+            # grouped together in pairs, so it's good to be able to handle
+            # adding a thick kicker to an already thick kicker.  Since hte length
+            # isn't of much importance (except for sync rad), make room for a 2mm
+            # kicker by default.  If then there is another kicker to be added,
+            # eat into that thick kicker by 1mm.  This means that a max of
+            # 2 kickers in a row can be successfully added to the end of
+            # a drift, so long as it's sufficiently thick (i.e >= 2.0 mm).
+            # this is assume to be the case a priori.  For this reason this
+            # is not a very robust piece of code, to put it mildly, but useful
+            # for my ends at this point in time.
+
+
+            # data is stored in raw lists so get the right index for L and LRAD
+            lengthInd = (self.columns).index('L')
+            lradInd   = (self.columns).index('LRAD')
+            smidInd   = (self.columns).index('SMID')
+            sInd      = (self.columns).index('S')
+            # get the data for the element to be eaten from and the kicker
+            elementData = self.data[ele['NAME']]
+            kickerData = self.data[kicker['NAME']]
+
+            if ele['KEYWORD'] == 'DRIFT':
+                # take 2 mm from drift and add 2 to kicker
+                elementData[lengthInd] -= thickness
+                kickerData[lengthInd] += thickness
+                # zeroing lrad for clarity, but note that this is an imperfect conv
+                # and synchrotron radiation will differ between two models.
+                kickerData[lradInd] = 0
+
+                kickerData[smidInd] -= thickness/2
+                elementData[smidInd] -= thickness/2
+
+                elementData[sInd] -= thickness
+
+            # if thick element is a kicker, i.e already been converted
+            # from previous step.
+            else:
+                  elementData[lengthInd] -= thickness/2
+                  kickerData[lengthInd] += thickness/2
+                  # zeroing lrad for clarity, but note that this is an imperfect conv
+                  # and synchrotron radiation will differ between two models.
+                  kickerData[lradInd] = 0.0
+
+                  kickerData[smidInd] -= thickness/4
+                  elementData[smidInd] -= thickness/4
+
+                  elementData[sInd] -= thickness/2
+
+        # get all thin magnets:
+        thinmags = {}
+        for index, element in enumerate(self):
+            name = element['NAME']
+            if (element['L'] == 0 and
+                self.ComponentPerturbs(index,terse=True)):
+                thinmags[name] = element
+
+        # loop over magnets and find a nearby drift > 2mm
+        for name, mag in thinmags.iteritems():
+
+            #get thick elements before and after current one.
+            kickInd   = self.IndexFromName(name)
+            thinKicker = self[kickInd]
+            thickInd  =  FindFirstThickElement(kickInd, '-')
+            thickEle  = self[thickInd]
+
+            if not (thickEle['KEYWORD'] == 'DRIFT' or
+                    thickEle['KEYWORD'] == 'VKICKER' or
+                    thickEle['KEYWORD'] == 'HKICKER'):
+                thickInd = FindFirstThickElement(startInd, '+')
+                thickEle = self[thickInd]
+
+            if (thickEle['KEYWORD'] == 'DRIFT' and thickEle['L'] > 0.002):
+                InsertThickenedKicker(thickEle, thinKicker)
+            elif ((thickEle['KEYWORD'] == 'VKICKER' or
+                   thickEle['KEYWORD'] == 'HKICKER') and
+                  thickEle['L'] > 0.01):
+                InsertThickenedKicker(thickEle, thinKicker)
+
     def ComponentPerturbs(self, componentName, terse=False):
         '''
         Returns names of variables which would perturb a particle.
