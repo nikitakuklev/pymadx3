@@ -151,8 +151,7 @@ def MadxTfs2PtcBeam(tfs, ptcfilename,  startname=None):
     
     energy   = float(tfs.header['ENERGY'])
     gamma    = float(tfs.header['GAMMA'])
-    particle = str.lower(tfs.header['PARTICLE'])      ##FIX THIS STUFF!
-    #particle = 'proton' 
+    particle = str.lower(tfs.header['PARTICLE'])
     ex       = tfs.header['EX']
     ey       = tfs.header['EY']
     sigmae   = float(tfs.header['SIGE'])
@@ -160,7 +159,7 @@ def MadxTfs2PtcBeam(tfs, ptcfilename,  startname=None):
 
     data     = tfs.GetRowDict(tfs.sequence[startindex])
 
-    beam  = _pymadx.Beam(particle,energy,'ptc')
+    beam  = _pymadx.Beam(particle, energy,'ptc', emitx=ex, emity=ey, sigmaE=sigmae)
 
     beam.SetDistribFileName(ptcfilename) 
 
