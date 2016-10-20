@@ -59,6 +59,8 @@ class Tfs(object):
         self.nsegments   = 0
         self.segments    = []
         self.filename    = filename
+        self.smax        = 0
+        self.smin        = 0
         if type(filename) == str:
             self.Load(filename)
         elif type(filename) == Tfs:
@@ -153,6 +155,7 @@ class Tfs(object):
         #additional processing
         self.index = range(0,len(self.data),1)
         if 'S' in self.columns:
+            self.smin = self[0]['S']
             self.smax = self[-1]['S']
             sindex = self.ColumnIndex('S')
             sEnd = self.GetColumn('S')  #calculating the mid points as the element
@@ -327,7 +330,10 @@ class Tfs(object):
                     # maintain the original s from the original data
                     elementlist[self.ColumnIndex('S')] = elementlist[self.ColumnIndex('SORIGINAL')] - sOffset
                     elementlist[self.ColumnIndex('SMID')] = elementlist[self.ColumnIndex('SMID')] - sOffsetMid
-                a._AppendDataEntry(self.sequence[i], elementlist)                
+                a._AppendDataEntry(self.sequence[i], elementlist)
+
+            a.smax = max(a.GetColumn('S'))
+            a.smin = min(a.GetColumn('S'))
             return a
         
         elif type(index) == int:
