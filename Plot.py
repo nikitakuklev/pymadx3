@@ -225,8 +225,8 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     def DrawLine(e,color,alpha=1.0):
         ax.plot([e['S']-e['L'],e['S']-e['L']],[-0.2,0.2],'-',color=color,alpha=alpha)
             
-    # plot beam line 
-    ax.plot([0,tfs.smax],[0,0],'k-',lw=1)
+    # plot beam line - make extra long in case of reversal - won't 
+    ax.plot([tfs.smin,tfs.smax],[0,0],'k-',lw=1)
     ax.set_ylim(-0.5,0.5)
  
     # loop over elements and Draw on beamline
