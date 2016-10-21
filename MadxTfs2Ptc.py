@@ -108,6 +108,10 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
             k2 = madx.data[name][k2lindex] / l
             a.AddSextupole(rname,l,k2=k2,**kws)
 
+        elif t == 'OCTUPOLE':
+            k3 = madx.data[name][k3lindex] / l
+            a.AddOctupole(rname,l,k3=k3,**kws)
+
         elif t == 'SBEND':
             angle = madx.data[name][angleindex]
             a.AddDipole(rname,category='sbend',length=l,angle=angle,**kws)
