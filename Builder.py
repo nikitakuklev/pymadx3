@@ -28,7 +28,9 @@ madxcategories = [
     'sbend',
     'rbend',
     'quadrupole',
-    'sextupole'
+    'sextupole',
+    'octupole',
+    'decapole'
     ]
 
 class Element(dict) : 
@@ -212,8 +214,14 @@ class Machine :
     def AddQuadrupole(self, name='qd', length=0.1, k1=0.0, **kwargs):
         self.Append(Element(name,'quadrupole',l=length,k1=k1,**kwargs))
 
-    def AddSextupole(self, name='sd', length=0.1,k2=0.0, **kwargs) : 
+    def AddSextupole(self, name='sd', length=0.1, k2=0.0, **kwargs) : 
         self.Append(Element(name,'sextupole',l=length,k2=k2,**kwargs))
+
+    def AddOctupole(self, name='oc', length=0.1, k3=0.0, **kwargs) : 
+        self.Append(Element(name,'octupole',l=length,k3=k3,**kwargs))
+
+    def AddDecapole(self, name='dc', length=0.1, k4=0.0, **kwargs) : 
+        self.Append(Element(name,'decapole',l=length,k4=k4,**kwargs))
 
     def AddSampler(self,*elementnames):
         if elementnames[0] == 'all':
