@@ -21,8 +21,7 @@ def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
     lentot = 0.0
     lldiff = []
     dldiff = {}
-    itemsomitted = []        
-
+    itemsomitted = []
 
     a = _pymadx.Builder.Machine()
     
@@ -97,7 +96,6 @@ def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
         if t == 'DRIFT':
             a.AddDrift(rname,l,**kws)
 
-
         elif t == 'QUADRUPOLE':
             k1 = madx.data[name][k1lindex] / l
             a.AddQuadrupole(rname,l,k1=k1,**kws)
@@ -126,7 +124,6 @@ def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
 
     a.AddSampler(samplers)
 
-
     # Make beam file 
     if beam: 
         b = MadxTfs2PtcBeam(madx, ptcfilename, startname)
@@ -135,7 +132,6 @@ def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
     a.Write(outputfilename)
 
     return a
-
 
 def MadxTfs2PtcBeam(tfs, ptcfilename,  startname=None):
     if startname == None:
@@ -166,8 +162,3 @@ def MadxTfs2PtcBeam(tfs, ptcfilename,  startname=None):
     beam.SetDistribFileName(ptcfilename) 
 
     return beam
-
-
-  
-
-    
