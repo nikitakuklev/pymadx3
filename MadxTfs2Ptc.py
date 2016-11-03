@@ -3,16 +3,14 @@ import numpy as _np
 import re as _re
 import csv
 
+import _General
 
-def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,ignorezerolengthitems=True,samplers='all',beampiperadius=0.2,beam=True) :
 
-    if type(input) == str :
-        print 'MadxTfs2Ptc> Loading file using pymadx'
-        madx   = _pymadx.Tfs(input)
-    else :
-        print 'Already a pymadx instance - proceeding'
-        madx   = input
+def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
+                stopname=None,ignorezerolengthitems=True,samplers='all',
+                beampiperadius=0.2,beam=True):
 
+    madx = _General.CheckItsTfs(inputfile)
     ptcfilename = ptcfile
         
     nitems = madx.nitems
