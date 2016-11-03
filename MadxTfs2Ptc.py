@@ -117,10 +117,12 @@ def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
             a.AddDipole(rname,category='rbend',length=l,angle=angle,**kws)
 
         else:
-            print 'unknown element type: ',t,' for element named: ',name
-            print 'putting drift in instead as it has finite length'
-            a.AddDrift(rname,l)
-
+            print 'MadxTfs2Ptc> unknown element type: ',t,' for element named: ',name
+            if not zerolength:
+                print('MadxTfs2Ptc> replacing with drift')
+                a.AddDrift(rname,l)
+            else:
+                pass
 
     a.AddSampler(samplers)
 
