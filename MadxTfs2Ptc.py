@@ -49,6 +49,8 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
         lindex          = madx.ColumnIndex('L')
         angleindex      = madx.ColumnIndex('ANGLE')
         ksIindex        = madx.ColumnIndex('KSI')
+        k0lindex        = madx.ColumnIndex('K0L')
+        k0slindex       = madx.ColumnIndex('K0SL')
         k1lindex        = madx.ColumnIndex('K1L')
         k2lindex        = madx.ColumnIndex('K2L')
         k3lindex        = madx.ColumnIndex('K3L')
@@ -99,7 +101,6 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
         if t == 'DRIFT':
             a.AddDrift(rname,l,**kws)
 
-
         elif t == 'QUADRUPOLE':
             k1 = madx.data[name][k1lindex] / l
             a.AddQuadrupole(rname,l,k1=k1,**kws)
@@ -119,6 +120,28 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
         elif t == 'RBEND':
             angle = madx.data[name][angleindex]
             a.AddDipole(rname,category='rbend',length=l,angle=angle,**kws)
+
+        elif t == 'MARKER':
+            angle = madx.data[name][angleindex]
+            a.AddMarker(rname, **kws)
+
+        elif t == 'MULTIPOLE':
+            kn0l  = madx.data[name][k0lindex]
+            kn1l  = madx.data[name][k1lindex]
+            kn2l  = madx.data[name][k2lindex]
+            kn3l  = madx.data[name][k3lindex]
+            kn4l  = madx.data[name][k4lindex]
+            kn5l  = madx.data[name][k5lindex]
+            kn6l  = madx.data[name][k6lindex]
+            kn0sl = madx.data[name][k0slindex]
+            kn1sl = madx.data[name][k1slindex]
+            kn2sl = madx.data[name][k2slindex]
+            kn3sl = madx.data[name][k3slindex]
+            kn4sl = madx.data[name][k4slindex]
+            kn5sl = madx.data[name][k5slindex]
+            kn6sl = madx.data[name][k6slindex]
+            
+            a.AddMultipole(rname, knl=(kn0l, kn1l, kn2l, kn3l, kn4l, kn5l, kn6l), ksl=(kn0sl, kn1sl, kn2sl, kn3sl, kn4sl, kn5sl, kn6sl),**kws)
 
         else:
             print 'unknown element type: ',t,' for element named: ',name
