@@ -3,16 +3,14 @@ import numpy as _np
 import re as _re
 import csv
 
+import _General
 
-def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,ignorezerolengthitems=True,samplers='all',beampiperadius=0.2,beam=True) :
 
-    if type(input) == str :
-        print 'MadxTfs2Ptc> Loading file using pymadx'
-        madx   = _pymadx.Tfs(input)
-    else :
-        print 'Already a pymadx instance - proceeding'
-        madx   = input
+def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
+                stopname=None,ignorezerolengthitems=True,samplers='all',
+                beampiperadius=0.2,beam=True):
 
+    madx = _General.CheckItsTfs(inputfile)
     ptcfilename = ptcfile
         
     nitems = madx.nitems
@@ -23,8 +21,7 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
     lentot = 0.0
     lldiff = []
     dldiff = {}
-    itemsomitted = []        
-
+    itemsomitted = []
 
     a = _pymadx.Builder.Machine()
     
@@ -144,13 +141,14 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
             a.AddMultipole(rname, knl=(kn0l, kn1l, kn2l, kn3l, kn4l, kn5l, kn6l), ksl=(kn0sl, kn1sl, kn2sl, kn3sl, kn4sl, kn5sl, kn6sl),**kws)
 
         else:
-            print 'unknown element type: ',t,' for element named: ',name
-            print 'putting drift in instead as it has finite length'
-            a.AddDrift(rname,l)
-
+            print 'MadxTfs2Ptc> unknown element type: ',t,' for element named: ',name
+            if not zerolength:
+                print('MadxTfs2Ptc> replacing with drift')
+                a.AddDrift(rname,l)
+            else:
+                pass
 
     a.AddSampler(samplers)
-
 
     # Make beam file 
     if beam: 
@@ -160,7 +158,6 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
     a.Write(outputfilename)
 
     return a
-
 
 def MadxTfs2PtcBeam(tfs, ptcfilename,  startname=None):
     if startname == None:
@@ -191,8 +188,3 @@ def MadxTfs2PtcBeam(tfs, ptcfilename,  startname=None):
     beam.SetDistribFileName(ptcfilename) 
 
     return beam
-
-
-  
-
-    
