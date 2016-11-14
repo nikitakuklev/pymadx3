@@ -94,6 +94,9 @@ def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
             continue #this skips the rest of the loop as we're ignoring this item
 
         kws = {} # element-specific keywords
+        tilt = madx.data[name][tiltindex]
+        if tilt != 0:
+            kws['tilt'] = tilt
 
         if t == 'DRIFT':
             a.AddDrift(rname,l,**kws)
