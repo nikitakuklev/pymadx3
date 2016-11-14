@@ -135,7 +135,7 @@ class PtcAnalysis(object) :
             yy_sv   = _np.sum((y-_np.mean(y))*(y-_np.mean(y)))
 
             xp_sv   = _np.sum(xp-_np.mean(xp))
-            xpxp_sv = _np.sum((xp-_np.pmean(xp))*(xp-_np.mean(xp)))
+            xpxp_sv = _np.sum((xp-_np.mean(xp))*(xp-_np.mean(xp)))
             yp_sv   = _np.sum(yp-_np.mean(yp))
             ypyp_sv = _np.sum((yp-_np.mean(yp))*(yp-_np.mean(yp)))
             
