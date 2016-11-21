@@ -68,7 +68,9 @@ def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
         betayindex      = madx.ColumnIndex('BETY')
         vkickangleindex = madx.ColumnIndex('VKICK')
         hkickangleindex = madx.ColumnIndex('HKICK')
-        
+        e1index         = madx.ColumnIndex('E1')
+        e2index         = madx.ColumnIndex('E2')
+
     except ValueError:
         print 'Missing columns from tfs file - insufficient information to convert file'
         print 'Required columns : L, ANGLE, KSI, K1L...K6L, K1SL...K6SL, TILT, KEYWORD, ALFX, ALFY, BETX, BETY, VKICK, HKICK'
@@ -97,6 +99,13 @@ def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
         tilt = madx.data[name][tiltindex]
         if tilt != 0:
             kws['tilt'] = tilt
+        
+        e1 = madx.data[name][e1index]
+        e2 = madx.data[name][e2index]
+        if e1 != 0:
+            kws['e1'] = e1
+        if e2 != 0:
+            kws['e2'] = e2
 
         if t == 'DRIFT':
             a.AddDrift(rname,l,**kws)
