@@ -3,16 +3,14 @@ import numpy as _np
 import re as _re
 import csv
 
+import _General
 
-def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,ignorezerolengthitems=True,samplers='all',beampiperadius=0.2,beam=True) :
 
-    if type(input) == str :
-        print 'MadxTfs2Ptc> Loading file using pymadx'
-        madx   = _pymadx.Tfs(input)
-    else :
-        print 'Already a pymadx instance - proceeding'
-        madx   = input
+def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
+                stopname=None,ignorezerolengthitems=True,samplers='all',
+                beampiperadius=0.2,beam=True):
 
+    madx = _General.CheckItsTfs(inputfile)
     ptcfilename = ptcfile
         
     nitems = madx.nitems
@@ -23,8 +21,7 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
     lentot = 0.0
     lldiff = []
     dldiff = {}
-    itemsomitted = []        
-
+    itemsomitted = []
 
     a = _pymadx.Builder.Machine()
     
@@ -49,6 +46,8 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
         lindex          = madx.ColumnIndex('L')
         angleindex      = madx.ColumnIndex('ANGLE')
         ksIindex        = madx.ColumnIndex('KSI')
+        k0lindex        = madx.ColumnIndex('K0L')
+        k0slindex       = madx.ColumnIndex('K0SL')
         k1lindex        = madx.ColumnIndex('K1L')
         k2lindex        = madx.ColumnIndex('K2L')
         k3lindex        = madx.ColumnIndex('K3L')
@@ -69,7 +68,9 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
         betayindex      = madx.ColumnIndex('BETY')
         vkickangleindex = madx.ColumnIndex('VKICK')
         hkickangleindex = madx.ColumnIndex('HKICK')
-        
+        e1index         = madx.ColumnIndex('E1')
+        e2index         = madx.ColumnIndex('E2')
+
     except ValueError:
         print 'Missing columns from tfs file - insufficient information to convert file'
         print 'Required columns : L, ANGLE, KSI, K1L...K6L, K1SL...K6SL, TILT, KEYWORD, ALFX, ALFY, BETX, BETY, VKICK, HKICK'
@@ -95,10 +96,19 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
             continue #this skips the rest of the loop as we're ignoring this item
 
         kws = {} # element-specific keywords
+        tilt = madx.data[name][tiltindex]
+        if tilt != 0:
+            kws['tilt'] = tilt
+        
+        e1 = madx.data[name][e1index]
+        e2 = madx.data[name][e2index]
+        if e1 != 0:
+            kws['e1'] = e1
+        if e2 != 0:
+            kws['e2'] = e2
 
         if t == 'DRIFT':
             a.AddDrift(rname,l,**kws)
-
 
         elif t == 'QUADRUPOLE':
             k1 = madx.data[name][k1lindex] / l
@@ -108,6 +118,10 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
             k2 = madx.data[name][k2lindex] / l
             a.AddSextupole(rname,l,k2=k2,**kws)
 
+        elif t == 'OCTUPOLE':
+            k3 = madx.data[name][k3lindex] / l
+            a.AddOctupole(rname,l,k3=k3,**kws)
+
         elif t == 'SBEND':
             angle = madx.data[name][angleindex]
             a.AddDipole(rname,category='sbend',length=l,angle=angle,**kws)
@@ -116,14 +130,37 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
             angle = madx.data[name][angleindex]
             a.AddDipole(rname,category='rbend',length=l,angle=angle,**kws)
 
-        else:
-            print 'unknown element type: ',t,' for element named: ',name
-            print 'putting drift in instead as it has finite length'
-            a.AddDrift(rname,l)
+        elif t == 'MARKER':
+            angle = madx.data[name][angleindex]
+            a.AddMarker(rname, **kws)
 
+        elif t == 'MULTIPOLE':
+            kn0l  = madx.data[name][k0lindex]
+            kn1l  = madx.data[name][k1lindex]
+            kn2l  = madx.data[name][k2lindex]
+            kn3l  = madx.data[name][k3lindex]
+            kn4l  = madx.data[name][k4lindex]
+            kn5l  = madx.data[name][k5lindex]
+            kn6l  = madx.data[name][k6lindex]
+            kn0sl = madx.data[name][k0slindex]
+            kn1sl = madx.data[name][k1slindex]
+            kn2sl = madx.data[name][k2slindex]
+            kn3sl = madx.data[name][k3slindex]
+            kn4sl = madx.data[name][k4slindex]
+            kn5sl = madx.data[name][k5slindex]
+            kn6sl = madx.data[name][k6slindex]
+            
+            a.AddMultipole(rname, knl=(kn0l, kn1l, kn2l, kn3l, kn4l, kn5l, kn6l), ksl=(kn0sl, kn1sl, kn2sl, kn3sl, kn4sl, kn5sl, kn6sl),**kws)
+
+        else:
+            print 'MadxTfs2Ptc> unknown element type: ',t,' for element named: ',name
+            if not zerolength:
+                print('MadxTfs2Ptc> replacing with drift')
+                a.AddDrift(rname,l)
+            else:
+                pass
 
     a.AddSampler(samplers)
-
 
     # Make beam file 
     if beam: 
@@ -133,7 +170,6 @@ def MadxTfs2Ptc(input,outputfilename, ptcfile, startname=None,stopname=None,igno
     a.Write(outputfilename)
 
     return a
-
 
 def MadxTfs2PtcBeam(tfs, ptcfilename,  startname=None):
     if startname == None:
@@ -164,8 +200,3 @@ def MadxTfs2PtcBeam(tfs, ptcfilename,  startname=None):
     beam.SetDistribFileName(ptcfilename) 
 
     return beam
-
-
-  
-
-    

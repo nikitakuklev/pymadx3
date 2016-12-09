@@ -129,18 +129,23 @@ class PtcAnalysis(object) :
             ypE_s  /= wgt
             yE_s   /= wgt
             
-            x_sv  = _np.sum(x-_np.mean(x))
-            xx_sv = _np.sum((x-_np.mean(x))*(x-_np.mean(x)))
-            y_sv  = _np.sum(y-_np.mean(y))
-            yy_sv = _np.sum((y-_np.mean(y))*(y-_np.mean(y)))
+            x_sv    = _np.sum(x-_np.mean(x))
+            xx_sv   = _np.sum((x-_np.mean(x))*(x-_np.mean(x)))
+            y_sv    = _np.sum(y-_np.mean(y))
+            yy_sv   = _np.sum((y-_np.mean(y))*(y-_np.mean(y)))
+
+            xp_sv   = _np.sum(xp-_np.mean(xp))
+            xpxp_sv = _np.sum((xp-_np.mean(xp))*(xp-_np.mean(xp)))
+            yp_sv   = _np.sum(yp-_np.mean(yp))
+            ypyp_sv = _np.sum((yp-_np.mean(yp))*(yp-_np.mean(yp)))
             
             #Calculate variances/sigmas
             variance_x = (xx_sv - (x_sv * x_sv)/wgt)/wgt
             variance_y = (yy_sv - (y_sv * y_sv)/wgt)/wgt
             sigma_x    = _np.sqrt(variance_x)
             sigma_y    = _np.sqrt(variance_y)
-            variance_xp = (xpxp_s - (xp_s * xp_s)/wgt)/wgt
-            variance_yp = (ypyp_s - (yp_s * yp_s)/wgt)/wgt
+            variance_xp = (xpxp_sv - (xp_sv * xp_sv)/wgt)/wgt
+            variance_yp = (ypyp_sv - (yp_sv * yp_sv)/wgt)/wgt
             sigma_xp   = _np.sqrt(variance_xp)
             sigma_yp   = _np.sqrt(variance_yp)
         

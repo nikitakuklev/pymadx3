@@ -95,12 +95,12 @@ def PlotTfsBeta(tfsfile, title='',outputfilename=None, machine=True, dispersion=
     axoptics = f.add_subplot(111)
 
     #optics plots
-    axoptics.plot(d['s'],_np.sqrt(d['betx']),'b-', label=r'$\sqrt{\beta_{x}}$')
-    axoptics.plot(d['s'],_np.sqrt(d['bety']),'g-', label=r'$\sqrt{\beta_{y}}$')
+    axoptics.plot(d['s'],_np.sqrt(d['betx']),'b-', label='x')
+    axoptics.plot(d['s'],_np.sqrt(d['bety']),'g-', label='y')
     if dispersion:
         axoptics.plot(-100,-100,'r--', label=r'$\mathrm{D}(x)$') #fake plot for legend
     axoptics.set_xlabel('S (m)')
-    axoptics.set_ylabel(r'$\sqrt{\beta_{x,y}}$ ($\sqrt{\mathrm{m}}$)')
+    axoptics.set_ylabel(r'$\sqrt{\beta}$ ($\sqrt{\mathrm{m}}$)')
     axoptics.legend(loc=0,fontsize='small') #best position
 
     #plot dispersion - only in horizontal
@@ -225,8 +225,8 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     def DrawLine(e,color,alpha=1.0):
         ax.plot([e['S']-e['L'],e['S']-e['L']],[-0.2,0.2],'-',color=color,alpha=alpha)
             
-    # plot beam line 
-    ax.plot([0,tfs.smax],[0,0],'k-',lw=1)
+    # plot beam line - make extra long in case of reversal - won't 
+    ax.plot([tfs.smin,tfs.smax],[0,0],'k-',lw=1)
     ax.set_ylim(-0.5,0.5)
  
     # loop over elements and Draw on beamline
