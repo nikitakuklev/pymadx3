@@ -771,7 +771,8 @@ class Tfs(object):
             return 'RECTANGLE'
         else:
             print "WARNING: The given aperture is not classified among the known types"
-            print "A1=" + str(aper1) + " A2=" +  str(aper2) + " A3=" + str(aper3) + " A4=" + str(aper4)
+            print "A1 = " + str(aper1) + ", A2 = " +  str(aper2) + ", A3 = " + str(aper3) + ", A4 = " + str(aper4)
+
 
 
 def Cast(string):
