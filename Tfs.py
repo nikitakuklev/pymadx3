@@ -764,8 +764,76 @@ class Tfs(object):
         else:
             return perturbingParameters
 
+    def SplitElement(self, SSplit):
+        '''Splits the element found at SSplit given, performs the necessary
+        operations on the lattice to leave the model functionally
+        identical and returns the indices of the first and second
+        component.  Element new name will be the same as the original
+        except appended with a number corresponding to its location in
+        the list of previously identically defined components used in
+        the sequence and either "split_1" or "split_2" depending on
+        which side of the split it is located.  It is necessary to
+        append both of these numbers to ensure robust name mangling.
 
-        return greZero
+        WARNING: DO NOT SPLIT THE ELEMENT WHICH MARKS THE BEGINNING OF
+        YOUR LATTICE.  YOUR OPTICS WILL BE WRONG!
+
+        '''
+
+        # the element to be split:
+        originalIndex = self.IndexFromNearestS(SSplit)
+        originalName = self.sequence[originalIndex]
+        originalLength = self[originalName]['L']
+        originalS = self[originalName]['S']
+        elementType = self[originalName]['KEYWORD']
+
+        # First of the two elements that the original is split into.
+        # Remembering that in MADX S is at the end of the component.
+        firstS = SSplit
+        firstLength = originalLength - (originalS - SSplit)
+        firstName = originalName + str("_split_1")
+        firstIndex = originalIndex
+
+        # second of two elements that original is split into:
+        secondS = originalS
+        secondLength = originalS - SSplit
+        secondName = originalName + str("_split_2")
+        secondIndex = originalIndex + 1
+
+        # Get the parameters which affect the particle's motion
+        perturbingParameters = self.ComponentPerturbs(originalIndex)
+
+        # update the sequence
+        self.sequence[originalIndex] = firstName
+        self.sequence.insert(originalIndex, secondName)
+
+        # Making data entries for new components
+        self.data[firstName] = _copy.deepcopy(self.data[originalName])
+        self.data[secondName] = _copy.deepcopy(self.data[originalName])
+        del self.data[originalName]
+
+        # Apply the relevant edits to the newly split component.
+        self.EditComponent(firstIndex, 'L', firstLength)
+        self.EditComponent(firstIndex, 'S', firstS)
+        self.EditComponent(firstIndex, 'SMID', firstS - firstLength/2.0)
+        self.EditComponent(firstIndex, 'SORIGINAL', originalS)
+        self.EditComponent(firstIndex, 'NAME', firstName)
+
+        self.EditComponent(secondIndex, 'L', secondLength)
+        self.EditComponent(secondIndex, 'S', secondS)
+        self.EditComponent(secondIndex, 'SMID', secondS - secondLength/2.0)
+        self.EditComponent(secondIndex, 'SORIGINAL', originalS)
+        self.EditComponent(secondIndex, 'NAME', secondName)
+        # Assign the appropriate amount of kick to each of the two components
+        ratio = firstLength/originalLength
+        originalHKick = self[firstIndex]['HKICK']
+        originalVKick = self[firstIndex]['VKICK']
+        self.EditComponent(firstIndex, 'HKICK', ratio * originalHKick)
+        self.EditComponent(firstIndex, 'VKICK', ratio * originalVKick)
+        self.EditComponent(secondIndex, 'HKICK', ratio * originalHKick)
+        self.EditComponent(secondIndex, 'VKICK', ratio * originalVKick)
+
+        return firstIndex, secondIndex
 
     @staticmethod
     def GetSixTrackAperType(aper1,aper2,aper3,aper4):
