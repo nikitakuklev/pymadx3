@@ -486,6 +486,17 @@ class Tfs(object):
                 a._AppendDataEntry(key,self.data[key])
         return a
 
+    def EditComponent(self, index, variable, value):
+        '''
+        Edits variable of component at index and sets it to value.  Can
+        only take indices as every single element in the sequence has
+        a unique definition, and components which may appear
+        degenerate/reused are in fact not in this data model.
+        '''
+        variableIndex = self.columns.index(variable)
+        componentName = self.sequence[index]
+        self.data[componentName][variableIndex] = value
+
     def InterrogateItem(self,itemname):
         """
         InterrogateItem(itemname)
