@@ -708,7 +708,7 @@ class Tfs(object):
                   thickEle['L'] > 0.01):
                 InsertThickenedKicker(thickEle, thinKicker)
 
-    def ComponentPerturbs(self, componentName, terse=False):
+    def ComponentPerturbs(self, componentName, terse=True):
         '''
         Returns names of variables which would perturb a particle.
         Some components written out in TFS are redundant,
@@ -717,8 +717,8 @@ class Tfs(object):
 
         Checks integrated stengths (but not if L=0), HKICK and VKICK
 
-        componentName    --  Name of component to be checked
-        terse            --  Print out the parameters which perturb if True
+        componentName    --  Name of component to be checked.  can also be index.
+        terse            --  Print out the parameters which perturb if False
         '''
 
         component = self[componentName]
@@ -728,7 +728,7 @@ class Tfs(object):
             componentIndex = componentName
             componentName = self[componentName]['NAME']
 
-        greZero = []  # list of perturbing params which are abs>0
+        perturbingParameters = []  # list of perturbing params which are abs>0
 
         # these checks may be incomplete..  just the ones i know of.
 
@@ -738,19 +738,26 @@ class Tfs(object):
                kls = _re.compile(r'K[0-9]*S?L') # matches all integrated strengths.
                if (_re.match(kls, variable) and
                    abs(component[variable]) > 0):
-                   greZero.append(variable)
+                   perturbingParameters.append(variable)
 
         #check the kick angles.
         if abs(component['VKICK']) > 0:
-            greZero.append('VKICK')
+            perturbingParameters.append('VKICK')
         if abs(component['HKICK']) > 0:
-            greZero.append('HKICK')
+            perturbingParameters.append('HKICK')
 
         if terse == False:
-            if greZero:
+            if perturbingParameters:
                 print "--Element: " + componentName + " @ index " + str(componentIndex) + " parameters:"
-                for variable in greZero:
+                for variable in perturbingParameters:
                     print variable + "= ", component[variable]
+                    print "Length = ", component['L']
+
+        if (not perturbingParameters):
+            return False
+        else:
+            return perturbingParameters
+
 
         return greZero
 
