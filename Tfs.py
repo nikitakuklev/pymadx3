@@ -400,15 +400,21 @@ class Tfs(object):
         i = self.IndexFromNearestS(S) 
         return self.sequence[i]
 
-    def IndexFromNearestS(self,S) : 
+    def IndexFromNearestS(self, S) :
         """
-        IndexFromNearestS(S) 
+        IndexFromNearestS(S)
 
-        return the index of the beamline element clostest to S 
+        return the index of the beamline element closest to S.
+
         """
-        sMid = self.GetColumn('SMID')
-        a = min(sMid, key=lambda x:abs(x-S))
-        return int(_np.where(sMid == a)[0])
+
+        for i in range(1, self.nitems + 1):
+            sLow = self[i - 1]['S']
+            sHigh = self[i]['S']
+
+            if (S >= sLow and S < sHigh):
+                return i
+        raise Exception("S outside of range")
 
     def _EnsureItsAnIndex(self, value):
         if type(value) == str:
