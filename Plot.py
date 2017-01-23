@@ -123,7 +123,7 @@ def PlotTfsBeta(tfsfile, title='',outputfilename=None, machine=True, dispersion=
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
-def AddMachineLatticeToFigure(figure,tfsfile):
+def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
     """
     Add a diagram above the current graph in the figure that represents the
     accelerator based on a madx twiss file in tfs format.
@@ -152,12 +152,13 @@ def AddMachineLatticeToFigure(figure,tfsfile):
     #adjust existing plot to make way for machine lattice
     #iterate over axes incase there's dual plots
     nAxesNewX = len(axs) + 1 # there will be one more new axis
-    ratios = [5]*len(axs) # here we assume if there are other figures, they're equal proportion
+    ratios = [15]*len(axs) # here we assume if there are other figures, they're equal proportion
     ratios.insert(0,1) # put the small one at the front, 1/5 the size of the others
     gs = _plt.GridSpec(nAxesNewX,1,height_ratios=tuple(ratios))
     # apparently, gridspec is like a list but doesn't implement len or shape
     # and it's in reverse order compared to the axes from a figure - it's bad
     for i,ax in enumerate(axs):
+        # axs is original set of axes
         gsindex = i+1
         ax.set_position(gs[gsindex].get_position(figure))
         ax.set_subplotspec(gs[gsindex])
@@ -171,8 +172,12 @@ def AddMachineLatticeToFigure(figure,tfsfile):
     axmachine.spines['left'].set_visible(False)
     axmachine.spines['right'].set_visible(False)
     figure.set_facecolor('white')
-    # leave plot as it was
-    #_plt.subplots_adjust(hspace=0.01,top=0.94,left=0.1,right=0.92,wspace=originalwspace)
+
+    # if we only have 2 axes (including new machine diagram, condense vertical space between
+    # the machine diagram and the plot. if more than 2, it means there are more user plots
+    # and we should leave it alone
+    if (nAxesNewX == 2):
+        _plt.subplots_adjust(hspace=0.01,top=0.94,left=0.1,right=0.92,wspace=0.02)
 
     #generate the machine lattice plot
     _DrawMachineLattice(axmachine,tfs)
@@ -180,6 +185,7 @@ def AddMachineLatticeToFigure(figure,tfsfile):
     xr = xl[1] - xl[0]
     axoptics.set_xlim(xl[0]-0.02*xr,xl[1]+0.02*xr)
     axmachine.set_xlim(xl[0]-0.02*xr,xl[1]+0.02*xr)
+    axmachine.set_ylim(-0.2,0.2)
 
     #put callbacks for linked scrolling
     def MachineXlim(ax): 
@@ -193,7 +199,10 @@ def AddMachineLatticeToFigure(figure,tfsfile):
             print 'Closest element: ',tfs.NameFromNearestS(a.xdata)
 
     axmachine.callbacks.connect('xlim_changed', MachineXlim)
-    figure.canvas.mpl_connect('button_press_event', Click) 
+    figure.canvas.mpl_connect('button_press_event', Click)
+
+    if (tightLayout):
+        _plt.tight_layout()
 
 def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     ax  = axesinstance #handy shortcut
