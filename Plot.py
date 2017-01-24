@@ -201,7 +201,7 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
     # if we only have 2 axes (including new machine diagram, condense vertical space between
     # the machine diagram and the plot. if more than 2, it means there are more user plots
     # and we should leave it alone
-    if (nAxesNewX == 
+    if (nAxesNewX == 2):
         _plt.subplots_adjust(hspace=0.04)
 
 def _DrawMachineLattice(axesinstance,pymadxtfsobject):
