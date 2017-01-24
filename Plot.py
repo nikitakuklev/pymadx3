@@ -242,19 +242,19 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     for element in tfs:
         kw = element['KEYWORD']
         if kw == 'QUADRUPOLE': 
-            DrawQuad(element)
+            DrawQuad(element, u'#d10000') #red
         elif kw == 'RBEND': 
-            DrawBend(element)
+            DrawBend(element, u'#0066cc') #blue
         elif kw == 'SBEND': 
-            DrawBend(element)
+            DrawBend(element, u'#0066cc') #blue
         elif kw == 'RCOLLIMATOR': 
             DrawRect(element,'k')
         elif kw == 'ECOLLIMATOR': 
             DrawRect(element,'k')
         elif kw == 'SEXTUPOLE':
-            DrawHex(element,'#ffcf17') #yellow
+            DrawHex(element, u'#ffcc00') #yellow
         elif kw == 'OCTUPOLE':
-            DrawHex(element,'g')
+            DrawHex(element, u'#00994c') #green
         elif kw == 'DRIFT':
             pass
         elif kw == 'MULTIPOLE':
