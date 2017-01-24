@@ -173,12 +173,6 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
     axmachine.spines['right'].set_visible(False)
     figure.set_facecolor('white')
 
-    # if we only have 2 axes (including new machine diagram, condense vertical space between
-    # the machine diagram and the plot. if more than 2, it means there are more user plots
-    # and we should leave it alone
-    if (nAxesNewX == 2):
-        _plt.subplots_adjust(hspace=0.01,top=0.94,left=0.1,right=0.92,wspace=0.02)
-
     #generate the machine lattice plot
     _DrawMachineLattice(axmachine,tfs)
     xl = axmachine.get_xlim()
@@ -203,6 +197,12 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
 
     if (tightLayout):
         _plt.tight_layout()
+
+    # if we only have 2 axes (including new machine diagram, condense vertical space between
+    # the machine diagram and the plot. if more than 2, it means there are more user plots
+    # and we should leave it alone
+    if (nAxesNewX == 
+        _plt.subplots_adjust(hspace=0.04)
 
 def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     ax  = axesinstance #handy shortcut
