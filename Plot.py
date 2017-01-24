@@ -247,6 +247,10 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
             DrawBend(element, u'#0066cc') #blue
         elif kw == 'SBEND': 
             DrawBend(element, u'#0066cc') #blue
+        elif kw == 'HKICKER':
+            DrawRect(element, u'#4c33b2') #purple
+        elif kw == 'VKICKER':
+            DrawRect(element, u'#ba55d3') #medium orchid
         elif kw == 'RCOLLIMATOR': 
             DrawRect(element,'k')
         elif kw == 'ECOLLIMATOR': 
