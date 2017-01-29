@@ -69,7 +69,6 @@ def PlotTfsCentroids(tfsfile, title='', outputfilename=None, machine=True):
         AddMachineLatticeToFigure(f,madx)
 
     _plt.suptitle(title,size='x-large')
-    _plt.tight_layout()
     
     if outputfilename != None:
         if '.' in outputfilename:
@@ -114,8 +113,6 @@ def PlotTfsBeta(tfsfile, title='',outputfilename=None, machine=True, dispersion=
         AddMachineLatticeToFigure(f,madx)
 
     _plt.suptitle(title,size='x-large')
-
-    _plt.tight_layout()
     
     if outputfilename != None:
         if '.' in outputfilename:
@@ -123,6 +120,38 @@ def PlotTfsBeta(tfsfile, title='',outputfilename=None, machine=True, dispersion=
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
+def _SetMachineAxesStyle(ax):
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+def _PrepareMachineAxes(figure):
+    # create new machine axis with proportions 6 : 1
+    axmachine = figure.add_subplot(911, projection="_My_Axes")
+    _SetMachineAxesStyle(axmachine)
+    return axmachine
+
+def _AdjustExistingAxes(figure, fraction=0.9, tightLayout=True):
+    """
+    Fraction is fraction of height all subplots will be after adjustment.
+    Default is 0.9 for 90% of height. 
+    """
+    # we have to set tight layout before adjustment otherwise if called
+    # later it will cause an overlap with the machine diagram
+    if (tightLayout):
+        _plt.tight_layout()
+    
+    axs = figure.get_axes()
+    
+    for ax in axs:
+        bbox = ax.get_position()
+        bbox.y0 = bbox.y0 * fraction
+        bbox.y1 = bbox.y1 * fraction
+        ax.set_position(bbox)  
+        
 def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
     """
     Add a diagram above the current graph in the figure that represents the
@@ -147,46 +176,17 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
         raise IOError
 
     axs = figure.get_axes() # get the existing graph
-    axoptics = axs[0]       # get the only presumed axes from the figure
     
-    #adjust existing plot to make way for machine lattice
-    #iterate over axes incase there's dual plots
-    nAxesNewX = len(axs) + 1 # there will be one more new axis
-    ratios = [15]*len(axs) # here we assume if there are other figures, they're equal proportion
-    ratios.insert(0,1) # put the small one at the front, 1/5 the size of the others
-    gs = _plt.GridSpec(nAxesNewX,1,height_ratios=tuple(ratios))
-    # apparently, gridspec is like a list but doesn't implement len or shape
-    # and it's in reverse order compared to the axes from a figure - it's bad
-    for i,ax in enumerate(axs):
-        # axs is original set of axes
-        gsindex = i+1
-        ax.set_position(gs[gsindex].get_position(figure))
-        ax.set_subplotspec(gs[gsindex])
-
-    #add new axes for machine lattice
-    axmachine = figure.add_subplot(gs[0], projection="_My_Axes")
-    axmachine.get_xaxis().set_visible(False)
-    axmachine.get_yaxis().set_visible(False)
-    axmachine.spines['top'].set_visible(False)
-    axmachine.spines['bottom'].set_visible(False)
-    axmachine.spines['left'].set_visible(False)
-    axmachine.spines['right'].set_visible(False)
-    figure.set_facecolor('white')
-
-    #generate the machine lattice plot
+    axoptics  = figure.get_axes()[0]
+    _AdjustExistingAxes(figure, tightLayout=tightLayout)
+    axmachine = _PrepareMachineAxes(figure)
+    
     _DrawMachineLattice(axmachine,tfs)
-    xl = axmachine.get_xlim()
-    xr = xl[1] - xl[0]
-    axoptics.set_xlim(xl[0]-0.02*xr,xl[1]+0.02*xr)
-    axmachine.set_xlim(xl[0]-0.02*xr,xl[1]+0.02*xr)
-    axmachine.set_ylim(-0.2,0.2)
 
     #put callbacks for linked scrolling
     def MachineXlim(ax): 
         axmachine.set_autoscale_on(False)
-        for ax in axs:
-            ax.set_xlim(axmachine.get_xlim())
-            #axoptics.set_xlim(axmachine.get_xlim())
+        axoptics.set_xlim(axmachine.get_xlim())
 
     def Click(a) : 
         if a.button == 3 : 
@@ -194,15 +194,6 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
 
     axmachine.callbacks.connect('xlim_changed', MachineXlim)
     figure.canvas.mpl_connect('button_press_event', Click)
-
-    if (tightLayout):
-        _plt.tight_layout()
-
-    # if we only have 2 axes (including new machine diagram, condense vertical space between
-    # the machine diagram and the plot. if more than 2, it means there are more user plots
-    # and we should leave it alone
-    if (nAxesNewX == 2):
-        _plt.subplots_adjust(hspace=0.04)
 
 def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     ax  = axesinstance #handy shortcut
@@ -236,7 +227,7 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
             
     # plot beam line - make extra long in case of reversal - won't 
     ax.plot([tfs.smin,tfs.smax],[0,0],'k-',lw=1)
-    ax.set_ylim(-0.5,0.5)
+    ax.set_ylim(-0.2,0.2)
  
     # loop over elements and Draw on beamline
     for element in tfs:
