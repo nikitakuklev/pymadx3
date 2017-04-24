@@ -70,6 +70,9 @@ def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
         hkickangleindex = madx.ColumnIndex('HKICK')
         e1index         = madx.ColumnIndex('E1')
         e2index         = madx.ColumnIndex('E2')
+        fintindex       = madx.ColumnIndex('FINT')
+        fintxindex      = madx.ColumnIndex('FINTX')
+        hgapindex       = madx.ColumnIndex('HGAP')
 
     except ValueError:
         print 'Missing columns from tfs file - insufficient information to convert file'
@@ -100,12 +103,22 @@ def MadxTfs2Ptc(inputfile,outputfilename, ptcfile, startname=None,
         if tilt != 0:
             kws['tilt'] = tilt
         
-        e1 = madx.data[name][e1index]
-        e2 = madx.data[name][e2index]
+        e1    = madx.data[name][e1index]
+        e2    = madx.data[name][e2index]
+        fint  = madx.data[name][fintindex]
+        fintx = madx.data[name][fintxindex]
+        hgap  = madx.data[name][hgapindex]
+
         if e1 != 0:
             kws['e1'] = e1
+            if fint != 0:
+                kws['fint'] = fint
         if e2 != 0:
             kws['e2'] = e2
+            if fintx != 0:
+                kws['fintx'] = fintx
+        if hgap != 0:
+            kws['hgap'] = hgap
 
         if t == 'DRIFT':
             a.AddDrift(rname,l,**kws)
