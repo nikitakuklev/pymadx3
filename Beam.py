@@ -84,6 +84,18 @@ class Beam(dict):
         s += ', file=' + basefilename+'.tfs;'
         return s
 
+    def SetX0(self,x0=0.0):
+        self['X0'] = x0
+
+    def SetY0(self,y0=0.0):
+        self['Y0'] = y0
+    
+    def SetXP0(self,xp0=0.0):
+        self['Xp0'] = xp0
+
+    def SetYP0(self,yp0=0.0):
+        self['Yp0'] = yp0
+
     def SetT0(self,t0=0.0,unitsstring='s'):
         self['T0'] = t0 + '*' + unitsstring
 
