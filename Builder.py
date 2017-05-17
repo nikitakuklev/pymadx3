@@ -215,10 +215,10 @@ class Machine :
         self.Append(Element(name,category,l=length,angle=angle,**kwargs))
 
     def AddHKicker(self, name='hk', hkick=0, length=0, **kwargs):
-        self.Append(Element(name,'hkicker',hkick=hkick,l=length,**kwargs)
+        self.Append(Element(name,'hkicker',hkick=hkick,l=length,**kwargs))
 
     def AddVKicker(self, name='vk', vkick=0, length=0, **kwargs):
-        self.Append(Element(name,'vkicker',vkick=vkick,l=length,**kwargs)
+        self.Append(Element(name,'vkicker',vkick=vkick,l=length,**kwargs))
 
     def AddQuadrupole(self, name='qd', length=0.1, k1=0.0, **kwargs):
         self.Append(Element(name,'quadrupole',l=length,k1=k1,**kwargs))
