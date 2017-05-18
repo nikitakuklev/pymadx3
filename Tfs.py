@@ -396,7 +396,7 @@ class Tfs(object):
         """
         return self.sequence[index]
 
-    def NameFromNearestS(self,S) : 
+    def NameFromNearestS(self,S):
         """
         NameFromNearestS(S) 
 
@@ -406,7 +406,7 @@ class Tfs(object):
         i = self.IndexFromNearestS(S) 
         return self.sequence[i]
 
-    def IndexFromNearestS(self, S) :
+    def IndexFromNearestS(self, S):
         """
         IndexFromNearestS(S)
 
