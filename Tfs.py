@@ -336,7 +336,7 @@ class Tfs(object):
             a.smin = min(a.GetColumn('S'))
             return a
         
-        elif type(index) == int:
+        elif type(index) == int or type(index) == _np.int64:
             return self.GetRowDict(self.sequence[index])
         elif type(index) == str:
             return self.GetRowDict(index)
@@ -414,14 +414,13 @@ class Tfs(object):
 
         """
 
-        for i in range(1, self.nitems + 1):
-            sLow = self[i - 1]['S']
-            sHigh = self[i]['S']
-
-            if (S >= sLow and S < sHigh):
-                return i
-        raise Exception("S outside of range")
-
+        sd = self.GetColumn('S')
+        if S > sd[-1]:
+            raise Exception("S outside of range")
+        else:
+            result = _np.argmin(abs(sd - S))
+            return result
+        
     def _EnsureItsAnIndex(self, value):
         if type(value) == str:
             return self.IndexFromName(value)
