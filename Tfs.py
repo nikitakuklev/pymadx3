@@ -55,6 +55,7 @@ class Tfs(object):
         self.formats     = []
         self.data        = {}
         self.sequence    = []
+        self.sequenceUnique = []
         self.nitems      = 0
         self.nsegments   = 0
         self.segments    = []
@@ -143,9 +144,12 @@ class Tfs(object):
                 d.insert(0,segment_name) #prepend segment info
                 d.insert(0,segment_i) #this one becomes the first item matching the column index
                 if usename:
-                    name = self._CheckName(d[namecolumnindex])
+                    name       = d[namecolumnindex]
+                    nameUnique = self._CheckName(name)
                 else:
-                    name = self.nitems
+                    name       = self.nitems
+                    nameUnique = name
+                self.sequenceUnique.append(nameUnique)
                 self.sequence.append(name) # keep the name in sequence
                 self.data[name] = d        # put in data dict by name
                 self.nitems += 1           # keep tally of number of items
@@ -743,6 +747,14 @@ class Tfs(object):
         elif isinstance(componentName, int):
             componentIndex = componentName
             componentName = self[componentName]['NAME']
+
+        return self.ElementPerturbs(component, terse)
+
+    def ElementPerturbs(self, component, terse=True):
+        """
+        Search an invidivual dictionary representing a row in the TFS file
+        for as to whether it perturbs.
+        """
 
         perturbingParameters = []  # list of perturbing params which are abs>0
 
