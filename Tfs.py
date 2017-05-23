@@ -416,7 +416,12 @@ class Tfs(object):
 
         sd = self.GetColumn('S')
         if S > sd[-1]:
-            raise Exception("S outside of range")
+            # allow some margin in case point is only just beyond beam line.
+            if S > sd[-1]+10:
+                raise Exception("S outside of range") # >10m past beam line - too far
+            else:
+                print "Warning S",S,"greater than length of beam line",sd[-1]
+                return -1 #index to last element
         else:
             result = _np.argmin(abs(sd - S))
             return result
