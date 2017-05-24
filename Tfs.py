@@ -55,7 +55,6 @@ class Tfs(object):
         self.formats     = []
         self.data        = {}
         self.sequence    = []
-        self.sequenceUnique = []
         self.nitems      = 0
         self.nsegments   = 0
         self.segments    = []
@@ -144,12 +143,9 @@ class Tfs(object):
                 d.insert(0,segment_name) #prepend segment info
                 d.insert(0,segment_i) #this one becomes the first item matching the column index
                 if usename:
-                    name       = d[namecolumnindex]
-                    nameUnique = self._CheckName(name)
+                    name = self._CheckName(d[namecolumnindex])
                 else:
-                    name       = self.nitems
-                    nameUnique = name
-                self.sequenceUnique.append(nameUnique)
+                    name = self.nitems
                 self.sequence.append(name) # keep the name in sequence
                 self.data[name] = d        # put in data dict by name
                 self.nitems += 1           # keep tally of number of items
