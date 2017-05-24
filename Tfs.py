@@ -724,7 +724,7 @@ class Tfs(object):
                   thickEle['L'] > 0.01):
                 InsertThickenedKicker(thickEle, thinKicker)
 
-    def ComponentPerturbs(self, componentName, terse=True):
+    def ComponentPerturbs(self, indexInSequence, terse=True):
         '''
         Returns names of variables which would perturb a particle.
         Some components written out in TFS are redundant,
@@ -733,18 +733,11 @@ class Tfs(object):
 
         Checks integrated stengths (but not if L=0), HKICK and VKICK
 
-        componentName    --  Name of component to be checked.  can also be index.
-        terse            --  Print out the parameters which perturb if False
+        indexInSequence - index of component to be checked.
+        terse           - print out the parameters which perturb if False
         '''
-
-        component = self[componentName]
-        if isinstance(componentName, str):
-            componentIndex = self.IndexFromName(componentName)
-        elif isinstance(componentName, int):
-            componentIndex = componentName
-            componentName = self[componentName]['NAME']
-
-        return self.ElementPerturbs(component, terse)
+        
+        return self.ElementPerturbs(self[index], terse)
 
     def ElementPerturbs(self, component, terse=True):
         """
