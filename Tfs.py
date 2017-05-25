@@ -61,8 +61,11 @@ class Tfs(object):
         self.filename    = filename
         self.smax        = 0
         self.smin        = 0
+        self._verbose    = False
+        if 'verbose' in kwargs:
+            self._verbose = kwargs['verbose']
         if type(filename) == str:
-            self.Load(filename)
+            self.Load(filename, self._verbose)
         elif type(filename) == Tfs:
             self._DeepCopy(filename)
         
@@ -72,7 +75,7 @@ class Tfs(object):
         """
         self.__init__()
     
-    def Load(self,filename):
+    def Load(self, filename, verbose=False):
         """
         >>> a = Tfs()
         >>> a.Load('filename.tfs')
@@ -96,6 +99,9 @@ class Tfs(object):
             if line[0] == '*':
                 #name
                 self.columns.extend(sl[1:]) #miss "*" from column names line
+                if verbose:
+                    print 'Columns will be:'
+                    print self.columns
                 break
         if 'NAME' in self.columns:
             usename = True #use the name
