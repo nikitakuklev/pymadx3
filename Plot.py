@@ -192,6 +192,7 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
         if a.button == 3 : 
             print 'Closest element: ',tfs.NameFromNearestS(a.xdata)
 
+    MachineXlim(axmachine)
     axmachine.callbacks.connect('xlim_changed', MachineXlim)
     figure.canvas.mpl_connect('button_press_event', Click)
 
