@@ -349,7 +349,15 @@ def GetApertureExtent(aper1, aper2, aper3, aper4, aper_type):
     returns x,y
     """
 
-    madxAperTypes = { 'CIRCLE', 'ELLIPSE', 'RECTANGLE', 'LHCSCREEN', 'MARGUERITE', 'RECTELLIPSE', 'RACETRACK'}
+    madxAperTypes = { 'CIRCLE',
+                      'RECTANGLE',
+                      'ELLIPSE',
+                      'RECTCIRCLE',
+                      'LHCSCREEN',
+                      'MARGUERITE',
+                      'RECTELLIPSE',
+                      'RACETRACK',
+                      'OCTAGON'}
     
     if  aper_type not in madxAperTypes:
         raise ValueError('Unknown aperture type: ' + aper_type)
@@ -360,12 +368,12 @@ def GetApertureExtent(aper1, aper2, aper3, aper4, aper_type):
     if aper_type == 'CIRCLE':
         x = aper1
         y = aper1
-    if aper_type in ['ELLIPSE', 'RECTANGLE']:
+    if aper_type in ['RECTANGLE', 'ELLIPSE', 'OCTAGON']:
         x = aper1
         y = aper2
-    elif aper_type in ['LHCSCREEN', 'MARGUERITE']:
-        x = aper3 
-        y = aper3 # TBC
+    elif aper_type in ['LHCSCREEN', 'RECTCIRCLE', 'MARGUERITE']:
+        x = min(aper1, aper3)
+        y = min(aper2, aper3)
     if aper_type == 'RECTELLIPSE':
         x = min(aper1, aper3)
         y = min(aper2, aper4)
