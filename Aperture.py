@@ -1,7 +1,11 @@
+"""
+Class to load apertures in Tfs files and methods to manipulate them.
+Some methods are part of the class and others are unbound.
+"""
+
 from pymadx import Tfs as _Tfs
 from bisect import bisect as _bisect
 import numpy as _np
-
 
 class Aperture(_Tfs):
     """
@@ -283,6 +287,64 @@ class Aperture(_Tfs):
                 apertures = apertures[:len(sSplits)] #should index 1 ahead - counteracts 0 counting
             
             return result, lSplits, apertures
+
+def GetApertureExtents(aperture):
+    """
+    Loop over a pymadx.Aperture.Aperture instance and calculate the maximum
+    +ve extent (assumed symmetric) in x and y.
+
+    returns x,y where x and y and 1D numpy arrays
+    """
+    aper1 = aperture.GetColumn('APER_1')
+    aper2 = aperture.GetColumn('APER_2')
+    aper3 = aperture.GetColumn('APER_3')
+    aper4 = aperture.GetColumn('APER_4')
+    apertureType = aperture.GetColumn('APERTYPE')
+
+    x = []
+    y = []
+    for i in range(len(aperture)):
+        xt,yt = GetApertureExtent(aper1[i], aper2[i], aper3[i], aper4[i], apertureType[i])
+        x.append(xt)
+        y.append(yt)
+
+    x = _np.array(x)
+    y = _np.array(y)
+    return x,y
+
+def GetApertureExtent(aper1, aper2, aper3, aper4, aper_type):
+    """
+    Get the maximum +ve half extent in x and y for a given aperture model and (up to)
+    four aperture parameters.
+
+    returns x,y
+    """
+
+    madxAperTypes = { 'CIRCLE', 'ELLIPSE', 'RECTANGLE', 'LHCSCREEN', 'MARGUERITE', 'RECTELLIPSE', 'RACETRACK'}
+    
+    if  aper_type not in madxAperTypes:
+        raise ValueError('Unknown aperture type: ' + aper_type)
+
+    x = aper1
+    y = aper2
+
+    if aper_type == 'CIRCLE':
+        x = aper1
+        y = aper1
+    if aper_type in ['ELLIPSE', 'RECTANGLE']:
+        x = aper1
+        y = aper2
+    elif aper_type in ['LHCSCREEN', 'MARGUERITE']:
+        x = aper3 
+        y = aper3 # TBC
+    if aper_type == 'RECTELLIPSE':
+        x = min(aper1, aper3)
+        y = min(aper2, aper4)
+    elif aper_type == 'RACETRACK':
+        x = aper3 + aper1
+        y = aper2 + aper3
+    
+    return x,y
 
 
 def NonZeroAperture(item):

@@ -12,7 +12,7 @@ Visualisation - visualisation of the loaded lattice
 import Convert
 
 from Tfs import Tfs
-from Aperture import Aperture
+import Aperture
 from TfsArray import TfsArray
 import Builder
 import Ptc
@@ -28,4 +28,4 @@ except ImportError:
 
 from _General import CheckItsTfs
 
-__all__ = ['Tfs','TfsArray','Beam','Builder','Plot','Ptc','MadxTfs2Ptc','PtcAnalysis']
+__all__ = ['Aperture','Tfs','TfsArray','Beam','Builder','Plot','Ptc','MadxTfs2Ptc','PtcAnalysis']
