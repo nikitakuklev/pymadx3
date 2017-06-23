@@ -12,6 +12,7 @@ except ImportError:
     import Tfs as _Tfs
 
 from _General import CheckItsTfs as _CheckItsTfs
+from _General import CheckItsTfsAperture as _CheckItsTfsAperture
 
 import numpy as _np
 #protect against matplotlib import errors
@@ -122,6 +123,36 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
 
     _plt.suptitle(title,size='x-large')
     
+    if outputfilename != None:
+        if '.' in outputfilename:
+            outputfilename = outputfilename.split('.')[0]
+        _plt.savefig(outputfilename+'.pdf')
+        _plt.savefig(outputfilename+'.png')
+
+def PlotAperture(tfsfile, title='', outputfilename=None, machine=None):
+    """
+    """
+
+    aper = _CheckItsTfsAperture(tfsfile)
+
+    f = _plt.figure(figsize=(11,5))
+
+    s = aper.GetColumn('S')
+    x,y = aper.GetExtentAll()    
+    
+    _plt.plot(s, x, 'b-', label='X')
+    _plt.plot(s, y, 'g-', label='Y')
+    _plt.xlabel('S (m)')
+    _plt.ylabel('Aperture (m)')
+    _plt.legend(loc='best', fontsize='small')
+
+    if machine != None:
+        AddMachineLatticeToFigure(_plt.gcf(), machine)
+
+    _plt.tight_layout()
+
+    _plt.suptitle(title, size='x-large')
+
     if outputfilename != None:
         if '.' in outputfilename:
             outputfilename = outputfilename.split('.')[0]
