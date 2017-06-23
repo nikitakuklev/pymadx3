@@ -23,10 +23,9 @@ from MadxTfs2Ptc import MadxTfs2Ptc
 # things the depend on matplotlib (optional)
 try:
     import Plot
-    from PtcPlot import PtcPlot
 except ImportError:
     pass
 
 from _General import CheckItsTfs
 
-__all__ = ['Tfs','TfsArray','Beam','Builder','Plot','Ptc','MadxTfs2Ptc','PtcPlot','PtcAnalysis']
+__all__ = ['Tfs','TfsArray','Beam','Builder','Plot','Ptc','MadxTfs2Ptc','PtcAnalysis']
