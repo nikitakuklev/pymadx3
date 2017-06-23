@@ -7,6 +7,16 @@ from pymadx import Tfs as _Tfs
 from bisect import bisect as _bisect
 import numpy as _np
 
+_madxAperTypes = { 'CIRCLE',
+                   'RECTANGLE',
+                   'ELLIPSE',
+                   'RECTCIRCLE',
+                   'LHCSCREEN',
+                   'MARGUERITE',
+                   'RECTELLIPSE',
+                   'RACETRACK',
+                   'OCTAGON'}
+
 class Aperture(_Tfs):
     """
     A class based on (which inherits) the Tfs class for reading aperture information.
@@ -15,6 +25,8 @@ class Aperture(_Tfs):
     split and therefore what the aperture should be.
 
     This class maintains a cache of aperture information as a function of S position.
+
+    'quiet' being defined in kwargs will silence a warning about unknown aperture types.
 
     """
     def __init__(self, *args, **kwargs):
@@ -26,6 +38,8 @@ class Aperture(_Tfs):
         # the tolerance below which, the aperture is considered 0
         self._tolerance = 1e-6
         self._UpdateCache()
+        if 'quiet' not in kwargs:
+            self.CheckKnownApertureTypes()
         
     def _UpdateCache(self):
         # create a cache of which aperture is at which s position
@@ -54,6 +68,17 @@ class Aperture(_Tfs):
                 setattr(self, '_'+str.lower(key), self.GetColumn(key))
         except ValueError:
             pass
+
+    def CheckKnownApertureTypes(self):
+        failed = False
+        ts = set(self.GetColumn('APERTYPE'))
+        for t in ts:
+            if t not in _madxAperTypes:
+                failed = True
+                print 'Warning: Aperture type ',t,'is not a valid MADX aperture types.'
+
+        if failed:
+            PrintMADXApertureTypes()
 
     def SetZeroTolerance(self, tolerance):
         """
@@ -317,6 +342,11 @@ class Aperture(_Tfs):
             
             return result, lSplits, apertures
 
+def PrintMADXApertureTypes():
+    print 'Valid MADX aperture types are:'
+    for t in _madxAperTypes:
+        print t
+        
 def GetApertureExtents(aperture):
     """
     Loop over a pymadx.Aperture.Aperture instance and calculate the maximum
@@ -348,18 +378,8 @@ def GetApertureExtent(aper1, aper2, aper3, aper4, aper_type):
 
     returns x,y
     """
-
-    madxAperTypes = { 'CIRCLE',
-                      'RECTANGLE',
-                      'ELLIPSE',
-                      'RECTCIRCLE',
-                      'LHCSCREEN',
-                      'MARGUERITE',
-                      'RECTELLIPSE',
-                      'RACETRACK',
-                      'OCTAGON'}
     
-    if  aper_type not in madxAperTypes:
+    if  aper_type not in _madxAperTypes:
         raise ValueError('Unknown aperture type: ' + aper_type)
 
     x = aper1
