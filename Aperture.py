@@ -163,12 +163,41 @@ class Aperture(_Tfs):
         S position to that requested - may be before or after that point.
         """
         return self[self._GetIndexInCacheOfS(sposition)]
+
+    def GetExtentAtS(self, sposition):
+        """
+        Get the x and y maximum +ve extent (assumed symmetric) for a given
+        s position.  Calls GetApertureAtS and then GetApertureExtent.
+        """
+        element = GetApertureAtS(sposition)
+        x,y     = GetApertureExtent(element)
+        return x,y
         
     def GetApertureForElementNamed(self, name):
         """
         Return a dictionary of the aperture information by the name of the element.
         """
         return self.GetRow(name)
+
+    def GetExtent(self, name):
+        """
+        Get the x and y maximum +ve extent (assumed symmetric) for a given
+        entry by name.  Calls GetApertureForElementNamed and then GetApertureExtent.
+        """
+        element = self.GetApertureForElementNamed(name)
+        x,y     = GetApertureExtent(element)
+        return x,y
+
+    def GetExtentAll(self):
+        """
+        Get the x and y maximum +ve extent (assumed symmetric) for the full
+        aperture instance.
+
+        returns x,y where x and y are 1D numpy arrays
+        """
+        x,y = GetApertureExtents(self)
+
+        return x,y
 
     def ReplaceType(self, existingType, replacementType):
         print 'Aperture> replacing',existingType,'with',replacementType
