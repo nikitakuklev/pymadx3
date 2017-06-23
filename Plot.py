@@ -49,7 +49,15 @@ def _GetOpticalDataFromTfs(tfsobject):
     d['y']     = tfsobject.GetColumn('Y')
     return d
 
-def PlotTfsCentroids(tfsfile, title='', outputfilename=None, machine=True):
+def PlotCentroids(tfsfile, title='', outputfilename=None, machine=True):
+    """
+    Plot the centroid (mean) x and y from the a Tfs file or pymadx.Tfs instance.
+
+    tfsfile        - can be either a string or a pymadx.Tfs instance.
+    title          - optional title for plot
+    outputfilename - optional name to save file to (extension determines format)
+    machine        - if True (default) add machine diagram to top of plot
+    """
     madx = _CheckItsTfs(tfsfile)
     d    = _GetOpticalDataFromTfs(madx)
     smax = madx.smax
@@ -77,7 +85,7 @@ def PlotTfsCentroids(tfsfile, title='', outputfilename=None, machine=True):
         _plt.savefig(outputfilename+'.png')
 
 
-def PlotTfsBeta(tfsfile, title='',outputfilename=None, machine=True, dispersion=False):
+def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=False):
     """
     Plot sqrt(beta x,y) as a function of S. By default, a machine diagram is shown at
     the top of the plot.
