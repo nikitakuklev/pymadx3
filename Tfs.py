@@ -4,6 +4,9 @@ import copy as _copy
 import string as _string
 import re as _re
 
+from _General import GetSixTrackAperType as _GetSixTrackAperType
+from _General import Cast as _Cast
+
 try:
     import Plot as _Plot
 except ImportError:
@@ -131,7 +134,7 @@ class Tfs(object):
             sl        = splitline #shortcut
             if line[0] == '@':
                 #header
-                self.header[sl[1]] = Cast(sl[-1])
+                self.header[sl[1]] = _Cast(sl[-1])
             elif line[0] == '*':
                 #name
                 self.columns.extend(sl[1:]) #miss *
@@ -142,14 +145,14 @@ class Tfs(object):
                 self.formats.extend(sl[1:]) #miss $
             elif '#' in line[0]:
                 #segment line
-                d = [Cast(item) for item in sl[1:]]
+                d = [_Cast(item) for item in sl[1:]]
                 segment_i    = d[0]
                 segment_name = d[-1]
                 self.nsegments += 1 # keep tally of number of segments
                 self.segments.append(segment_name)
             else:
                 #data
-                d = [Cast(item) for item in sl]
+                d = [_Cast(item) for item in sl]
                 d.insert(0,segment_name) #prepend segment info
                 d.insert(0,segment_i) #this one becomes the first item matching the column index
                 if usename:
@@ -189,7 +192,7 @@ class Tfs(object):
                 aper2 = element[self.columns.index('APER_2')]
                 aper3 = element[self.columns.index('APER_3')]
                 aper4 = element[self.columns.index('APER_4')]
-                apertype = self.GetSixTrackAperType(aper1,aper2,aper3,aper4)
+                apertype = _GetSixTrackAperType(aper1,aper2,aper3,aper4)
 
                 element.append(apertype)
 
@@ -894,36 +897,18 @@ class Tfs(object):
         self.sequence = self.sequence[index:] + self.sequence[:index]
         self.sequence = self.sequence[0:-1]
 
-    @staticmethod
-    def GetSixTrackAperType(aper1,aper2,aper3,aper4):
 
-        if aper1 == 0 and aper2 == 0 and aper3 == 0 and aper4== 0:
-            return ''
-        elif aper1 == aper3 and aper2 == aper4:
-            return 'ELLIPSE'
-        elif aper1 == aper3 and aper2 < aper4:
-            return 'LHCSCREEN'
-        elif aper1 < aper3 and aper2 == aper4:
-            return 'LHCSCREEN'
-        elif aper1 == 0 and aper2 == 0:
-            return 'RACETRACK'
-        elif aper3 == 0:
-            return 'RECTANGLE'
-        else:
-            print "WARNING: The given aperture is not classified among the known types"
-            print "A1 = " + str(aper1) + ", A2 = " +  str(aper2) + ", A3 = " + str(aper3) + ", A4 = " + str(aper4)
-
-
-
-def Cast(string):
+def CheckItsTfs(tfsfile):
     """
-    Cast(string)
+    Ensure the provided file is a Tfs instance.  If it's a string, ie path to
+    a tfs file, open it and return the Tfs instance.
     
-    tries to cast to a (python) float and if it doesn't work, 
-    returns a string
-
+    tfsfile can be either a tfs instance or a string.
     """
-    try:
-        return float(string)
-    except ValueError:
-        return string.replace('"','')
+    if type(tfsfile) == str:
+        madx = pymadx.Tfs(tfsfile)
+    elif type(tfsfile) == pymadx.Tfs:
+        madx = tfsfile
+    else:
+        raise IOError("Not pymadx.Tfs file type: "+str(tfsfile))
+    return madx

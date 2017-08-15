@@ -8,8 +8,6 @@ General utilities for day to day housekeeping
 """
 
 import os
-import pymadx.Tfs
-import pymadx.Aperture
 
 def CheckFileExists(filename):
     i = 1
@@ -62,4 +60,21 @@ def IndexOfElement(tfsinstance,markername):
         print 'Unknown element name'
     return i
 
+def GetSixTrackAperType(aper1,aper2,aper3,aper4):
+    if aper1 == 0 and aper2 == 0 and aper3 == 0 and aper4== 0:
+        return ''
+    elif aper1 == aper3 and aper2 == aper4:
+        return 'ELLIPSE'
+    elif aper1 == aper3 and aper2 < aper4:
+        return 'LHCSCREEN'
+    elif aper1 < aper3 and aper2 == aper4:
+        return 'LHCSCREEN'
+    elif aper1 == 0 and aper2 == 0:
+        return 'RACETRACK'
+    elif aper3 == 0:
+        return 'RECTANGLE'
     else:
+        s = "WARNING: The given aperture is not classified among the known types\n"
+        s += "A1 = " + str(aper1) + ", A2 = " +  str(aper2) + ", A3 = "
+        s += str(aper3) + ", A4 = " + str(aper4)
+        raise AttributeError(s)
