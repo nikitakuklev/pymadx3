@@ -6,13 +6,14 @@ Ploting script for madx TFS files using the pymadx Tfs class
 #need TFS but protect against already being imported in pymadx.__init__
 #and therefore is a class and no longer a module - a consequence of
 #the class having the same name as a file
-try:
-    from . import Tfs as _Tfs
-except ImportError:
-    import Tfs as _Tfs
-
-from _General import CheckItsTfs as _CheckItsTfs
-from _General import CheckItsTfsAperture as _CheckItsTfsAperture
+#try:
+#    from . import Tfs as _Tfs
+#    from . import Tfs.CheckItsTfs as _CheckItsTfs
+#    from . import Aperture.CheckItsTfsAperture as _CheckItsTfsAperture
+#except ImportError:
+import Tfs as _Tfs
+from Tfs import  CheckItsTfs as _CheckItsTfs
+from Aperture import CheckItsTfsAperture as _CheckItsTfsAperture
 
 import numpy as _np
 #protect against matplotlib import errors

@@ -3,7 +3,7 @@ Class to load apertures in Tfs files and methods to manipulate them.
 Some methods are part of the class and others are unbound.
 """
 
-from pymadx import Tfs as _Tfs
+from Tfs import Tfs as _Tfs
 from bisect import bisect as _bisect
 import numpy as _np
 
