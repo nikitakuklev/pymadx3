@@ -9,16 +9,15 @@ Visualisation - visualisation of the loaded lattice
 
 """
 
-import Convert
-
-from Tfs import Tfs
 import Aperture
-from TfsArray import TfsArray
+from Beam import Beam
 import Builder
+import Convert
+from MadxTfs2Ptc import MadxTfs2Ptc
+import Plot
 import Ptc
 from PtcAnalysis import PtcAnalysis 
-from Beam import Beam
-from MadxTfs2Ptc import MadxTfs2Ptc
+from Tfs import Tfs
 
 # things the depend on matplotlib (optional)
 try:
@@ -26,6 +25,12 @@ try:
 except ImportError:
     pass
 
-from _General import CheckItsTfs
-
-__all__ = ['Aperture','Tfs','TfsArray','Beam','Builder','Plot','Ptc','MadxTfs2Ptc','PtcAnalysis']
+__all__ = ['Aperture',
+           'Beam',
+           'Builder',
+           'Convert',
+           'MadxTfs2Ptc',
+           'Plot',
+           'Ptc',
+           'PtcAnalysis',
+           'Tfs',]
