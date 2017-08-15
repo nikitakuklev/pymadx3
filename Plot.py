@@ -3,17 +3,9 @@ Ploting script for madx TFS files using the pymadx Tfs class
 
 """
 
-#need TFS but protect against already being imported in pymadx.__init__
-#and therefore is a class and no longer a module - a consequence of
-#the class having the same name as a file
-#try:
-#    from . import Tfs as _Tfs
-#    from . import Tfs.CheckItsTfs as _CheckItsTfs
-#    from . import Aperture.CheckItsTfsAperture as _CheckItsTfsAperture
-#except ImportError:
-import Tfs as _Tfs
-from Tfs import  CheckItsTfs as _CheckItsTfs
-from Aperture import CheckItsTfsAperture as _CheckItsTfsAperture
+from pymadx.Data import Tfs as _Tfs
+from pymadx.Data import CheckItsTfs as _CheckItsTfs
+from pymadx.Aperture import CheckItsTfsAperture as _CheckItsTfsAperture
 
 import numpy as _np
 #protect against matplotlib import errors
@@ -22,7 +14,7 @@ try:
     import matplotlib.patches as _patches
     import matplotlib.pyplot  as _plt
 except ImportError:
-    print "pymadx.Plot -> WARNING - plotting will not work on this machine"
+    print "pymadx.Plot -> WARNING - plotting will not work!"
     print "matplotlib.pyplot doesn't exist"
     
 class _My_Axes(_matplotlib.axes.Axes):

@@ -7,6 +7,8 @@ import re as _re
 from _General import GetSixTrackAperType as _GetSixTrackAperType
 from _General import Cast as _Cast
 
+#from pymadx.Plot import PlotTfsBeta as _PlotTfsBeta
+
 try:
     import Plot as _Plot
 except ImportError:
@@ -591,10 +593,10 @@ class Tfs(object):
             print item[1].ljust(15,'.'),item[0]
 
     def Plot(self,filename='optics.pdf'):
-        _Plot.PlotTfsBeta(self,outputfilename=filename)
+        _PlotTfsBeta(self,outputfilename=filename)
 
     def PlotSimple(self,filename='optics.pdf'):
-        _Plot.PlotTfsBeta(self,outputfilename=filename,machine=False)
+        _PlotTfsBeta(self,outputfilename=filename,machine=False)
 
     def IndexFromGmadName(self, gmadname, verbose=False):
         '''

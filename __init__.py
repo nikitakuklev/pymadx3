@@ -13,11 +13,13 @@ import Aperture
 from Beam import Beam
 import Builder
 import Convert
+import Data
 from MadxTfs2Ptc import MadxTfs2Ptc
 import Plot
 import Ptc
 from PtcAnalysis import PtcAnalysis 
-from Tfs import Tfs
+
+from Data import Tfs
 
 # things the depend on matplotlib (optional)
 try:
@@ -29,8 +31,8 @@ __all__ = ['Aperture',
            'Beam',
            'Builder',
            'Convert',
+           'Data',
            'MadxTfs2Ptc',
            'Plot',
            'Ptc',
-           'PtcAnalysis',
-           'Tfs',]
+           'PtcAnalysis']
