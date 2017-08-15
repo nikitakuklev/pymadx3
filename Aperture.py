@@ -342,6 +342,21 @@ class Aperture(_Tfs):
             
             return result, lSplits, apertures
 
+def CheckItsTfsAperture(tfsfile):
+    """
+    Ensure the provided file is an Aperture instance.  If it's a string, ie path to
+    a tfs file, open it and return the Tfs instance.
+    
+    tfsfile can be either a tfs instance or a string.
+    """
+    if type(tfsfile) == str:
+        aper = Aperture(tfsfile)
+    elif type(tfsfile) == pymadx.Aperture.Aperture:
+        aper = tfsfile
+    else:
+        raise IOError("Not pymadx.Aperture.Aperture file type: "+str(tfsfile))
+    return aper
+
 def PrintMADXApertureTypes():
     print 'Valid MADX aperture types are:'
     for t in _madxAperTypes:
