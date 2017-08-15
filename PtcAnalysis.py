@@ -1,32 +1,36 @@
 import Ptc as _Ptc 
-from TfsArray import TfsArray as _TfsArray
 from Tfs import Tfs as _Tfs
 import numpy as _np
 import csv
 import time
 
+class PtcAnalysis(object):
+    """
+    Deprecated.
 
+    Optical function calculation for PTC tracking data.
 
-class PtcAnalysis(object) : 
+    This has be reimplemented and replaced by C++ implementation
+    in rebdsim.
+
+    """
     def __init__(self,ptcInput = None, ptcOutput = None) : 
 
         # Load input rays 
-        if type(ptcInput) == str : 
+        if type(ptcInput) == str: 
             self.ptcInput = _Ptc.LoadInrays(ptcInput)
         else : 
             self.ptcInput = ptcInput 
 
         # Load output rays 
-        if type(ptcOutput) == str : 
-            self.ptcOutput = _TfsArray(ptcOutput)
-            #self.ptcOutput = _Tfs(ptcOutput)
+        if type(ptcOutput) == str:
+            self.ptcOutput = _Tfs(ptcOutput)
         else : 
             self.ptcOutput = ptcOutput
     
     def SamplerLoop(self):
         #for segment in ptcOutput.segments:
         for isampler in (0,self.ptcOutput.isegment,1):
-            #samplerData = self.ptcOutput.GetSegment(segment)
             samplerData = self.ptcOutput.GetSegment(isampler)
             
             xrms  = samplerData.GetColumn('X').std()
