@@ -109,8 +109,8 @@ A nice summary of the file can be provided with the `ReportPopulations` function
 Indexing and Slicing
 ********************
 
-The instance may be indexed like a normal python iterable structure such as a list or a tuple.
-Square brackets with a number *i* will return the *ith* element in the sequence. A python 'slice'
+The instance may be indexed like a normal Python iterable structure such as a list or a tuple.
+Square brackets with a number *i* will return the *ith* element in the sequence. A Python 'slice'
 may also be used where a range of elements may be selected. If only one element is indexed a
 Python dictionary is returned for that element. If a range is required, another Tfs instance
 is returned::
