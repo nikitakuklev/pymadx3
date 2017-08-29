@@ -117,6 +117,14 @@ class Tfs(object):
         self.formats.extend("%s")
 
         namecolumnindex = 0
+
+        def CastAndStrip(arg):
+            argCast = _Cast(arg)
+            if type(argCast) == str:
+                #print argCast
+                argCast = argCast.strip('"') # strip unnecessary quote marks off
+                #print argCast
+            return argCast
         
         #read in data
         for line in f:
@@ -137,14 +145,14 @@ class Tfs(object):
                 self.formats.extend(sl[1:]) #miss $
             elif '#' in line[0]:
                 #segment line
-                d = [_Cast(item) for item in sl[1:]]
+                d = [CastAndStrip(item) for item in sl[1:]]
                 segment_i    = d[0]
                 segment_name = d[-1]
                 self.nsegments += 1 # keep tally of number of segments
                 self.segments.append(segment_name)
             else:
                 #data
-                d = [_Cast(item) for item in sl]
+                d = [CastAndStrip(item) for item in sl]
                 d.insert(0,segment_name) #prepend segment info
                 d.insert(0,segment_i) #this one becomes the first item matching the column index
                 if usename:

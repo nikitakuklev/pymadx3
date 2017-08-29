@@ -3,10 +3,6 @@ Ploting script for madx TFS files using the pymadx Tfs class
 
 """
 
-from pymadx.Data import Tfs as _Tfs
-from pymadx.Data import CheckItsTfs as _CheckItsTfs
-from pymadx.Aperture import CheckItsTfsAperture as _CheckItsTfsAperture
-
 import numpy as _np
 #protect against matplotlib import errors
 try:
@@ -52,7 +48,8 @@ def PlotCentroids(tfsfile, title='', outputfilename=None, machine=True):
     outputfilename - optional name to save file to (extension determines format)
     machine        - if True (default) add machine diagram to top of plot
     """
-    madx = _CheckItsTfs(tfsfile)
+    import pymadx.Data as _Data
+    madx = _Data.CheckItsTfs(tfsfile)
     d    = _GetOpticalDataFromTfs(madx)
     smax = madx.smax
 
@@ -88,7 +85,8 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
     Optionally turn off machine overlay at top with machine=False
     Specify outputfilename (without extension) to save the plot as both pdf and png.
     """
-    madx = _CheckItsTfs(tfsfile)
+    import pymadx.Data as _Data
+    madx = _Data.CheckItsTfs(tfsfile)
     d    = _GetOpticalDataFromTfs(madx)
     smax = madx.smax
 
@@ -125,8 +123,8 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
 def PlotAperture(tfsfile, title='', outputfilename=None, machine=None):
     """
     """
-
-    aper = _CheckItsTfsAperture(tfsfile)
+    import pymadx.Data as _Data
+    aper = _Data.CheckItsTfsAperture(tfsfile)
 
     f = _plt.figure(figsize=(11,5))
 
@@ -197,7 +195,8 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
     supplied as the second argument interchangeably.
 
     """
-    tfs = _CheckItsTfs(tfsfile) #load the machine description
+    import pymadx.Data as _Data
+    tfs = _Data.CheckItsTfs(tfsfile) #load the machine description
 
     #check required keys
     requiredKeys = ['KEYWORD', 'S', 'L', 'K1L']
