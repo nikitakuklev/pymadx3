@@ -1,4 +1,4 @@
-import pymadx as _pymadx
+import pymadx.Beam as _Beam
 import numpy as _np
 import re as _re
 import csv
@@ -212,7 +212,7 @@ def MadxTfsToPtcBeam(tfs, ptcfilename,  startname=None):
 
     data     = tfs.GetRowDict(tfs.sequence[startindex])
 
-    beam  = _pymadx.Beam(particle, energy,'ptc', emitx=ex, emity=ey, sigmaE=sigmae)
+    beam  = _Beam.Beam(particle, energy,'ptc', emitx=ex, emity=ey, sigmaE=sigmae)
 
     beam.SetDistribFileName(ptcfilename) 
 
