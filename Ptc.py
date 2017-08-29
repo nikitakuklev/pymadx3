@@ -6,7 +6,7 @@ except ImportError:
     pass
 from numpy.random import multivariate_normal as _multivariate_normal
 
-class Inray:
+class Inray(object):
     """
     Class for a madx ptc input ray
     x  : horizontal position [m]

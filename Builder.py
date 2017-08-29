@@ -124,7 +124,7 @@ class Line(list):
             s += str(item) #uses elements __repr__ function
         return s
 
-class Sampler:
+class Sampler(object):
     """
     Class that can return the appropriate sampler syntax if required.
     """ 
@@ -134,7 +134,7 @@ class Sampler:
     def __repr__(self):
         return 'PTC_OBSERVE, place='+self.name+';\n'
 
-class Machine:     
+class Machine(object):     
     def __init__(self,verbose=False):
         self.verbose   = verbose
         self.sequence  = []
