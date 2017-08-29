@@ -1,26 +1,26 @@
-# pymadx.Builder - tools to build madx lattices
-# Version 1.0
+"""
+Builder
+
+Classes for programmatically constructing and writing out a MADX
+lattice. You can create a lattice using one of the predefined simple 
+lattices or by instantiating the Machine class and adding many 
+elements to it using its various Add methods. This instance may be
+written out to a MADX input text file using the WriteMachine method.
+
+Classes:
+
+Element - beam line element that always has name and type
+Line    - a list of elements
+Machine - a sequence of elements and associated options and beam etc.
+
+"""
 
 import _General
 from   _General import IsFloat as _IsFloat
 from   decimal import Decimal as _Decimal
 import time
 
-from Beam import Beam
-
-"""
-Builder
-
-Build generic machines for madx. (Based on pybdsim.Builder)
-You can create a lattice using one of the predefined simple 
-lattices or by adding many pieces together of your own design. 
-Finally, output the gmad files required.
-
-Classes:
-Element - beam line element that always has name and type
-Machine - a list of elements
-
-"""
+from pymadx.Beam import Beam as _Beam
 
 madxcategories = [
     'drift',
@@ -125,14 +125,16 @@ class Line(list):
         return s
 
 class Sampler:
-    ''' PTC observe command ''' 
+    """
+    Class that can return the appropriate sampler syntax if required.
+    """ 
     def __init__(self,name):
         self.name = name
 
     def __repr__(self):
         return 'PTC_OBSERVE, place='+self.name+';\n'
 
-class Machine :     
+class Machine:     
     def __init__(self,verbose=False):
         self.verbose   = verbose
         self.sequence  = []
@@ -285,18 +287,17 @@ class ParamInput :
 def WriteMachine(machine, filename, verbose=False):
     """
     WriteMachine(machine(machine),filename(string),verbose(bool))
-
+    
     Write a lattice to disk. This writes several files to make the
     machine, namely:
     
-    filename_components.madx - component files (max 10k per file)
-    filename_sequence.madx   - lattice definition
-    filename_samplers.madx   - sampler definitions (max 10k per file)
-    filename.gmad            - suitable main file with all sub 
-                               files in correct order
-
-    these are prefixed with the specified filename / path
-
+     * filename_components.madx - component files (max 10k per file)
+     * filename_sequence.madx   - lattice definition
+     * filename_samplers.madx   - sampler definitions (max 10k per file)
+     * filename.gmad            - suitable main file with all sub 
+                                  files in correct order
+    
+    These are prefixed with the specified filename / path.
     """
     
     if not isinstance(machine,Machine):
@@ -395,7 +396,6 @@ def WriteMachine(machine, filename, verbose=False):
     if not machine.beam['distrType'] == 'ptc':
         f.write('\n')
         f.write(machine.beam.ReturnTwissString(basefilename))
-
 
     f.close()
 

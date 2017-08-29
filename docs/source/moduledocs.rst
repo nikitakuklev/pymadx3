@@ -18,6 +18,22 @@ pymadx.Beam module
     :undoc-members:
     :show-inheritance:
 
+pymadx.Builder module
+---------------------
+   
+.. automodule:: pymadx.Builder
+		:members:
+		:undoc-members:
+		:show-inheritance:
+
+pymadx.Data module
+------------------
+   
+.. automodule:: pymadx.Data
+		:members:
+		:undoc-members:
+		:show-inheritance:
+
 pymadx.Plot module
 ------------------
 
@@ -41,11 +57,3 @@ pymadx.PtcAnalysis module
     :members:
     :undoc-members:
     :show-inheritance:
-
-pymadx.Tfs module
------------------
-   
-.. automodule:: pymadx.Tfs
-		:members:
-		:undoc-members:
-		:show-inheritance:

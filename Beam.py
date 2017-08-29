@@ -1,8 +1,3 @@
-# pymadx.Beam - generate MADX beam
-# Version 1.0
-# S. T. Boogert
-# stewart.boogert@rhul.ac.uk
-
 MADXDistributionTypes = [
     'reference',
     'madx',
@@ -16,6 +11,13 @@ MADXParticleTypes = [
 ]
 
 class Beam(dict):
+    """
+    A class that extends a dictionary for the specific parameters
+    in a MADX beam definition. This class can return a string 
+    representation of itself that is valid MADX syntax.
+
+    Setter methods are dynamically added based on the distribution selected.
+    """
     def __init__(self,particletype='e-',energy=1.0,distrtype='reference',*args,**kwargs):
         dict.__init__(self,*args,**kwargs)
         self.isPTCDistribution = False

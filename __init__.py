@@ -1,11 +1,16 @@
 """
-pymadx - Madx TFS file parser
+pymadx - Royal Holloway utility to manipulate MADX data and models.
 
-Authors: L. Nevay, S. Boogert
-2014 11 14
+Authors:
 
-Tfs           - a loader class
-Visualisation - visualisation of the loaded lattice
+ * Laurie Nevay
+ * Andrey Abramov
+ * Stewart Boogert
+ * William Shields
+ * Jochem Snuverink
+ * Stuart Walker
+
+Copyright Royal Holloway, University of London 2017.
 
 """
 
