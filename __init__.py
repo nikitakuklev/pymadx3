@@ -14,7 +14,7 @@ Copyright Royal Holloway, University of London 2017.
 
 """
 
-from Beam import Beam
+import Beam
 import Builder
 import Convert
 import Data

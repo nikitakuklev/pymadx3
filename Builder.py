@@ -143,7 +143,7 @@ class Machine:
         self.samplers  = []
         self.length    = 0.0
         self.angint    = 0.0
-        self.beam      = Beam() # always construct at least default beam
+        self.beam      = _Beam() # always construct at least default beam
 
     def __repr__(self):
         s = ''
