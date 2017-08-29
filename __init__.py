@@ -9,30 +9,18 @@ Visualisation - visualisation of the loaded lattice
 
 """
 
-import Aperture
 from Beam import Beam
 import Builder
 import Convert
 import Data
-from MadxTfs2Ptc import MadxTfs2Ptc
 import Plot
 import Ptc
-from PtcAnalysis import PtcAnalysis 
+import PtcAnalysis
 
-from Data import Tfs
-
-# things the depend on matplotlib (optional)
-try:
-    import Plot
-except ImportError:
-    pass
-
-__all__ = ['Aperture',
-           'Beam',
+__all__ = ['Beam',
            'Builder',
            'Convert',
            'Data',
-           'MadxTfs2Ptc',
            'Plot',
            'Ptc',
            'PtcAnalysis']
