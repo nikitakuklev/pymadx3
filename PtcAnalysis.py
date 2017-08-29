@@ -1,5 +1,5 @@
 import Ptc as _Ptc 
-from Tfs import Tfs as _Tfs
+from  pymadx.Data import Tfs as _Tfs
 import numpy as _np
 import csv
 import time
