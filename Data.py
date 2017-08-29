@@ -590,17 +590,23 @@ class Tfs(object):
         for item in sorted(populations)[::-1]:
             print item[1].ljust(15,'.'),item[0]
 
-    def Plot(self,filename='optics.pdf'):
+    def Plot(self, title='', outputfilename=None, machine=True, dispersion=False):
+        """
+        Plot the Beta amplitude functions from the file if they exist.
+        """
         try:
             import pymadx.Plot as _Plot
-            _Plot.PlotBeta(self,outputfilename=filename)
+            _Plot.PlotBeta(self,title,outputfilename,machine,dispersion)
         except ImportError:
             pass
 
-    def PlotSimple(self,filename='optics.pdf'):
+    def PlotCentroids(self, title='', outputfilename=None, machine=True):
+        """
+        Plot the centroid in the horizontal and vertical from the file if they exist.
+        """
         try:
             import pymadx.Plot as _Plot
-            _Plot.PlotBeta(self,outputfilename=filename,machine=False)
+            _Plot.PlotCentroids(self,title,outputfilename,machine)
         except ImportError:
             pass
 
@@ -932,7 +938,7 @@ _madxAperTypes = { 'CIRCLE',
 
 class Aperture(Tfs):
     """
-    A class based on (which inherits) the Tfs class for reading aperture information.
+    A class based on (ie inherits) the Tfs class for reading aperture information.
     This allows madx aperture information in Tfs format to be loaded, filtered and 
     queried. This also provides the ability to suggest whether an element should be
     split and therefore what the aperture should be.
