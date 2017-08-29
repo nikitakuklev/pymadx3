@@ -268,22 +268,6 @@ class Machine:
 
 # General scripts below this point
 
-class ParamInput :
-    def __init__(self, fileName) : 
-        self.fileName = fileName 
-        self.readFile()
-        self.determineParam()
-
-    def readFile(self) :
-        f = open(self.fileName) 
-        self.file = []
-        for l in f : 
-            self.file.append(l)
-        
-    def determineParam(self) : 
-        for l in f : 
-            pass
-
 def WriteMachine(machine, filename, verbose=False):
     """
     WriteMachine(machine(machine),filename(string),verbose(bool))
