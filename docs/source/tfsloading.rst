@@ -6,7 +6,8 @@ MADX outputs Twiss information as well as PTC tracking data in their own Table
 File System (TFS). This is the only format used by MADX. pymadx includes a class
 called Tfs for the purpose of loading and manipulating this data.
 
-The TFS format is described in the MADX manual available from madx.cern.ch. The format
+The TFS format is described in the MADX manual available from `the madx website <http://madx.web.cern.ch>`_.
+The format
 roughly is described as a text file. The file contains first a header with key and
 value pairs for one-off definitions. This is proceeded by a line
 with column names and a line with the data type of each column. After this each line
@@ -40,7 +41,7 @@ Loading
 A file may be loading by constructing a Tfs instance from a file name.
 
 >>> import pymadx
->>> a = pymadx.Tfs("myTwissFile.tfs")
+>>> a = pymadx.Data.Tfs("myTwissFile.tfs")
 
 .. note:: The import will be assumed from now on in examples.
 
@@ -50,7 +51,7 @@ without any difference in functionality. Not temporary files are created::
   tar -czf myTwissFile.tar.gz myTwissFile.fs
   
 >>> import pymadx
->>> a = pymadx.Tfs("myTwissFile.tar.gz")
+>>> a = pymadx.Data.Tfs("myTwissFile.tar.gz")
 
 .. note:: The detection of a compressed file is based on 'tar' or 'gz' existing
 	  in the file name.

@@ -189,7 +189,7 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
     
     Note you can use matplotlib's gcf() 'get current figure' as an argument.
 
-    AddMachineLatticeToFigure(gcf(), 'afile.tfs')
+    >>> pymadx.Plot.AddMachineLatticeToFigure(gcf(), 'afile.tfs')
 
     A pymadx.Tfs class instance or a string specifying a tfs file can be
     supplied as the second argument interchangeably.
