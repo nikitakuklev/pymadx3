@@ -72,7 +72,203 @@ The following MADX syntax in a MADX input script will prepare a Tfs file with al
   select,flag=twiss, clear; 
   twiss,sequence=SEQUENCENAME, file=outputfilename.tfs;
 
+
+Querying
+--------
+
+The Tfs class can be used to query the data in various ways.
+
+Basic Information
+*****************
+
+ * All data is stored in the **data** object inside the class
+ * The header information is stored in **header**.
+ * The names of all elements in order is stored in **sequence**.
+ * The names of all columns in the file is stored in **columns**
+
+Generally, members beginning with small letters are objects and capital letters are functions.
+
+A nice summary of the file can be provided with the `ReportPopulations` function.::
+
+  a = pymadx.Data.Tfs("mytwissfile.tar.gz")
+  a.ReportPopulations()
+
+  Filename > twiss_v5.2.tfs
+  Total number of items > 1032
+  Type........... Population
+  MULTIPOLE...... 516
+  DRIFT.......... 201
+  QUADRUPOLE..... 102
+  MARKER......... 78
+  MONITOR........ 64
+  SBEND.......... 24
+  SEXTUPOLE...... 18
+  HKICKER........ 15
+  VKICKER........ 14
+
+Indexing and Slicing
+********************
+
+The instance may be indexed like a normal python iterable structure such as a list or a tuple.
+Square brackets with a number *i* will return the *ith* element in the sequence. A python 'slice'
+may also be used where a range of elements may be selected. If only one element is indexed a
+Python dictionary is returned for that element. If a range is required, another Tfs instance
+is returned::
+
+  a = pymadx.Data.Tfs("mytwissfile.tar.gz")
+  a[3]         # 4th element in sequence (0,1,2,3!)
+  a[3:10]      # 4th to 11th elements (tfs instance returned)
+  a[3:10:-1]   # similarly but in steps on -1 ie reversed
+  a['IP1':300] # find element named IP1 (exactly) and start from that until the #301th element
+  a['IP3':]    # find element named IP3 (exactly) and take from there to the end of the file
+  a['L230A']   # returns a Python dictionary for element named L230A
+
+If you know the name of an element you can search for it and get the index from that.::
+
+  a.IndexFromName('L230A')
+  >>> 995
+
+You can also search by nearest curvilinear S coordinate along the beam line.::
+
+  a.IndexFromNearestS(34.4)
+  >>> 225
+  a[225]['NAME']
+
+Row or Element
+**************
+
+A row of data is an entry for a particular element. The Tfs class is conceptually a list of
+elements. Each element is represented by a Python dictionary that has a key for each column.
+The list of acceptable keys (ie names of columns) can be found in the member named 'colums'.::
+
+  a.columns #prints out list of column names
+
+If a single element is indexed, a dictionary is returned and can be accessed - even in one step.::
+
+  d = a[123]
+  d['NAME']
+  >>> 'MQD8X'
+  a[123]['NAME'] # equivalent
+
+
+Looping & Iterating
+*******************
+
+The Tfs class may be iterated over like a list in Python. For each iteration a dictionary
+for that element is returned.::
+  
+  for el in a:
+      print(el['NAME'])
+
+Beam Sizes
+**********
+
+For convenience the beam size is calculated from the Beta amplitude functions, the emittance
+and dispersion if they are present. The emittance is defined by 'EX' and 'EY' in the header.
+These are calculated according to
+
+.. math::
+
+   \sigma_x &= \sqrt{ \beta_x \epsilon_x + D(S)^2 \frac{\sigma_{E}^{2}}{\beta_{\mathrm{Lorentz}}^{2}}} \\
+   \sigma_y &= \sqrt{ \beta_y \epsilon_y + D(S)^2 \frac{\sigma_{E}^{2}}{\beta_{\mathrm{Lorentz}}^{2}}}
+
+:math:`\sigma_E` in MADX is fractional. Here we use the relation
+
+.. math::
+
+   \sigma_E = \frac{\Delta E}{E} = \beta_{\mathrm{Lorentz}}^{2} \frac{\Delta p}{p}
+
+.. note:: MADX input files often don't have a sensible emittance defined as it is not always
+	  required. Ensure the emittance is what you intended it to be in the Tfs file.
+
+
+Modification
+************
+
+It is not recommended to modify the data structures inside the Tfs class. Of course one can,
+but one must be careful of Python's copying behaviour. Often a 'deep copy' is required or
+care must be taken to modify the original and not a reference to a particular variable.
+
+
 Plotting
 --------
 
-A simple optics plot may be made
+A simple optics plot may be made with the following syntax::
+
+  a = pymadx.Data.Tfs("mytwissfile.tar.gz")
+  a.Plot()
+
+This creates a plot of the Beta amplitude functions against curvilinear S position. A
+colour diagram representing the machine is also produced above the graph as shown below.
+
+.. figure:: figures/optics.pdf
+   :width: 90%
+   :align: center
+
+The command has optional arguments such as a title string to be put at the top of the graph
+and whether to also plot the horizontal dispersion function. This function is provided as
+a quick utility and not the ultimate plotting script. The user can make their own plot and
+then append a machine diagram at the end if they wish.::
+
+  f = matplotlib.pyplot.figure()
+  # user plotting commands here
+  pymadx.Plot.AddMachineLatticeToFigure(f, "mytwissfile.tar.gz")
+
+`gcf()` is a matplotlib.pyplot function to get a reference to the current matplotlib
+figure and can be used as the first argument.::
+
+  pymadx.Plot.AddMachineLatticeToFigure(gcf(), "mytwissfile.tar.gz")
+
+.. note:: It becomes difficult to adjust the axes and layout of the graph after adding the
+	  machine description. It is therefore strongly recommended to do this last.
+
+
+Colour Coding
+*************
+
+Each magnet is colour coded an positioned depending on its type and strength.
+
++--------------+------------------+--------------+-----------------------------------------------+
+| **Type**     | **Shape**        | **Colour**   | **Vertical Position**                         |
++==============+==================+==============+===============================================+
+| drift        | N/A              | Not shown    | N/A                                           |
++--------------+------------------+--------------+-----------------------------------------------+
+| sbend        | Rectangle        | Blue         | Central always                                |
++--------------+------------------+--------------+-----------------------------------------------+
+| rbend        | Rectangle        | Blue         | Central always                                |
++--------------+------------------+--------------+-----------------------------------------------+
+| hkicker      | Rectangle        | Purple       | Central always                                |
++--------------+------------------+--------------+-----------------------------------------------+
+| vkicker      | Rectangle        | Pink         | Central always                                |
++--------------+------------------+--------------+-----------------------------------------------+
+| quadrupole   | Rectangle        | Red          | Top half for K1L > 0; Bottom half for K1L < 0 |
++--------------+------------------+--------------+-----------------------------------------------+
+| sextupole    | Hexagon          | Yellow       | Central always                                |
++--------------+------------------+--------------+-----------------------------------------------+
+| octupole     | Hexagon          | Green        | Central always                                |
++--------------+------------------+--------------+-----------------------------------------------+
+| multiple     | Hexagon          | Light grey   | Central always                                |
++--------------+------------------+--------------+-----------------------------------------------+
+| rcollimator  | Rectangle        | Black        | Central always                                |
++--------------+------------------+--------------+-----------------------------------------------+
+| ecollimator  | Rectangle        | Black        | Central always                                |
++--------------+------------------+--------------+-----------------------------------------------+
+| *any other*  | Rectangle / Line | Light Grey   | Central always                                |
++--------------+------------------+--------------+-----------------------------------------------+
+
+.. note:: In all cases if the element is a magnet and the appropriate strength is zero, it is
+	  shown as a grey line.
+
+Plot Interactivity
+******************
+
+With the adition of the machine axes, some extra interactivity is included to the matplotlib
+figures.
+
+ * zooming - if the 'right-click and drag' zoom feature is used on the machine diagram, the
+   graph will automatically update and follow the machine diagram.
+ * xlim - setting the horizontal graph limits with the 'xlim' command will update both the
+   machine diagram and the graph.
+ * querying - right-clicking anywhere on the graph will print out the name of the nearest element
+   in the terminal.
+

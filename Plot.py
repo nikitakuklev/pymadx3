@@ -97,7 +97,7 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
     axoptics.plot(d['s'],_np.sqrt(d['betx']),'b-', label='x')
     axoptics.plot(d['s'],_np.sqrt(d['bety']),'g-', label='y')
     if dispersion:
-        axoptics.plot(-100,-100,'r--', label=r'$\mathrm{D}(x)$') #fake plot for legend
+        axoptics.plot(-100,-100,'r--', label=r'$\mathrm{D}(S)$') #fake plot for legend
     axoptics.set_xlabel('S (m)')
     axoptics.set_ylabel(r'$\sqrt{\beta}$ ($\sqrt{\mathrm{m}}$)')
     axoptics.legend(loc=0,fontsize='small') #best position
