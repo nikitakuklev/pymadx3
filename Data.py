@@ -233,8 +233,8 @@ class Tfs(object):
         for elementname in self.sequence:
             # beam size calculations (using relation deltaE/E = beta^2 * deltaP/P)
             d = self.data[elementname]
-            xdispersionterm = (d[dxindex] * sige / beta)**2
-            ydispersionterm = (d[dyindex] * sige / beta)**2
+            xdispersionterm = (d[dxindex] * sige / beta**2)**2
+            ydispersionterm = (d[dyindex] * sige / beta**2)**2
             sigx = _np.sqrt((d[betxindex] * ex) + xdispersionterm)
             sigy = _np.sqrt((d[betyindex] * ey) + ydispersionterm)
             d.append(sigx)
@@ -243,8 +243,8 @@ class Tfs(object):
             # beam divergences (using relation x',y' = sqrt(gamma_x,y * emittance_x,y))
             gammax = (1.0 + d[alfxindex]**2) / d[betxindex] # twiss gamma
             gammay = (1.0 + d[alfyindex]**2) / d[betyindex]
-            xdispersionterm = (d[dpxindex] * sige / beta)**2
-            ydispersionterm = (d[dpyindex] * sige / beta)**2
+            xdispersionterm = (d[dpxindex] * sige / beta**2)**2
+            ydispersionterm = (d[dpyindex] * sige / beta**2)**2
             sigxp  = _np.sqrt((gammax * ex) + xdispersionterm)
             sigyp  = _np.sqrt((gammay * ey) + ydispersionterm)
             d.append(sigxp)
