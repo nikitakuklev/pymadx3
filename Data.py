@@ -919,11 +919,11 @@ def CheckItsTfs(tfsfile):
     tfsfile can be either a tfs instance or a string.
     """
     if type(tfsfile) == str:
-        madx = pymadx.Tfs(tfsfile)
+        madx = Tfs(tfsfile)
     elif type(tfsfile) == Tfs:
         madx = tfsfile
     else:
-        raise IOError("Not pymadx.Tfs file type: "+str(tfsfile))
+        raise IOError("Not pymadx.Data.Tfs file type: "+str(tfsfile))
     return madx
 
 _madxAperTypes = { 'CIRCLE',
