@@ -65,11 +65,15 @@ class Beam(dict):
             setattr(self, 'SetDistribFileName',  self._SetDistribFileName)
         
     def ReturnBeamString(self):
-        s = 'beam, particle='+self['particle']+', energy='+self['energy']
-        s += ', ex=' + self.GetItemStr('emitx') + ', ey=' + self.GetItemStr('emity')
-        if self.has_key('sigmaE'):
-            s += ', sige=' + self.GetItemStr('sigmaE')+';\n'
-        else:
+        s = 'beam, particle = {}, energy = {}'.format(self['particle'],
+                                                      self['energy'])
+        try:
+            s += ', ex={}, ey={}'.format(self['emitx'], self['emity'])
+        except KeyError:
+            pass
+        try:
+            s += ', sige = {};\n'.format(self['sigmaE'])
+        except KeyError:
             s += ';\n'
         return s
 
