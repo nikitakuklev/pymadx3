@@ -9,6 +9,7 @@ pymadx Documentation
    introduction
    installation
    tfsloading
+   plotting
    building
    converting
    moduledocs
