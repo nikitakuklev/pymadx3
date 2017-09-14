@@ -50,7 +50,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pymadx'
-copyright = u'2017, L Nevay, A Abramov, S Boogert, W Shields, J Snuverink, S Walker'
+copyright = u'Royal Holloway, University of London 2017'
 author = u'L Nevay, A Abramov, S Boogert, W Shields, J Snuverink, S Walker'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -147,7 +147,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'pymadx.tex', u'pymadx Documentation',
-     u'L Nevay, A Abramov, S Boogert, W Shields, J Snuverink, S Walker', 'manual'),
+     u'Royal Holloway', 'manual'),
 ]
 
 
