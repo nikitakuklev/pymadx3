@@ -14,13 +14,13 @@ Copyright Royal Holloway, University of London 2017.
 
 """
 
-import Beam
-import Builder
-import Convert
-import Data
-import Plot
-import Ptc
-import PtcAnalysis
+from . import Beam
+from . import Builder
+from . import Convert
+from . import Data
+from . import Plot
+from . import Ptc
+from . import PtcAnalysis
 
 __all__ = ['Beam',
            'Builder',
