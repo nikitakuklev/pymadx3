@@ -133,8 +133,8 @@ class Tfs(object):
             splitline = line.strip('\n').split()
             sl        = splitline #shortcut
             if line[0] == '@':
-                #header
-                self.header[sl[1]] = _Cast(sl[-1])
+                # Header
+                self.header[sl[1]] = CastAndStrip(sl[-1])
             elif line[0] == '*':
                 #name
                 self.columns.extend(sl[1:]) #miss *
