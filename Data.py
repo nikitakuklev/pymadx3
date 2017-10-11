@@ -1022,32 +1022,7 @@ class Aperture(Tfs):
         Return a copy of this class with all non-zero items removed.
 
         """
-        print 'Aperture> removing zero aperture items'
-        # prepare list of relevant aperture keys to check
-        aperkeys = []
-        aperkeystocheck = ['APER_%s' %n for n in [1,2,3,4]]
-        for key in aperkeystocheck:
-            if key in self.columns:
-                aperkeys.append(key)
-            else:
-                print key,' will be ignored as not in this aperture Tfs file'
-        if len(aperkeys) == 0:
-            raise KeyError("This file does not contain APER_1,2,3 or 4 - required!")
-
-        # prepare resultant tfs instance
-        a = Aperture(debug=self.debug, quiet=True)
-        a._CopyMetaData(self)
-        for item in self:
-            apervalues = _np.array([item[key] for key in aperkeys])
-            nonzeros = apervalues > self._tolerance
-            nonzero  = nonzeros.any() #if any are true
-            if nonzero:
-                if item['APER_1'] < self._tolerance:
-                    continue # aper1 must at least be non zero
-                key = self.sequence[self._iterindex]
-                a._AppendDataEntry(key, self.data[key])
-        a._UpdateCache()
-        return a
+        return self.RemoveBelowValue(self._tolerance)
 
     def GetEntriesBelow(self, value=8, keys='all'):
         return self.RemoveAboveValue(value,keys)
@@ -1070,6 +1045,43 @@ class Aperture(Tfs):
                 pass #don't copy
             else:
                 #copy over as normal
+                key = self.sequence[self._iterindex]
+                a._AppendDataEntry(key, self.data[key])
+        a._UpdateCache()
+        return a
+
+    def RemoveBelowValue(self, limits, keys='all'):
+        """
+        Return a copy of the aperture instance with all entries where
+        any of the aperture values are below value. The default is
+        the tolerance as defined by SetZeroTolerance().
+        """       
+        print 'Aperture> removing any aperture entries below',limits
+        if keys == 'all':
+            aperkeystocheck = ['APER_%s' %n for n in range(1,5)] #prepare #APER_1, APER_2 etc
+        elif type(keys) in (float, int):
+            aperkeystocheck = [keys]
+        elif type(keys) in (list, tuple):
+            aperkeystocheck = list(keys)
+
+        limitvals = _np.array(limits) # works for single value, list or tuple in comparison
+
+        # check validity of the supplied keys
+        aperkeys = []
+        for key in aperkeystocheck:
+            if key in self.columns:
+                aperkeys.append(key)
+            else:
+                print key,' will be ignored as not in this aperture Tfs file'
+
+        # 'quiet' stops it complaining about not finding metadata
+        a = Aperture(debug=self.debug, quiet=True)
+        a._CopyMetaData(self)
+        for item in self:
+            apervals = _np.array([item[key] for key in aperkeys])
+            abovelimit = apervals < limitvals
+            abovelimittotal = abovelimit.any() # if any are true
+            if not abovelimittotal:
                 key = self.sequence[self._iterindex]
                 a._AppendDataEntry(key, self.data[key])
         a._UpdateCache()
