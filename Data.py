@@ -994,7 +994,7 @@ class Aperture(Tfs):
         for t in ts:
             if t not in _madxAperTypes:
                 failed = True
-                print 'Warning: Aperture type \"',t,'\" is not a valid MADX aperture types.'
+                print 'Warning: Aperture type \"',t,'\" is not a valid MADX aperture type.'
 
         if failed:
             PrintMADXApertureTypes()
