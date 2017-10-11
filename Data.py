@@ -1039,6 +1039,29 @@ class Aperture(Tfs):
 
     def GetEntriesBelow(self, value=8, keys='all'):
         return self.RemoveAboveValue(value,keys)
+
+    def RemoveNoApertureTypeEntries(self):
+        """
+        Return a copy of this instance with any null aperture types removed.
+        
+        Aperture type of "" will be removed.
+        """
+        atKey = 'APERTYPE'
+        if atKey not in self.columns:
+            print('No APERTYPE column')
+            return self
+
+        a = Aperture(debug=self.debug, quiet=True)
+        a._CopyMetaData(self)
+        for item in self:
+            if item[atKey] == "":
+                pass #don't copy
+            else:
+                #copy over as normal
+                key = self.sequence[self._iterindex]
+                a._AppendDataEntry(key, self.data[key])
+        a._UpdateCache()
+        return a
     
     def RemoveAboveValue(self, limits=8, keys='all'):
         print 'Aperture> removing any aperture entries above',limits
