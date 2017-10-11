@@ -1059,7 +1059,8 @@ class Aperture(Tfs):
             else:
                 print key,' will be ignored as not in this aperture Tfs file'
 
-        a = Aperture(debug=self.debug)
+        # 'quiet' stops it complaining about not finding metadata
+        a = Aperture(debug=self.debug, quiet=True)
         a._CopyMetaData(self)
         for item in self:
             apervals = _np.array([item[key] for key in aperkeys])
