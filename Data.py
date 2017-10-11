@@ -949,7 +949,7 @@ class Aperture(Tfs):
 
     """
     def __init__(self, *args, **kwargs):
-        _Tfs.__init__(self, *args, **kwargs)
+        Tfs.__init__(self, *args, **kwargs)
         self.debug = False
         if 'debug' in kwargs:
             self.debug = kwargs['debug']
