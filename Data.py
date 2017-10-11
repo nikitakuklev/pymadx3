@@ -1317,7 +1317,7 @@ def GetApertureExtents(aperture):
     aper3 = aperture.GetColumn('APER_3')
     aper4 = aperture.GetColumn('APER_4')
     apertureType = aperture.GetColumn('APERTYPE')
-
+    
     x = []
     y = []
     for i in range(len(aperture)):
@@ -1337,7 +1337,7 @@ def GetApertureExtent(aper1, aper2, aper3, aper4, aper_type):
     returns x,y
     """
     
-    if  aper_type not in _madxAperTypes:
+    if aper_type not in _madxAperTypes:
         raise ValueError('Unknown aperture type: ' + aper_type)
 
     x = aper1
