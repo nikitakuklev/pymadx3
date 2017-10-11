@@ -120,11 +120,11 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
-def PlotAperture(tfsfile, title='', outputfilename=None, machine=None):
+def PlotAperture(aperture, title='', outputfilename=None, machine=None):
     """
     """
     import pymadx.Data as _Data
-    aper = _Data.CheckItsTfsAperture(tfsfile)
+    aper = _Data.CheckItsTfsAperture(aperture)
 
     f = _plt.figure(figsize=(11,5))
 
