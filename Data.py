@@ -1023,7 +1023,7 @@ class Aperture(Tfs):
             raise KeyError("This file does not contain APER_1,2,3 or 4 - required!")
 
         # prepare resultant tfs instance
-        a = Aperture(debug=self.debug)
+        a = Aperture(debug=self.debug, quiet=True)
         a._CopyMetaData(self)
         for item in self:
             apervalues = _np.array([item[key] for key in aperkeys])
@@ -1086,7 +1086,7 @@ class Aperture(Tfs):
             # no duplicates!
             return self
         
-        a = Aperture(debug=self.debug)
+        a = Aperture(debug=self.debug, quiet=True)
         a._CopyMetaData(self)
         u,indices = _np.unique(self.GetColumn('S'), return_index=True)
         for ind in indices:
