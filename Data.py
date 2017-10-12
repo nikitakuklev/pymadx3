@@ -1091,10 +1091,12 @@ class Aperture(Tfs):
         print 'Aperture> removing any aperture entries above',limits
         if keys == 'all':
             aperkeystocheck = ['APER_%s' %n for n in [1,2,3,4]]
-        elif type(keys) in (float, int):
+        elif type(keys) in (float, int, str):
             aperkeystocheck = [keys]
         elif type(keys) in (list, tuple):
             aperkeystocheck = list(keys)
+        else:
+            raise ValueError("Invalid key")
 
         limitvals = _np.array(limits) # works for single value, list or tuple in comparison
 
@@ -1105,6 +1107,10 @@ class Aperture(Tfs):
                 aperkeys.append(key)
             else:
                 print key,' will be ignored as not in this aperture Tfs file'
+
+        if len(aperkeys) == 0:
+            print('No aperture values to check')
+            return self
 
         # 'quiet' stops it complaining about not finding metadata
         a = Aperture(debug=self.debug, quiet=True)
