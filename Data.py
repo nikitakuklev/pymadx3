@@ -1149,7 +1149,8 @@ class Aperture(Tfs):
         return a
 
     def _GetIndexInCacheOfS(self, sposition):
-        index = _bisect.bisect(self._ssorted, sposition)
+        index = _bisect.bisect_right(self._ssorted, sposition)
+        
         if index > 0:
             return index - 1
         else:
@@ -1160,15 +1161,24 @@ class Aperture(Tfs):
         Return a dictionary of the aperture information specified at the closest
         S position to that requested - may be before or after that point.
         """
-        return self[self._GetIndexInCacheOfS(sposition)]
 
+        a = Aperture(debug=self.debug, quiet=True)
+        a._CopyMetaData(self)
+        #key = self._ssorted[self._GetIndexInCacheOfS(sposition)]
+        key = self.sequence[self._GetIndexInCacheOfS(sposition)]
+        a._AppendDataEntry(key, self.data[key])
+        a._UpdateCache()
+        
+        #return self[self._GetIndexInCacheOfS(sposition)]
+        return a
+        
     def GetExtentAtS(self, sposition):
         """
         Get the x and y maximum +ve extent (assumed symmetric) for a given
         s position.  Calls GetApertureAtS and then GetApertureExtent.
         """
-        element = GetApertureAtS(sposition)
-        x,y     = GetApertureExtent(element)
+        element = self.GetApertureAtS(sposition)
+        x,y     = GetApertureExtents(element)
         return x,y
         
     def GetApertureForElementNamed(self, name):
