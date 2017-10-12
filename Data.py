@@ -1158,8 +1158,8 @@ class Aperture(Tfs):
 
         a = Aperture(debug=self.debug, quiet=True)
         a._CopyMetaData(self)
-        #key = self._ssorted[self._GetIndexInCacheOfS(sposition)]
-        key = self.sequence[self._GetIndexInCacheOfS(sposition)]
+        key = self.cache[self._ssorted[self._GetIndexInCacheOfS(sposition)]]["NAME"]
+        #key = self.sequence[self._GetIndexInCacheOfS(sposition)]
         a._AppendDataEntry(key, self.data[key])
         a._UpdateCache()
         
