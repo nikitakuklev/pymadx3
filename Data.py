@@ -207,48 +207,91 @@ class Tfs(object):
 
         # check this file has the appropriate variables else, return without calculating
         # use a set to check if all variables are in a given list easily
-        requiredVariablesB = set(['DX', 'DY', 'DPX', 'DPY', 'ALFX', 'ALFY', 'BETX', 'BETY'])
-        if not requiredVariablesB.issubset(self.columns):
-            return
-        requiredVariablesH = set(['SIGE', 'EX', 'EY'])
-        if not requiredVariablesH.issubset(self.header.keys()):
-            return
+        requiredVariablesB1 = set(['DX', 'DY', 'BETX', 'BETY'])
+        calculateSpace = requiredVariablesB1.issubset(self.columns)
+
+        requiredVariablesB2 = set(['DPX', 'DPY', 'ALFX', 'ALFY', 'BETX', 'BETY'])
+        calculatePrime = requiredVariablesB2.issubset(self.columns)
+
+        ex   = 1e-9
+        ey   = 1e-9
+        sige = 1e-4
+        requiredVariablesH1 = set(['SIGE', 'EX', 'EY'])
+        method1 = requiredVariablesH1.issubset(self.header.keys())
+        requiredVariablesH2 = set(['EXN', 'EYN', 'GAMMA'])
+        method2 = requiredVariablesH2.issubset(self.header.keys())
+        if not (method1 or method2):
+            return #no emittance information to calcualte sigma
+
+        if method1:
+            ex   = self.header['EX']
+            ey   = self.header['EY']
+            sige = self.header['SIGE']
+        if method2:
+            ex   = self.header['EXN']*self.header['GAMMA']
+            ey   = self.header['EYN']*self.header['GAMMA']
+            sige = 0
+            
+        #if not requiredVariablesH.issubset(self.header.keys()):
+        #    return
+
+        if not (calculateSpace or calculatePrime):
+            return # can't calculate either
         
         # get indices to the columns we'll need in the data
-        dxindex   = self.ColumnIndex('DX')
-        dyindex   = self.ColumnIndex('DY')
-        dpxindex  = self.ColumnIndex('DPX')
-        dpyindex  = self.ColumnIndex('DPY')
-        alfxindex = self.ColumnIndex('ALFX')
-        alfyindex = self.ColumnIndex('ALFY')
+        dxindex = -1
+        dyindex = -1
+        if calculateSpace:
+            dxindex   = self.ColumnIndex('DX')
+            dyindex   = self.ColumnIndex('DY')
+
+        dpxindex  = -1
+        dpyindex  = -1
+        alfxindex = -1
+        alfyindex = -1
+        if calculatePrime:
+            dpxindex = self.ColumnIndex('DPX')
+            dpyindex  = self.ColumnIndex('DPY')
+            alfxindex = self.ColumnIndex('ALFX')
+            alfyindex = self.ColumnIndex('ALFY')
+            
         betxindex = self.ColumnIndex('BETX')
         betyindex = self.ColumnIndex('BETY')
 
         # constants
-        sige = self.header['SIGE']
+        #sige = self.header['SIGE']
         beta = self.header['BETA'] # relativistic beta
-        ex   = self.header['EX']
-        ey   = self.header['EY']
-        self.columns.extend(['SIGMAX', 'SIGMAY', 'SIGMAXP', 'SIGMAYP'])
+        #ex   = self.header['EX']
+        #ey   = self.header['EY']
+        newcolumns = []
+        
+        if calculateSpace:
+            newcolumns.extend(['SIGMAX', 'SIGMAY'])
+        if calculatePrime:
+            newcolumns.extend(['SIGMAXP', 'SIGMAYP'])
+        self.columns.extend(newcolumns)
+
         for elementname in self.sequence:
             # beam size calculations (using relation deltaE/E = beta^2 * deltaP/P)
             d = self.data[elementname]
-            xdispersionterm = (d[dxindex] * sige / beta**2)**2
-            ydispersionterm = (d[dyindex] * sige / beta**2)**2
-            sigx = _np.sqrt((d[betxindex] * ex) + xdispersionterm)
-            sigy = _np.sqrt((d[betyindex] * ey) + ydispersionterm)
-            d.append(sigx)
-            d.append(sigy)
+            if calculateSpace:
+                xdispersionterm = (d[dxindex] * sige / beta**2)**2
+                ydispersionterm = (d[dyindex] * sige / beta**2)**2
+                sigx = _np.sqrt((d[betxindex] * ex) + xdispersionterm)
+                sigy = _np.sqrt((d[betyindex] * ey) + ydispersionterm)
+                d.append(sigx)
+                d.append(sigy)
 
             # beam divergences (using relation x',y' = sqrt(gamma_x,y * emittance_x,y))
-            gammax = (1.0 + d[alfxindex]**2) / d[betxindex] # twiss gamma
-            gammay = (1.0 + d[alfyindex]**2) / d[betyindex]
-            xdispersionterm = (d[dpxindex] * sige / beta**2)**2
-            ydispersionterm = (d[dpyindex] * sige / beta**2)**2
-            sigxp  = _np.sqrt((gammax * ex) + xdispersionterm)
-            sigyp  = _np.sqrt((gammay * ey) + ydispersionterm)
-            d.append(sigxp)
-            d.append(sigyp)
+            if calculatePrime:
+                gammax = (1.0 + d[alfxindex]**2) / d[betxindex] # twiss gamma
+                gammay = (1.0 + d[alfyindex]**2) / d[betyindex]
+                xdispersionterm = (d[dpxindex] * sige / beta**2)**2
+                ydispersionterm = (d[dpyindex] * sige / beta**2)**2
+                sigxp  = _np.sqrt((gammax * ex) + xdispersionterm)
+                sigyp  = _np.sqrt((gammay * ey) + ydispersionterm)
+                d.append(sigxp)
+                d.append(sigyp)
 
     def __repr__(self):
         s =  ''
