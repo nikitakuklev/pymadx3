@@ -613,6 +613,14 @@ class Tfs(object):
             a._AppendDataEntry(key,self.data[key])
         return a
 
+    def GetElementsWithTextInName(self, text):
+        a = Tfs()
+        a._CopyMetaData(self)
+        for item in self.sequence:
+            if text in item:
+                a._AppendDataEntry(item, self.data[item])
+        return a
+
     def ReportPopulations(self):
         """
         Print out all the population of each type of
