@@ -614,6 +614,13 @@ class Tfs(object):
         return a
 
     def GetElementsWithTextInName(self, text):
+        """
+        Returns a Tfs instance containing only the elements with the string in
+        text in the their name.
+
+        This returns a Tfs instance with all the same capabilities as this one.
+
+        """
         a = Tfs()
         a._CopyMetaData(self)
         for item in self.sequence:
