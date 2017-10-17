@@ -1,4 +1,5 @@
 import pymadx.Beam as _Beam
+import pymadx.Builder as _Builder
 import numpy as _np
 import re as _re
 import csv
@@ -27,7 +28,7 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
     dldiff = {}
     itemsomitted = []
 
-    a = _pymadx.Builder.Machine()
+    a = _Builder.Machine()
     
     #prepare index for iteration:
     if startname == None:
