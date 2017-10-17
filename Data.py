@@ -988,7 +988,7 @@ class Aperture(Tfs):
         except ValueError:
             pass
 
-    def Plot(self, title='', outputfilename=None, machine=None):
+    def Plot(self, title='', outputfilename=None, machine=None, plot="xy"):
         """
         This plots the aperture extent in x and y.
 
@@ -996,7 +996,7 @@ class Aperture(Tfs):
         """
         try:
             import pymadx.Plot as _Plot
-            _Plot.PlotAperture(self, title, outputfilename, machine)
+            _Plot.PlotAperture(self, title, outputfilename, machine, plot=plot)
         except ImportError:
             pass
             

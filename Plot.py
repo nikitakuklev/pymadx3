@@ -120,19 +120,31 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
-def PlotAperture(aperture, title='', outputfilename=None, machine=None):
+def PlotAperture(aperture, title='', outputfilename=None, machine=None, plot="xy"):
     """
     """
     import pymadx.Data as _Data
     aper = _Data.CheckItsTfsAperture(aperture)
 
+    plotwhat = (0, 0)
+    if plot.lower() == "xy":
+        plotwhat = (1, 1)
+    elif plot.lower() == "x":
+        plotwhat = (1, 0)
+    elif plot.lower() == "y":
+        plotwhat = (0, 1)
+    else:
+        raise Exception("Invalid plot option:"+plot+". Use 'x', 'y' or 'xy'")
+        
     f = _plt.figure(figsize=(11,5))
 
     s = aper.GetColumn('S')
     x,y = aper.GetExtentAll()    
-    
-    _plt.plot(s, x, 'b-', label='X')
-    _plt.plot(s, y, 'g-', label='Y')
+
+    if plotwhat[0]:
+        _plt.plot(s, x, 'b-', label='X')
+    if plotwhat[1]:
+        _plt.plot(s, y, 'g-', label='Y')
     _plt.xlabel('S (m)')
     _plt.ylabel('Aperture (m)')
     _plt.legend(loc='best', fontsize='small')
