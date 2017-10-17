@@ -1117,7 +1117,7 @@ class Aperture(Tfs):
         print 'Aperture> removing any aperture entries below',limits
         if keys == 'all':
             aperkeystocheck = ['APER_%s' %n for n in range(1,5)] #prepare #APER_1, APER_2 etc
-        elif type(keys) in (float, int):
+        elif type(keys) in (float, int, str):
             aperkeystocheck = [keys]
         elif type(keys) in (list, tuple):
             aperkeystocheck = list(keys)
