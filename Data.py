@@ -1011,13 +1011,13 @@ class Aperture(Tfs):
         self.debug = False
         if 'debug' in kwargs:
             self.debug = kwargs['debug']
-            
+
         # the tolerance below which, the aperture is considered 0
         self._tolerance = 1e-6
         self._UpdateCache()
         if 'quiet' not in kwargs:
             self.CheckKnownApertureTypes()
-        
+
     def _UpdateCache(self):
         # create a cache of which aperture is at which s position
         # do this by creatig a map of the s position of each entry
@@ -1046,7 +1046,7 @@ class Aperture(Tfs):
         except ValueError:
             pass
 
-    def Plot(self, title='', outputfilename=None, machine=None, plot="xy"):
+    def Plot(self, title='', outputfilename=None, machine=None, plot="xy", plotapertype=False):
         """
         This plots the aperture extent in x and y.
 
@@ -1054,10 +1054,10 @@ class Aperture(Tfs):
         """
         try:
             import pymadx.Plot as _Plot
-            _Plot.PlotAperture(self, title, outputfilename, machine, plot=plot)
+            _Plot.PlotAperture(self, title, outputfilename, machine, plot=plot, plotapertype=plotapertype)
         except ImportError:
             pass
-            
+
     def CheckKnownApertureTypes(self):
         failed = False
         ts = set(self.GetColumn('APERTYPE'))
@@ -1088,7 +1088,7 @@ class Aperture(Tfs):
     def RemoveNoApertureTypeEntries(self):
         """
         Return a copy of this instance with any null aperture types removed.
-        
+
         Aperture type of "" will be removed.
         """
         atKey = 'APERTYPE'
@@ -1113,7 +1113,7 @@ class Aperture(Tfs):
         Return a copy of the aperture instance with all entries where
         any of the aperture values are below value. The default is
         the tolerance as defined by SetZeroTolerance().
-        """       
+        """
         print 'Aperture> removing any aperture entries below',limits
         if keys == 'all':
             aperkeystocheck = ['APER_%s' %n for n in range(1,5)] #prepare #APER_1, APER_2 etc
@@ -1144,7 +1144,7 @@ class Aperture(Tfs):
                 a._AppendDataEntry(key, self.data[key])
         a._UpdateCache()
         return a
-    
+
     def RemoveAboveValue(self, limits=8, keys='all'):
         print 'Aperture> removing any aperture entries above',limits
         if keys == 'all':
@@ -1196,7 +1196,7 @@ class Aperture(Tfs):
         if len(self) == len(self._ssorted):
             # no duplicates!
             return self
-        
+
         a = Aperture(debug=self.debug, quiet=True)
         a._CopyMetaData(self)
         u,indices = _np.unique(self.GetColumn('S'), return_index=True)
@@ -1208,7 +1208,7 @@ class Aperture(Tfs):
 
     def _GetIndexInCacheOfS(self, sposition):
         index = _bisect.bisect_right(self._ssorted, sposition)
-        
+
         if index > 0:
             return index - 1
         else:
@@ -1226,10 +1226,10 @@ class Aperture(Tfs):
         #key = self.sequence[self._GetIndexInCacheOfS(sposition)]
         a._AppendDataEntry(key, self.data[key])
         a._UpdateCache()
-        
+
         #return self[self._GetIndexInCacheOfS(sposition)]
         return a
-        
+
     def GetExtentAtS(self, sposition):
         """
         Get the x and y maximum +ve extent (assumed symmetric) for a given
@@ -1238,7 +1238,7 @@ class Aperture(Tfs):
         element = self.GetApertureAtS(sposition)
         x,y     = GetApertureExtents(element)
         return x,y
-        
+
     def GetApertureForElementNamed(self, name):
         """
         Return a dictionary of the aperture information by the name of the element.
@@ -1287,7 +1287,7 @@ class Aperture(Tfs):
         in this class suggests multiple aperture changes within the element.
 
         Returns bool, [], []
-        
+
         which are in order:
 
         bool - whether to split or not
@@ -1298,7 +1298,7 @@ class Aperture(Tfs):
         l      = rowDictionary['L']
         sEnd   = rowDictionary['S']
         sStart = sEnd -l
-        
+
         indexStart = self._GetIndexInCacheOfS(sStart)
         indexEnd   = self._GetIndexInCacheOfS(sEnd)
         # get the s positions of any defined aperture points within
@@ -1311,7 +1311,7 @@ class Aperture(Tfs):
         bdA2 = _np.diff(self._aper_2[indexStart:indexEnd]) != 0
         bdA3 = _np.diff(self._aper_3[indexStart:indexEnd]) != 0
         bdA4 = _np.diff(self._aper_4[indexStart:indexEnd]) != 0
-        
+
         # find if there are any changes in aperture for any parameter
         shouldSplit = _np.array([bdA1, bdA2, bdA3, bdA4]).any()
 
@@ -1332,7 +1332,7 @@ class Aperture(Tfs):
                 print 'Recommend splitting element'
             # should split!
             # work out s locations at split points
-            
+
             # put all selection boolean arrays into one large 2D array
             # of nonzero differential vs aperture parameter
             bdA = _np.array([bdA1, bdA2, bdA3, bdA4])
@@ -1354,7 +1354,7 @@ class Aperture(Tfs):
             # replace any <0 lengths ie nearest aperture definition behind start of this object
             # ignore these and only take aperture definitions in front of the element
             lSplits     = lSplits[lSplits > 0]
-            
+
             if self.debug:
                 print 'Aperture> length of splits: ',lSplits
 
@@ -1362,7 +1362,7 @@ class Aperture(Tfs):
             # make them a local S within the element by prepending 0 and appending L(ength)
             lSplits = _np.insert(lSplits, 0, 0)
             lSplits = _np.append(lSplits, l) # make length last one
-            
+
             lSplits = _np.diff(lSplits)
 
             if self.debug:
@@ -1380,14 +1380,14 @@ class Aperture(Tfs):
             result = True if len(sSplits)>1 else False
             if len(apertures) > len(sSplits):
                 apertures = apertures[:len(sSplits)] #should index 1 ahead - counteracts 0 counting
-            
+
             return result, lSplits, apertures
 
 def CheckItsTfsAperture(tfsfile):
     """
     Ensure the provided file is an Aperture instance.  If it's a string, ie path to
     a tfs file, open it and return the Tfs instance.
-    
+
     tfsfile can be either a tfs instance or a string.
     """
     if type(tfsfile) == str:
@@ -1402,7 +1402,7 @@ def PrintMADXApertureTypes():
     print 'Valid MADX aperture types are:'
     for t in _madxAperTypes:
         print t
-        
+
 def GetApertureExtents(aperture):
     """
     Loop over a pymadx.Aperture.Aperture instance and calculate the maximum
@@ -1415,7 +1415,7 @@ def GetApertureExtents(aperture):
     aper3 = aperture.GetColumn('APER_3')
     aper4 = aperture.GetColumn('APER_4')
     apertureType = aperture.GetColumn('APERTYPE')
-    
+
     x = []
     y = []
     for i in range(len(aperture)):
@@ -1437,7 +1437,7 @@ def GetApertureExtent(aper1, aper2, aper3, aper4, aper_type):
     # protect against empty aperture type
     if aper_type == "":
         return 0,0
-    
+
     if aper_type not in _madxAperTypes:
         raise ValueError('Unknown aperture type: ' + aper_type)
 
@@ -1459,7 +1459,7 @@ def GetApertureExtent(aper1, aper2, aper3, aper4, aper_type):
     elif aper_type == 'RACETRACK':
         x = aper3 + aper1
         y = aper2 + aper3
-    
+
     return x,y
 
 
