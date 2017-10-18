@@ -113,41 +113,49 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
         AddMachineLatticeToFigure(f,madx)
 
     _plt.suptitle(title,size='x-large')
-    
+
     if outputfilename != None:
         if '.' in outputfilename:
             outputfilename = outputfilename.split('.')[0]
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
-def PlotAperture(aperture, title='', outputfilename=None, machine=None, plot="xy"):
+def PlotAperture(aperture, title='', outputfilename=None, machine=None, plot="xy", plotapertype=False):
     """
     """
     import pymadx.Data as _Data
     aper = _Data.CheckItsTfsAperture(aperture)
 
-    plotwhat = (0, 0)
-    if plot.lower() == "xy":
-        plotwhat = (1, 1)
-    elif plot.lower() == "x":
-        plotwhat = (1, 0)
-    elif plot.lower() == "y":
-        plotwhat = (0, 1)
-    else:
-        raise Exception("Invalid plot option:"+plot+". Use 'x', 'y' or 'xy'")
-        
+    allowed = ["x", "y", "xy", "X", "Y", "XY"]
+    if plot not in allowed:
+        raise ValueError("Invalid option plot: "+plot+". Use 'x', 'y' or 'xy'")
+
     f = _plt.figure(figsize=(11,5))
 
     s = aper.GetColumn('S')
-    x,y = aper.GetExtentAll()    
+    x,y = aper.GetExtentAll()
 
-    if plotwhat[0]:
-        _plt.plot(s, x, 'b-', label='X')
-    if plotwhat[1]:
-        _plt.plot(s, y, 'g-', label='Y')
+    if plotapertype:
+        t = aper.GetColumn('APERTYPE')
+        c = map(_ApertypeToColor, t)
+
+    if "x" in plot.lower():
+        #line1, = _plt.plot(s, x, 'b-', label='X')
+        if plotapertype:
+            _plt.scatter(s, x, color=c, s=6)
+
+    if "y" in plot.lower():
+        #line2, = _plt.plot(s, y, 'g-', label='Y')
+        if plotapertype:
+            _plt.scatter(s, y, color=c, s=6)
+
     _plt.xlabel('S (m)')
     _plt.ylabel('Aperture (m)')
-    _plt.legend(loc='best', fontsize='small')
+
+    if plotapertype:
+        _AddColorLegend(c)
+
+    _plt.legend(loc='best', numpoints=1, scatterpoints=1, fontsize='small')
 
     if machine != None:
         AddMachineLatticeToFigure(_plt.gcf(), machine)
@@ -161,6 +169,52 @@ def PlotAperture(aperture, title='', outputfilename=None, machine=None, plot="xy
             outputfilename = outputfilename.split('.')[0]
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
+
+def _ApertypeColorMap():
+    #Some nice colors
+    color_codes = ['#C03028',
+                   '#F8D030',
+                   '#6890F0',
+                   '#F85888',
+                   '#A8B820',
+                   '#F08030',
+                   '#7038F8',
+                   '#78C850',
+                   '#A8A878']
+
+    # MADX aperture types
+    _madxAperTypes = [ 'CIRCLE',
+                   'RECTANGLE',
+                   'ELLIPSE',
+                   'RECTCIRCLE',
+                   'LHCSCREEN',
+                   'MARGUERITE',
+                   'RECTELLIPSE',
+                   'RACETRACK',
+                   'OCTAGON']
+    typeToCol = {}
+    for i in range(len(_madxAperTypes)):
+        typeToCol[_madxAperTypes[i]] = color_codes[i]
+
+    return typeToCol
+
+def _ApertypeToColor(apertype, cmap=_ApertypeColorMap()):
+    color = (0,0,0)
+    try:
+        color = cmap[apertype.upper()]
+    except:
+        print "Warning, unrecognised apertype: "+apertype+". Default to white color."
+        color =(1,1,1)
+
+    return color
+
+def _AddColorLegend(colors, cmap=_ApertypeColorMap()):
+    found_cols = set(colors)
+    typemap = dict((v,k) for k,v in cmap.iteritems()) #invert to get apertype from color
+    handles = []
+    for col in found_cols:
+        _plt.scatter(None,None,color=col, label=typemap[col].lower())
+
 
 def _SetMachineAxesStyle(ax):
     ax.get_xaxis().set_visible(False)
