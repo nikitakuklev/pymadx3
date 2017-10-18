@@ -613,6 +613,23 @@ class Tfs(object):
             a._AppendDataEntry(key,self.data[key])
         return a
 
+    def GetCollimators(self):
+        """
+        Returns a Tfs instance containing any type of collimator (both RCOLLIMATOR
+        and ECOLLIMATOR)
+        """
+        if 'KEYWORD' in self.columns:
+            i = self.ColumnIndex('KEYWORD')
+        else:
+            i = 0
+
+        names = [name for name in self.sequence if 'COLLIMATOR' in self.data[name][i]]
+        a = Tfs()
+        a._CopyMetaData(self)
+        for key in names:
+            a._AppendDataEntry(key,self.data[key])
+        return a
+
     def GetElementsWithTextInName(self, text):
         """
         Returns a Tfs instance containing only the elements with the string in
