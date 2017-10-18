@@ -76,7 +76,7 @@ def PlotCentroids(tfsfile, title='', outputfilename=None, machine=True):
         _plt.savefig(outputfilename+'.png')
 
 
-def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=False):
+def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=False, squareroot=True):
     """
     Plot sqrt(beta x,y) as a function of S. By default, a machine diagram is shown at
     the top of the plot.
@@ -94,12 +94,21 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
     axoptics = f.add_subplot(111)
 
     #optics plots
-    axoptics.plot(d['s'],_np.sqrt(d['betx']),'b-', label='x')
-    axoptics.plot(d['s'],_np.sqrt(d['bety']),'g-', label='y')
+    if squareroot:
+        yx = _np.sqrt(d['betx'])
+        yy = _np.sqrt(d['bety'])
+    else:
+        yx = d['betx']
+        yy = d['bety']
+    axoptics.plot(d['s'], yx, 'b-', label='x')
+    axoptics.plot(d['s'], yy, 'g-', label='y')
     if dispersion:
         axoptics.plot(-100,-100,'r--', label=r'$\mathrm{D}(S)$') #fake plot for legend
     axoptics.set_xlabel('S (m)')
-    axoptics.set_ylabel(r'$\sqrt{\beta}$ ($\sqrt{\mathrm{m}}$)')
+    if squareroot:
+        axoptics.set_ylabel(r'$\sqrt{\beta}$ ($\sqrt{\mathrm{m}}$)')
+    else:
+        axoptics.set_ylabel(r'$\beta$ (m)')
     axoptics.legend(loc=0,fontsize='small') #best position
 
     #plot dispersion - only in horizontal

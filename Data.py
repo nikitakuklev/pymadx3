@@ -648,13 +648,15 @@ class Tfs(object):
         for item in sorted(populations)[::-1]:
             print item[1].ljust(15,'.'),item[0]
 
-    def Plot(self, title='', outputfilename=None, machine=True, dispersion=False):
+    def Plot(self, title='', outputfilename=None, machine=True, dispersion=False, squareroot=True):
         """
         Plot the Beta amplitude functions from the file if they exist.
+
+        squareroot -> whether to square root the beta functions or not (default = True)
         """
         try:
             import pymadx.Plot as _Plot
-            _Plot.PlotBeta(self,title,outputfilename,machine,dispersion)
+            _Plot.PlotBeta(self,title,outputfilename,machine,dispersion,squareroot)
         except ImportError:
             pass
 
