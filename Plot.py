@@ -34,7 +34,7 @@ def _GetOpticalDataFromTfs(tfsobject):
     d['betx']  = tfsobject.GetColumn('BETX')
     d['bety']  = tfsobject.GetColumn('BETY')
     d['dispx'] = tfsobject.GetColumn('DX')
-    d['dispy'] = tfsobject.GetColumn('DY')
+    #d['dispy'] = tfsobject.GetColumn('DY') #don't use
     d['x']     = tfsobject.GetColumn('X')
     d['y']     = tfsobject.GetColumn('Y')
     return d
