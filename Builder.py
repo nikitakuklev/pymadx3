@@ -37,19 +37,19 @@ madxcategories = [
     'marker'
     ]
 
-class Element(dict) : 
+class Element(dict) :
     """
     Element - a beam element class - inherits dict
 
     Element(name,type,**kwargs)
-    
+
     A beam line element must ALWAYs have a name, and type.
     The keyword arguments are specific to the type and are up to
     the user to specify.
 
-    Numbers are converted to a python Decimal type to provide 
-    higher accuracy in the representation of numbers - 15 
-    decimal places are used. 
+    Numbers are converted to a python Decimal type to provide
+    higher accuracy in the representation of numbers - 15
+    decimal places are used.
     """
     def __init__(self, name, category, **kwargs):
         if category not in madxcategories:
@@ -58,13 +58,13 @@ class Element(dict) :
         self.category = str(category)
         self.length      = 0.0 #for bookeeping only
         self['name']     = self.name
-        self['category'] = self.category        
+        self['category'] = self.category
         self._keysextra = []
         for key,value in kwargs.iteritems():
             if type(value) == tuple and category != 'multipole':
                 #use a tuple for (value,units)
                 self[key] = (_Decimal(str(value[0])),value[1])
-            elif type(value) == tuple and category == 'multipole' : 
+            elif type(value) == tuple and category == 'multipole' :
                 self[key] = value
             elif _IsFloat(value):
                 #just a number
@@ -92,7 +92,7 @@ class Element(dict) :
             for key in self._keysextra:
                 if type(self[key]) == tuple and self.category != 'multipole':
                     s += ', ' + key + '=' + str(self[key][0]) + '*' + str(self[key][1])
-                elif type(self[key]) == tuple and self.category == 'multipole' : 
+                elif type(self[key]) == tuple and self.category == 'multipole' :
                     s += ', ' + key + '=' + '{'+(','.join([str(s) for s in self[key]]))+'}'
                 else:
                     s += ', ' + key + '=' + str(self[key])
@@ -109,7 +109,7 @@ class Line(list):
         self.length = 0.0 
         for item in args[0]:
             self.length += item.length
-        
+
     def __repr__(self):
         s = ''
         for item in self:
