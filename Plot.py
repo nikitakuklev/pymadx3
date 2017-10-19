@@ -131,6 +131,15 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
 
 def PlotAperture(aperture, title='', outputfilename=None, machine=None, plot="xy", plotapertype=False):
     """
+    Plots the aperture extents vs. S from a pymadx.Data.Aperture instance.
+
+    Inputs:
+      aperture (pymadx.Data.Aperture) - the aperture model to plot from
+      title (str) - The title of the resultant plot (default: None)
+      outputfilename (str) - Name without extension of the output file if desired (default: None)
+      machine (str or pymadx.Data.Tfs) - TFS file or TFS istance to plot a machine lattice from (default: None)
+      plot (str) - Indicates whcih aperture to plot - 'x' for X, 'y' for Y and 'xy' for both (default: 'xy')
+      plotapertype (bool) - If enabled plots the aperture type at every definted aperture point as a color-coded dot (default: False)
     """
     import pymadx.Data as _Data
     aper = _Data.CheckItsTfsAperture(aperture)
