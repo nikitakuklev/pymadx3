@@ -1070,6 +1070,14 @@ class Aperture(Tfs):
         This plots the aperture extent in x and y.
 
         This replaces the base class Tfs Plot method.
+
+        Inputs:
+          title (str) - The title of the resultant plot (default: None)
+          outputfilename (str) - Name without extension of the output file if desired (default: None)
+          machine (str or pymadx.Data.Tfs) - TFS file or TFS istance to plot a machine lattice from (default: None)
+          plot (str) - Indicates whcih aperture to plot - 'x' for X, 'y' for Y and 'xy' for both (default: 'xy')
+          plotapertype (bool) - If enabled plots the aperture type at every definted aperture point as a color-coded dot (default: False)
+
         """
         try:
             import pymadx.Plot as _Plot
