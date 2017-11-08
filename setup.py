@@ -5,8 +5,8 @@ setup(
     version='0.9',
     packages=find_packages(exclude=["docs", "tests", "obsolete"]),
     # Not sure how strict these need to be...
-    install_requires=["matplotlib >= 2.1.0",
-                      "numpy >= 1.13"],
+    install_requires=["matplotlib",
+                      "numpy"],
     # Some version of python2.7
     python_requires="==2.7.*",
 
