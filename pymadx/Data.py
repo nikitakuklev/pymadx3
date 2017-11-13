@@ -641,8 +641,15 @@ class Tfs(object):
         a = Tfs()
         a._CopyMetaData(self)
         for item in self.sequence:
-            if text in item:
-                a._AppendDataEntry(item, self.data[item])
+            if type(type) == str:
+                if text in item:
+                    a._AppendDataEntry(item, self.data[item])
+            elif type(text) == list:
+                for t in text:
+                    if t in item:
+                        a._AppendDataEntry(item, self.data[item])
+            else:
+                pass
         return a
 
     def ReportPopulations(self):
