@@ -1,4 +1,4 @@
-# pybdsim._General - general python scripts / tools
+# pymadx._General - general python scripts / tools
 # Version 1.0
 # L. Nevay, S.T.Boogert
 # laurie.nevay@rhul.ac.uk
