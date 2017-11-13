@@ -16,7 +16,7 @@ class Tfs(object):
     >>> a.Load('myfile.tfs')
     >>> a.Load('myfile.tar.gz') -> extracts from tar file
 
-    or 
+    or
 
     >>> a = Tfs("myfile.tfs")
     >>> b = Tfs("myfile.tar.gz")
@@ -32,7 +32,7 @@ class Tfs(object):
     NOTE: if no column "NAME" is found, integer indices are used instead
 
     See the various methods inside a to get different bits of information:
-    
+
     >>> a.ReportPopulations?
 
     Examples:
@@ -40,7 +40,7 @@ class Tfs(object):
     >>> a.['IP.1'] #returns dict for element named "IP.1"
     >>> a[:30]     #returns list of dicts for elements up to number 30
     >>> a[345]     #returns dict for element number 345 in sequence
-    
+
     """
     def __init__(self,filename=None,**kwargs):
         object.__init__(self) #this allows type comparison for this class
@@ -63,19 +63,19 @@ class Tfs(object):
             self.Load(filename, self._verbose)
         elif type(filename) == Tfs:
             self._DeepCopy(filename)
-        
+
     def Clear(self):
         """
         Empties all data structures in this instance.
         """
         self.__init__()
-    
+
     def Load(self, filename, verbose=False):
         """
         >>> a = Tfs()
         >>> a.Load('filename.tfs')
-        
-        Read the tfs file and prepare data structures. If 'tar' or 'gz are in 
+
+        Read the tfs file and prepare data structures. If 'tar' or 'gz are in
         the filename, the file will be opened still compressed.
         """
         if ('tar' in filename) or ('gz' in filename):
@@ -85,7 +85,7 @@ class Tfs(object):
         else:
             print 'pymadx.Tfs.Load> normal file'
             f = open(filename)
-        
+
         #first pass at file - need to check if it has 'NAME' column
         #if it has name, use that, otherwise use an integer
         #find column names line
@@ -125,7 +125,7 @@ class Tfs(object):
                 argCast = argCast.strip('"') # strip unnecessary quote marks off
                 #print argCast
             return argCast
-        
+
         #read in data
         for line in f:
             if not line.strip():
@@ -162,9 +162,9 @@ class Tfs(object):
                 self.sequence.append(name) # keep the name in sequence
                 self.data[name] = d        # put in data dict by name
                 self.nitems += 1           # keep tally of number of items
-                
+
         f.close()
-        
+
         #additional processing
         self.index = range(0,len(self.data),1)
         if 'S' in self.columns:
@@ -231,13 +231,13 @@ class Tfs(object):
             ex   = self.header['EXN']*self.header['GAMMA']
             ey   = self.header['EYN']*self.header['GAMMA']
             sige = 0
-            
+
         #if not requiredVariablesH.issubset(self.header.keys()):
         #    return
 
         if not (calculateSpace or calculatePrime):
             return # can't calculate either
-        
+
         # get indices to the columns we'll need in the data
         dxindex = -1
         dyindex = -1
@@ -254,7 +254,7 @@ class Tfs(object):
             dpyindex  = self.ColumnIndex('DPY')
             alfxindex = self.ColumnIndex('ALFX')
             alfyindex = self.ColumnIndex('ALFY')
-            
+
         betxindex = self.ColumnIndex('BETX')
         betyindex = self.ColumnIndex('BETY')
 
@@ -264,7 +264,7 @@ class Tfs(object):
         #ex   = self.header['EX']
         #ey   = self.header['EY']
         newcolumns = []
-        
+
         if calculateSpace:
             newcolumns.extend(['SIGMAX', 'SIGMAY'])
         if calculatePrime:
@@ -389,14 +389,14 @@ class Tfs(object):
             a.smax = max(a.GetColumn('S'))
             a.smin = min(a.GetColumn('S'))
             return a
-        
+
         elif type(index) == int or type(index) == _np.int64:
             return self.GetRowDict(self.sequence[index])
         elif type(index) == str:
             return self.GetRowDict(index)
         else:
             raise ValueError("argument not an index or a slice")
-    
+
     def _CheckName(self,name):
         if self.data.has_key(name):
             #name already exists - boo degenerate names!
@@ -441,7 +441,7 @@ class Tfs(object):
             key = other.sequence[i]
             self._AppendDataEntry(key,other.data[key])
         return self
-            
+
     def NameFromIndex(self,index):
         """
         NameFromIndex(integerindex)
@@ -452,12 +452,12 @@ class Tfs(object):
 
     def NameFromNearestS(self,S):
         """
-        NameFromNearestS(S) 
+        NameFromNearestS(S)
 
-        return the name of the beamline element clostest to S 
+        return the name of the beamline element clostest to S
         """
-        
-        i = self.IndexFromNearestS(S) 
+
+        i = self.IndexFromNearestS(S)
         return self.sequence[i]
 
     def IndexFromNearestS(self, S):
@@ -479,7 +479,7 @@ class Tfs(object):
         else:
             result = _np.argmin(abs(sd - S))
             return result
-        
+
     def _EnsureItsAnIndex(self, value):
         if type(value) == str:
             return self.IndexFromName(value)
@@ -496,7 +496,7 @@ class Tfs(object):
     def ColumnIndex(self,columnstring):
         """
         Return the index to the column matching the name
-        
+
         REMEMBER: excludes the first column NAME
         0 counting
 
@@ -534,7 +534,7 @@ class Tfs(object):
             print 'No such item',elementname,' in this tfs file'
             return None
         return [d[key] for key in self.columns]
-    
+
     def GetRowDict(self,elementname):
         """
         Return a dictionary of all parameters for a specifc element
@@ -570,8 +570,8 @@ class Tfs(object):
     def InterrogateItem(self,itemname):
         """
         InterrogateItem(itemname)
-        
-        Print out all the parameters and their names for a 
+
+        Print out all the parameters and their names for a
         particlular element in the sequence identified by name.
         """
         for i,parameter in enumerate(self.columns):
@@ -579,13 +579,13 @@ class Tfs(object):
 
     def GetElementNamesOfType(self,typename):
         """
-        GetElementNamesOfType(typename) 
-        
-        Returns a list of the names of elements of a certain type. Typename can 
+        GetElementNamesOfType(typename)
+
+        Returns a list of the names of elements of a certain type. Typename can
         be a single string or a tuple or list of strings.
 
         Examples:
-        
+
         >>> GetElementsOfType('SBEND')
         >>> GetElementsOfType(['SBEND','RBEND'])
         >>> GetElementsOfType(('SBEND','RBEND','QUADRUPOLE'))
@@ -658,7 +658,7 @@ class Tfs(object):
             i = self.ColumnIndex('APERTYPE')
         else:
             raise KeyError("No keyword or apertype columns in this Tfs file")
-        
+
         keys = set([self.data[name][i] for name in self.sequence])
         populations = [(len(self.GetElementsOfType(key)),key) for key in keys]
         print 'Type'.ljust(15,'.'),'Population'
@@ -838,7 +838,7 @@ class Tfs(object):
         indexInSequence - index of component to be checked.
         terse           - print out the parameters which perturb if False
         '''
-        
+
         return self.ElementPerturbs(self[index], terse)
 
     def ElementPerturbs(self, component, terse=True):
@@ -992,7 +992,7 @@ def CheckItsTfs(tfsfile):
     """
     Ensure the provided file is a Tfs instance.  If it's a string, ie path to
     a tfs file, open it and return the Tfs instance.
-    
+
     tfsfile can be either a tfs instance or a string.
     """
     if type(tfsfile) == str:
@@ -1040,7 +1040,7 @@ class Aperture(Tfs):
     def _UpdateCache(self):
         # create a cache of which aperture is at which s position
         # do this by creatig a map of the s position of each entry
-        # with the associated 
+        # with the associated
         self.cache = {}
 
         print('Aperture> preparing cache')
@@ -1180,8 +1180,7 @@ class Aperture(Tfs):
             aperkeystocheck = [keys]
         elif type(keys) in (list, tuple):
             aperkeystocheck = list(keys)
-        else:
-            raise ValueError("Invalid key")
+        else:            raise ValueError("Invalid key")
 
         limitvals = _np.array(limits) # works for single value, list or tuple in comparison
 
@@ -1249,21 +1248,28 @@ class Aperture(Tfs):
 
         a = Aperture(debug=self.debug, quiet=True)
         a._CopyMetaData(self)
-        key = self.cache[self._ssorted[self._GetIndexInCacheOfS(sposition)]]["NAME"]
+        rowdict = self.cache[self._ssorted[self._GetIndexInCacheOfS(sposition)]]
         #key = self.sequence[self._GetIndexInCacheOfS(sposition)]
-        a._AppendDataEntry(key, self.data[key])
-        a._UpdateCache()
+        #a._AppendDataEntry(key, self.data[key])
+        #a._UpdateCache()
 
+        #.cache.values()[0]
         #return self[self._GetIndexInCacheOfS(sposition)]
-        return a
+        return rowdict
 
     def GetExtentAtS(self, sposition):
         """
         Get the x and y maximum +ve extent (assumed symmetric) for a given
         s position.  Calls GetApertureAtS and then GetApertureExtent.
         """
-        element = self.GetApertureAtS(sposition)
-        x,y     = GetApertureExtents(element)
+        rd = self.GetApertureAtS(sposition)
+        aper1 = rd('APER_1')
+        aper2 = rd('APER_2')
+        aper3 = rd('APER_3')
+        aper4 = rd('APER_4')
+        apertureType = rd('APERTYPE')
+
+        x,y     = GetApertureExtent(apertureType, aper1, aper2, aper3, aper4)
         return x,y
 
     def GetApertureForElementNamed(self, name):

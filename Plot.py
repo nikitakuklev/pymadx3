@@ -12,7 +12,7 @@ try:
 except ImportError:
     print "pymadx.Plot -> WARNING - plotting will not work!"
     print "matplotlib.pyplot doesn't exist"
-    
+
 class _My_Axes(_matplotlib.axes.Axes):
     """
     Inherit matplotlib.axes.Axes but override pan action for mouse.
@@ -68,7 +68,7 @@ def PlotCentroids(tfsfile, title='', outputfilename=None, machine=True):
         AddMachineLatticeToFigure(f,madx)
 
     _plt.suptitle(title,size='x-large')
-    
+
     if outputfilename != None:
         if '.' in outputfilename:
             outputfilename = outputfilename.split('.')[0]
@@ -103,7 +103,7 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
     axoptics.plot(d['s'], yx, 'b-', label='x')
     axoptics.plot(d['s'], yy, 'g-', label='y')
     if dispersion:
-        axoptics.plot(-100,-100,'r--', label=r'$\mathrm{D}(S)$') #fake plot for legend
+        axoptics.plot([], [],'r--', label=r'$\mathrm{D}(S)$') #fake plot for legend
     axoptics.set_xlabel('S (m)')
     if squareroot:
         axoptics.set_ylabel(r'$\sqrt{\beta}$ ($\sqrt{\mathrm{m}}$)')
@@ -122,7 +122,7 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
         AddMachineLatticeToFigure(f,madx)
 
     _plt.suptitle(title,size='x-large')
-
+    _plt.xlim((0 - 0.05*smax, 1.05*smax))
     if outputfilename != None:
         if '.' in outputfilename:
             outputfilename = outputfilename.split('.')[0]
@@ -257,20 +257,20 @@ def _AdjustExistingAxes(figure, fraction=0.9, tightLayout=True):
     # later it will cause an overlap with the machine diagram
     if (tightLayout):
         _plt.tight_layout()
-    
+
     axs = figure.get_axes()
-    
+
     for ax in axs:
         bbox = ax.get_position()
         bbox.y0 = bbox.y0 * fraction
         bbox.y1 = bbox.y1 * fraction
-        ax.set_position(bbox)  
-        
+        ax.set_position(bbox)
+
 def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
     """
     Add a diagram above the current graph in the figure that represents the
     accelerator based on a madx twiss file in tfs format.
-    
+
     Note you can use matplotlib's gcf() 'get current figure' as an argument.
 
     >>> pymadx.Plot.AddMachineLatticeToFigure(gcf(), 'afile.tfs')
@@ -291,20 +291,20 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
         raise IOError
 
     axs = figure.get_axes() # get the existing graph
-    
+
     axoptics  = figure.get_axes()[0]
     _AdjustExistingAxes(figure, tightLayout=tightLayout)
     axmachine = _PrepareMachineAxes(figure)
-    
+
     _DrawMachineLattice(axmachine,tfs)
 
     #put callbacks for linked scrolling
-    def MachineXlim(ax): 
+    def MachineXlim(ax):
         axmachine.set_autoscale_on(False)
         axoptics.set_xlim(axmachine.get_xlim())
 
-    def Click(a) : 
-        if a.button == 3 : 
+    def Click(a) :
+        if a.button == 3 :
             print 'Closest element: ',tfs.NameFromNearestS(a.xdata)
 
     MachineXlim(axmachine)
@@ -314,7 +314,7 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
 def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     ax  = axesinstance #handy shortcut
     tfs = pymadxtfsobject
-    
+
     #NOTE madx defines S as the end of the element by default
     #define temporary functions to draw individual objects
     def DrawBend(e,color='b',alpha=1.0):
@@ -323,7 +323,7 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     def DrawQuad(e,color='r',alpha=1.0):
         if e['K1L'] > 0 :
             qr = _patches.Rectangle((e['S']-e['L'],0),e['L'],0.2,color=color,alpha=alpha)
-        elif e['K1L'] < 0: 
+        elif e['K1L'] < 0:
             qr = _patches.Rectangle((e['S']-e['L'],-0.2),e['L'],0.2,color=color,alpha=alpha)
         else:
             #quadrupole off
@@ -340,27 +340,27 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
         ax.add_patch(rect)
     def DrawLine(e,color,alpha=1.0):
         ax.plot([e['S']-e['L'],e['S']-e['L']],[-0.2,0.2],'-',color=color,alpha=alpha)
-            
-    # plot beam line - make extra long in case of reversal - won't 
+
+    # plot beam line - make extra long in case of reversal - won't
     ax.plot([tfs.smin,tfs.smax],[0,0],'k-',lw=1)
     ax.set_ylim(-0.2,0.2)
- 
+
     # loop over elements and Draw on beamline
     for element in tfs:
         kw = element['KEYWORD']
-        if kw == 'QUADRUPOLE': 
+        if kw == 'QUADRUPOLE':
             DrawQuad(element, u'#d10000') #red
-        elif kw == 'RBEND': 
+        elif kw == 'RBEND':
             DrawBend(element, u'#0066cc') #blue
-        elif kw == 'SBEND': 
+        elif kw == 'SBEND':
             DrawBend(element, u'#0066cc') #blue
         elif kw == 'HKICKER':
             DrawRect(element, u'#4c33b2') #purple
         elif kw == 'VKICKER':
             DrawRect(element, u'#ba55d3') #medium orchid
-        elif kw == 'RCOLLIMATOR': 
+        elif kw == 'RCOLLIMATOR':
             DrawRect(element,'k')
-        elif kw == 'ECOLLIMATOR': 
+        elif kw == 'ECOLLIMATOR':
             DrawRect(element,'k')
         elif kw == 'SEXTUPOLE':
             DrawHex(element, u'#ffcc00') #yellow
