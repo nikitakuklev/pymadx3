@@ -6,28 +6,19 @@ Installation
 Requirements
 ------------
 
- * pymadx was developed for the Python 2.7 series.
-
-pymadx depends on the following Python packages not included with Python:
-
- * matplotlib
- * numpy
+ * pymadx is developed exclusively for Python 2.7.
 
 Installation
 ------------
 
 
-A `setup.py` file required for a correct python installation is currently under development.
+To install pymadx, simply run ``make install`` from the root pymadx
+directory.::
 
-Currently, we recommend the user clones the source repository and exports the parent directory
-to their PYTHONPATH environmental variable. This will allow Python to find pymadx.::
-
-  pwd
-  /Users/nevay/physics/reps
+  cd /my/path/to/repositories/
   git clone http://bitbucket.org/jairhul/pymadx
-  ls
-  > pymadx
-  export PYTHONPATH=/Users/nevay/physics/reps
+  cd pymadx
+  make install
 
-  python
-  >>> import pymadx # no errors!
+Alternatively, run ``make develop`` from the same directory to ensure
+that any local changes are picked up.
