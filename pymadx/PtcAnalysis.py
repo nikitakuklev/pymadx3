@@ -1,3 +1,7 @@
+"""
+Analysis utilities for PTC data.
+"""
+
 import Ptc as _Ptc 
 from  pymadx.Data import Tfs as _Tfs
 import numpy as _np

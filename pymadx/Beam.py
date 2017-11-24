@@ -1,3 +1,7 @@
+"""
+Class to create a MADX beam definition.
+"""
+
 MADXDistributionTypes = [
     'reference',
     'madx',

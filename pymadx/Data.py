@@ -1,3 +1,7 @@
+"""
+Classes to load and manipulate data from MADX.
+"""
+
 import bisect as _bisect
 import copy as _copy
 import numpy as _np

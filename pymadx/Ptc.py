@@ -1,3 +1,7 @@
+"""
+Classes to handle PTC runs and data.
+"""
+
 import numpy as _np
 import re as _re
 try:
