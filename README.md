@@ -1,4 +1,4 @@
-#pyMadx#
+#pymadx#
 
 A python package containing both utilities for processing and analysing MADX output.
 
@@ -6,6 +6,10 @@ A python package containing both utilities for processing and analysing MADX out
 
 L. Nevay
 S. Boogert
+S. Walker
+A. Abramov
+W. Shields
+J. Snuverink
 
 ## Setup ##
 
@@ -23,7 +27,10 @@ $ make develop
 
 $>python
 $>>> import pymadx
-$>>> t = pymadx.Tfs("twiss")
+$>>> t = pymadx.Data.Tfs("twiss.tfs")
 ```
 
 # Dependencies #
+
+ * matplotlib
+ * numpy
