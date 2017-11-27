@@ -17,7 +17,8 @@ programmatically.
    building
    converting
    moduledocs
-
+   version_history
+   
 
 Indices and tables
 ==================
