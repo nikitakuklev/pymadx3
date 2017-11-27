@@ -30,7 +30,7 @@ $>>> import pymadx
 $>>> t = pymadx.Data.Tfs("twiss.tfs")
 ```
 
-# Dependencies #
+## Dependencies ##
 
  * matplotlib
  * numpy
