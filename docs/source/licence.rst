@@ -2,7 +2,7 @@
 Licence & Disclaimer
 ====================
 
-pymadx copyright (c) Royal Holloway, University of London, 2017.  All rights reserved.
+pymadx Copyright (C) Royal Holloway, University of London 2017.
 
 CERN MADX
 ---------
@@ -14,9 +14,14 @@ purely as a utility for BDSIM.
 Licence
 -------
 
-This software is provided "AS IS" and any express or limit warranties, including, but not
-limited to, implied warranties of merchantability, of satisfactory quality, and fitness
-for a particular purpose or use are disclaimed. In no event shall Royal Holloway, University
-of London be liable for any direct, indirect, incidental, special, exemplary, or consequential
-damages arising in any way out of the use of this software, even if advised of the possibility
-of such damage.
+pymadx is free software: you can redistribute it and/or modify 
+it under the terms of the GNU General Public License as published 
+by the Free Software Foundation version 3 of the License.
+
+pymadx is distributed in the hope that it will be useful, but 
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with pymadx.  If not, see http://www.gnu.org/licenses/.
