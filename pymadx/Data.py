@@ -645,7 +645,7 @@ class Tfs(object):
         a = Tfs()
         a._CopyMetaData(self)
         for item in self.sequence:
-            if type(type) == str:
+            if type(text) == str:
                 if text in item:
                     a._AppendDataEntry(item, self.data[item])
             elif type(text) == list:
