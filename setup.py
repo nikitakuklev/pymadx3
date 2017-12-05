@@ -1,5 +1,14 @@
 from setuptools import setup, find_packages
 
+try:
+    import pypandoc
+    long_description = pypandoc.convert_file("README.md", "rst")
+except ImportError:
+    print ("Warning: pypandoc module not found, could not convert"
+           " Markdown to reStructuredText." )
+    long_description = ""
+
+
 setup(
     name='pymadx',
     version='0.9.0',
@@ -13,7 +22,8 @@ setup(
     author='JAI@RHUL',
     author_email='laurie.nevay@rhul.ac.uk',
     description="Write MADX models and load MADX output.",
+    long_description=long_description,
     url='https://bitbucket.org/jairhul/pymadx/',
     license='GPL3',
-    keywords='madx accelerator twiss ptc'
+    keywords='madx accelerator twiss ptc',
 )
