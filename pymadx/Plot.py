@@ -103,7 +103,7 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
     axoptics.plot(d['s'], yx, 'b-', label='x')
     axoptics.plot(d['s'], yy, 'g-', label='y')
     if dispersion:
-        axoptics.plot([], [],'r--', label=r'$\mathrm{D}(S)$') #fake plot for legend
+        axoptics.plot([], [],'r--', label=r'$\mathrm{D}_{x} (S)$') #fake plot for legend
     axoptics.set_xlabel('S (m)')
     if squareroot:
         axoptics.set_ylabel(r'$\sqrt{\beta}$ ($\sqrt{\mathrm{m}}$)')
