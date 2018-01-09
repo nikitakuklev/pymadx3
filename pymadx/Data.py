@@ -494,7 +494,8 @@ class Tfs(object):
 
     def IndexFromName(self,namestring):
         """
-        Return the index of the element named namestring
+        Return the index of the element named namestring.  Raises
+        ValueError if not found.
 
         """
         return self.sequence.index(namestring)
