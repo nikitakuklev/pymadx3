@@ -75,6 +75,24 @@ def PlotCentroids(tfsfile, title='', outputfilename=None, machine=True):
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
+def PlotSurvey(tfsfile, title='', outputfilename=None):
+    """
+    Plot the x and z coordinates from a tfs file.
+    """
+    import pymadx.Data as _Data
+    madx = _Data.CheckItsTfs(tfsfile)
+    x    = madx.GetColumn('X')
+    z    = madx.GetColumn('Z')
+
+    f = _plt.figure()
+    ax = f.add_subplot(111)
+    ax.set_aspect('equal')
+
+    ax.plot(x, z, marker='.')
+    _plt.suptitle(title,size='x-large')
+    _plt.xlabel('X (m)')
+    _plt.ylabel('Z (m)')
+
 
 def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=False, squareroot=True):
     """
@@ -103,7 +121,7 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
     axoptics.plot(d['s'], yx, 'b-', label='x')
     axoptics.plot(d['s'], yy, 'g-', label='y')
     if dispersion:
-        axoptics.plot([], [],'r--', label=r'$\mathrm{D}(S)$') #fake plot for legend
+        axoptics.plot([], [],'r--', label=r'$\mathrm{D}_{x} (S)$') #fake plot for legend
     axoptics.set_xlabel('S (m)')
     if squareroot:
         axoptics.set_ylabel(r'$\sqrt{\beta}$ ($\sqrt{\mathrm{m}}$)')
