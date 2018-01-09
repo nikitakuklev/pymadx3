@@ -8,6 +8,7 @@ import numpy as _np
 import re as _re
 import string as _string
 import tarfile
+import os.path
 
 from _General import GetSixTrackAperType as _GetSixTrackAperType
 from _General import Cast as _Cast
@@ -298,10 +299,11 @@ class Tfs(object):
                 d.append(sigyp)
 
     def __repr__(self):
-        s =  ''
-        s += 'pymadx.Tfs instance\n'
-        s += str(self.nitems) + ' items in lattice\n'
-        return s
+        if self.filename is not None:
+            return "<pymadx.Data.Tfs, {} items in lattice ({})>".format(
+                self.nitems,
+                os.path.basename(self.filename))
+        return "<pymadx.Data.Tfs, {} items in lattice>".format(self.nitems)
 
     def __len__(self):
         return len(self.sequence)
