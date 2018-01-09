@@ -850,7 +850,7 @@ class Tfs(object):
         terse           - print out the parameters which perturb if False
         '''
 
-        return self.ElementPerturbs(self[index], terse)
+        return self.ElementPerturbs(self[indexInSequence], terse)
 
     def ElementPerturbs(self, component, terse=True):
         """
