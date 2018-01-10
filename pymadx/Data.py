@@ -687,9 +687,13 @@ class Tfs(object):
         """
         try:
             import pymadx.Plot as _Plot
-            _Plot.PlotBeta(self,title,outputfilename,machine,dispersion,squareroot)
+            if outputfilename is None:
+                outputfilename = "{}_beta".format((self.filename.split("."))[0])
+            _Plot.PlotBeta(self, title, outputfilename, machine,
+                           dispersion, squareroot)
         except ImportError:
-            pass
+            print "No beta plotting available due to missing dependencies!"
+
 
     def PlotCentroids(self, title='', outputfilename=None, machine=True):
         """
@@ -697,9 +701,13 @@ class Tfs(object):
         """
         try:
             import pymadx.Plot as _Plot
+            if outputfilename is None:
+                outputfilename = "{}_centroid".format(
+                    (self.filename.split("."))[0])
             _Plot.PlotCentroids(self,title,outputfilename,machine)
         except ImportError:
-            pass
+            print "No centroid plotting available due to missing dependencies!"
+
 
     def IndexFromGmadName(self, gmadname, verbose=False):
         '''
