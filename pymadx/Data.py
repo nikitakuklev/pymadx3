@@ -908,6 +908,21 @@ class Tfs(object):
         else:
             return perturbingParameters
 
+    def RenameElement(self, index, new):
+        """Rename indexed element."""
+        # I don't fully understand how defensive this method needs to
+        # be, so I err on the side of caution and prevent any name
+        # which already exists in either self.sequence or self.data
+        # from being used as a new name.
+        old = self.sequence[index]
+        if (new in self.sequence or
+            new in self.GetColumn("NAME") or
+            new in self.data):
+            raise ValueError("New name already present: {}".format(new))
+        self.sequence[index] = new
+        self.data[old][self.ColumnIndex("NAME")] = new
+        self.data[new] = self.data.pop(old)
+
     def SplitElement(self, SSplit):
         '''Splits the element found at SSplit given, performs the necessary
         operations on the lattice to leave the model functionally
