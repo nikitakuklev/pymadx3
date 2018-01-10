@@ -1040,7 +1040,7 @@ _madxAperTypes = { 'CIRCLE',
 class Aperture(Tfs):
     """
     A class based on (ie inherits) the Tfs class for reading aperture information.
-    This allows madx aperture information in Tfs format to be loaded, filtered and 
+    This allows madx aperture information in Tfs format to be loaded, filtered and
     queried. This also provides the ability to suggest whether an element should be
     split and therefore what the aperture should be.
 
@@ -1395,7 +1395,7 @@ class Aperture(Tfs):
             bdA = _np.array([bdA1, bdA2, bdA3, bdA4])
             # get the a unique set of the indices where any aperture changes
             # nonzero->bool array, take only which items (rows) have nonzero diffs, take set of to remove duplication
-            indices = _np.array(list(set(bdA.nonzero()[1]))) 
+            indices = _np.array(list(set(bdA.nonzero()[1])))
             indices += indexStart # add on offset to get index for whole data
             if self.debug:
                 print indices
