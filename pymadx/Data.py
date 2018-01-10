@@ -944,6 +944,8 @@ class Tfs(object):
         originalName = self.sequence[originalIndex]
         originalLength = self[originalName]['L']
         originalS = self[originalName]['S']
+        originalHKick = self[originalName]['HKICK']
+        originalVKick = self[originalName]['VKICK']
         elementType = self[originalName]['KEYWORD']
 
         # First of the two elements that the original is split into.
@@ -959,12 +961,9 @@ class Tfs(object):
         secondName = originalName + str("_split_2")
         secondIndex = originalIndex + 1
 
-        # Get the parameters which affect the particle's motion
-        perturbingParameters = self.ComponentPerturbs(originalIndex)
-
         # update the sequence
-        self.sequence[originalIndex] = firstName
-        self.sequence.insert(originalIndex, secondName)
+        self.sequence[firstIndex] = firstName
+        self.sequence.insert(secondIndex, secondName)
 
         # Making data entries for new components
         self.data[firstName] = _copy.deepcopy(self.data[originalName])
@@ -985,13 +984,17 @@ class Tfs(object):
         self.EditComponent(secondIndex, 'NAME', secondName)
         # Assign the appropriate amount of kick to each of the two components
         ratio = firstLength/originalLength
-        originalHKick = self[firstIndex]['HKICK']
-        originalVKick = self[firstIndex]['VKICK']
         self.EditComponent(firstIndex, 'HKICK', ratio * originalHKick)
         self.EditComponent(firstIndex, 'VKICK', ratio * originalVKick)
-        self.EditComponent(secondIndex, 'HKICK', ratio * originalHKick)
-        self.EditComponent(secondIndex, 'VKICK', ratio * originalVKick)
+        self.EditComponent(secondIndex, 'HKICK', (1 - ratio) * originalHKick)
+        self.EditComponent(secondIndex, 'VKICK', (1 - ratio) * originalVKick)
 
+        assert self[secondName]["S"] == originalS
+        assert self[firstName]["L"] + self[secondName]["L"] == originalLength
+        assert (self[firstName]["HKICK"]
+                + self[secondName]["HKICK"]) == originalHKick
+        assert (self[firstName]["VKICK"]
+                + self[secondName]["VKICK"]) == originalVKick
         return firstIndex, secondIndex
 
     def WrapAroundElement(self, item):
