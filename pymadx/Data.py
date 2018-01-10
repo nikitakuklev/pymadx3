@@ -976,7 +976,9 @@ class Tfs(object):
         '''
 
         if isinstance(item, basestring):
-            index = self.IndexFromName(index)
+            index = self.IndexFromName(item)
+        else:
+            index = item
 
         # Get the element which will be the new start's S and SMID
         # values.  These will be used for updating all the other
