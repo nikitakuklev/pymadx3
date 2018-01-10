@@ -970,13 +970,17 @@ class Tfs(object):
 
         return firstIndex, secondIndex
 
-    def WrapAroundElement(self, index):
+    def WrapAroundElement(self, item):
         '''
-        Define new starting point for lattice.  Element at index
+        Define new starting point for lattice.  The arg `item' can be
+        either the name of the element or its index and will
         will become the new beginning of the lattice, and elements
         that came before the new start are appended to the end.
-        Changes S and SMID appropriately.
+        S and SMID are updated as necessary.
         '''
+
+        if isinstance(item, basestring):
+            index = self.IndexFromName(index)
 
         # Get the element which will be the new start's S and SMID
         # values.  These will be used for updating all the other
