@@ -477,7 +477,7 @@ class Tfs(object):
         be -1 (i.e. the last element).
 
         """
-        if (S > self.smax and S < self.smax + 10:
+        if S > self.smax and S < self.smax + 10:
             # allow some margin (+10) in case point is only just beyond the
             # beam line.  This is purely for clicking the plotted the machine
             # along the top of a figure.
