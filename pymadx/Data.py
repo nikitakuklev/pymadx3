@@ -473,14 +473,27 @@ class Tfs(object):
         return the index of the beamline element which CONTAINS the
         position S.
 
+        Note:  For small values beyond smax, the index returned will
+        be -1 (i.e. the last element).
+
         """
+        if (S > self.smax and S < self.smax + 10:
+            # allow some margin (+10) in case point is only just beyond the
+            # beam line.  This is purely for clicking the plotted the machine
+            # along the top of a figure.
+            return -1
+        elif S > self.smax + 10:
+            raise ValueError("S is out of bounds.")
+        elif S < self.smin:
+            raise ValueError("S is out of bounds.")
+
         for i in range(1, self.nitems + 1):
             sLow = self[i - 1]['S']
             sHigh = self[i]['S']
 
             if (S >= sLow and S < sHigh):
                 return i
-        raise Exception("S outside of range")
+        raise ValueError("S is out of bounds.")
 
     def _EnsureItsAnIndex(self, value):
         if type(value) == str:
