@@ -470,21 +470,17 @@ class Tfs(object):
         """
         IndexFromNearestS(S)
 
-        return the index of the beamline element closest to S.
+        return the index of the beamline element which CONTAINS the
+        position S.
 
         """
+        for i in range(1, self.nitems + 1):
+            sLow = self[i - 1]['S']
+            sHigh = self[i]['S']
 
-        sd = self.GetColumn('S')
-        if S > sd[-1]:
-            # allow some margin in case point is only just beyond beam line.
-            if S > sd[-1]+10:
-                raise Exception("S outside of range") # >10m past beam line - too far
-            else:
-                print "Warning S",S,"greater than length of beam line",sd[-1]
-                return -1 #index to last element
-        else:
-            result = _np.argmin(abs(sd - S))
-            return result
+            if (S >= sLow and S < sHigh):
+                return i
+        raise Exception("S outside of range")
 
     def _EnsureItsAnIndex(self, value):
         if type(value) == str:
