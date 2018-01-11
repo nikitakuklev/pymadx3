@@ -47,6 +47,16 @@ class Tfs(object):
     >>> a[345]     #returns dict for element number 345 in sequence
 
     """
+    # The Tfs class data model:
+    # The NAME column for a given row refers to the name of the
+    # accelerator component.  Each row is stored in a dictionary,
+    # self.data, with the mangled NAME as a key, and the row as the
+    # entry.  The names must be mangled as they are in general not
+    # unique.  Dictionaries are not ordered, so the sequence of these
+    # mangled names is stored in self.sequence.  Two accelerator
+    # components with identical names in the sequence will be
+    # identical, but the optical functions at that point will in
+    # general be different.
     def __init__(self,filename=None,**kwargs):
         object.__init__(self) #this allows type comparison for this class
         self.index       = []
