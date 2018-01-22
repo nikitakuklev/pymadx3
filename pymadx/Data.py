@@ -1107,8 +1107,6 @@ class Aperture(Tfs):
         # do this by creatig a map of the s position of each entry
         # with the associated
         self.cache = {}
-
-        print('Aperture> preparing cache')
         for item in self:
             s = item['S']
             if s in self.cache.keys():
