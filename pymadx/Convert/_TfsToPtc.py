@@ -113,7 +113,10 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
         fint  = madx.data[name][fintindex]
         fintx = madx.data[name][fintxindex]
         hgap  = madx.data[name][hgapindex]
+        k1l   = madx.data[name][k1lindex]
 
+        if k1l != 0:
+            kws['k1'] = k1l / l
         if e1 != 0:
             kws['e1'] = e1
             if fint != 0:
