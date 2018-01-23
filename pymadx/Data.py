@@ -193,10 +193,17 @@ class Tfs(object):
             for i, name in enumerate(self.sequence):
                 self.data[name].append(self.data[name][sindex]) # copy S to SORIGINAL
                 self.data[name].append(sMid[i])
+                self.data[name].append(name)
             self.columns.append('SORIGINAL')
             self.formats.append('%le')
             self.columns.append('SMID')
             self.formats.append('%le')
+            # Additional column which is just the name used to define
+            # the sequence in self.sequence.
+            self.columns.append("UNIQUENAME")
+            self.formats.append("%s")
+            assert len(set(self.GetColumn("UNIQUENAME"))) == len(self)
+
         else:
             self.smax = 0
 
@@ -930,12 +937,14 @@ class Tfs(object):
         # which already exists in either self.sequence or self.data
         # from being used as a new name.
         old = self.sequence[index]
-        if (new in self.sequence or
-            new in self.GetColumn("NAME") or
-            new in self.data):
+        if (new in self.sequence
+            or new in self.data
+            or new in self.GetColumn("NAME")
+            or new in self.GetColumn("UNIQUENAME")):
             raise ValueError("New name already present: {}".format(new))
         self.sequence[index] = new
         self.data[old][self.ColumnIndex("NAME")] = new
+        self.data[old][self.ColumnIndex("UNIQUENAME")] = new
         self.data[new] = self.data.pop(old)
 
     def SplitElement(self, SSplit):
