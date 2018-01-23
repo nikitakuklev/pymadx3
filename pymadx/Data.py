@@ -194,13 +194,16 @@ class Tfs(object):
                 self.data[name].append(self.data[name][sindex]) # copy S to SORIGINAL
                 self.data[name].append(sMid[i])
             self.columns.append('SORIGINAL')
+            self.formats.append('%le')
             self.columns.append('SMID')
+            self.formats.append('%le')
         else:
             self.smax = 0
 
         #Check to see if input Tfs is Sixtrack style (i.e no APERTYPE, and is instead implicit)
         if 'APER_1' in self.columns and 'APERTYPE' not in self.columns:
             self.columns.append('APERTYPE')
+            self.formats.append('%s')
 
             for key, element in self.data.iteritems():
                 aper1 = element[self.columns.index('APER_1')]
@@ -282,8 +285,10 @@ class Tfs(object):
 
         if calculateSpace:
             newcolumns.extend(['SIGMAX', 'SIGMAY'])
+            self.formats.extend(['%le','%le'])
         if calculatePrime:
             newcolumns.extend(['SIGMAXP', 'SIGMAYP'])
+            self.formats.extend(['%le','%le'])
         self.columns.extend(newcolumns)
 
         for elementname in self.sequence:
