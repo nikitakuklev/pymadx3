@@ -977,12 +977,14 @@ class Tfs(object):
         firstS = SSplit
         firstLength = originalLength - (originalS - SSplit)
         firstName = originalName + str("_split_1")
+        firstUniqueName = firstName
         firstIndex = originalIndex
 
         # second of two elements that original is split into:
         secondS = originalS
         secondLength = originalS - SSplit
         secondName = originalName + str("_split_2")
+        secondUniqueName = secondName
         secondIndex = originalIndex + 1
 
         # update the sequence
@@ -1000,12 +1002,15 @@ class Tfs(object):
         self.EditComponent(firstIndex, 'SMID', firstS - firstLength/2.0)
         self.EditComponent(firstIndex, 'SORIGINAL', originalS)
         self.EditComponent(firstIndex, 'NAME', firstName)
+        self.EditComponent(firstIndex, 'UNIQUENAME', firstUniqueName)
 
         self.EditComponent(secondIndex, 'L', secondLength)
         self.EditComponent(secondIndex, 'S', secondS)
         self.EditComponent(secondIndex, 'SMID', secondS - secondLength/2.0)
         self.EditComponent(secondIndex, 'SORIGINAL', originalS)
         self.EditComponent(secondIndex, 'NAME', secondName)
+        self.EditComponent(secondIndex, 'UNIQUENAME', secondUniqueName)
+
         # Assign the appropriate amount of kick to each of the two components
         ratio = firstLength/originalLength
         self.EditComponent(firstIndex, 'HKICK', ratio * originalHKick)
