@@ -127,9 +127,9 @@ class Tfs(object):
         segment_name = 'NA'
         #always include segments - put as first column in data
         self.columns.append("SEGMENT")
-        self.formats.extend("%d")
+        self.formats.append("%d")
         self.columns.append("SEGMENTNAME")
-        self.formats.extend("%s")
+        self.formats.append("%s")
 
         namecolumnindex = 0
 
