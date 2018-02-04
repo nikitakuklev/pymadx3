@@ -9,9 +9,9 @@ try:
     from _Transport2Madx import Transport2Madx
 except ImportError:
     import warnings
-    msg = ("Missing pytransport dependency.  TRANSPORT conversion"
+    _msg = ("Missing pytransport dependency.  TRANSPORT conversion"
            " facilities excluded.")
-    warnings.warn(msg)
+    warnings.warn(_msg)
     del warnings
 
 from _Mad8ToMadx import Mad8ToMadx
