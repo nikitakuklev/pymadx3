@@ -11,7 +11,6 @@ Requirements
 Installation
 ------------
 
-
 To install pymadx, simply run ``make install`` from the root pymadx
 directory.::
 

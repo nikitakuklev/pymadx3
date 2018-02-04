@@ -18,6 +18,8 @@ pymadx.Beam module
     :undoc-members:
     :show-inheritance:
 
+.. _pymadx-builder:
+
 pymadx.Builder module
 ---------------------
    
