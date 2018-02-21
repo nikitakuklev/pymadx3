@@ -40,14 +40,14 @@ def Cast(string):
     """
     try:
         return float(string)
-    except ValueError:
+    except (ValueError, TypeError):
         return string
 
 def IsFloat(stringtotest):
     try:
         float(stringtotest)
         return True
-    except ValueError:
+    except (ValueError, TypeError):
         return False
 
 def IndexOfElement(tfsinstance,markername):
