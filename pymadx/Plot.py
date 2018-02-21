@@ -326,8 +326,11 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
         axoptics.set_xlim(axmachine.get_xlim())
 
     def Click(a) :
-        if a.button == 3 :
-            print 'Closest element: ',tfs.NameFromNearestS(a.xdata)
+        if a.button == 3:
+            try:
+                print 'Closest element: ',tfs.NameFromNearestS(a.xdata)
+            except ValueError:
+                pass # don't complain if the S is out of bounds
 
     MachineXlim(axmachine)
     axmachine.callbacks.connect('xlim_changed', MachineXlim)
