@@ -133,7 +133,7 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
 
         elif t == 'QUADRUPOLE':
             k1 = madx.data[name][k1lindex] / l
-            a.AddQuadrupole(rname,l,k1=k1,**kws)
+            a.AddQuadrupole(rname,l,**kws)
 
         elif t == 'SEXTUPOLE':
             k2 = madx.data[name][k2lindex] / l
