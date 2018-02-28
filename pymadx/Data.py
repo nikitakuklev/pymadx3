@@ -404,14 +404,23 @@ class Tfs(object):
                 # note S is at the end of an element, so take the element before for offset ( start - 1 )
                 # if 'S' is in the columns, 'SORIGINAL' will be too
                 sOffset = self.GetRowDict(self.sequence[start-1])['SORIGINAL']
-                sOffsetMid = self.GetRowDict(self.sequence[start-1])['SMID']
             # prepare S coordinate and append to each list per element
             for i in range(index.start,index.stop,index.step):
-                elementlist = list(self.data[self.sequence[i]]) # copy instead of modify existing
+                # Get data associated with the element at index i
+                # copy instead of modify existing
+                elementlist = list(self.data[self.sequence[i]])
                 if prepareNewS:
-                    # maintain the original s from the original data
-                    elementlist[self.ColumnIndex('S')] = elementlist[self.ColumnIndex('SORIGINAL')] - sOffset
-                    elementlist[self.ColumnIndex('SMID')] = elementlist[self.ColumnIndex('SMID')] - sOffsetMid
+                    # S marks the end of the element.  When we
+                    # reverse, 'S' will mark the start of the element,
+                    # so we add the length to get back to the end.
+                    elementlist[self.ColumnIndex('S')] = (
+                        sOffset
+                        - elementlist[self.ColumnIndex('SORIGINAL')]
+                        + elementlist[self.ColumnIndex('L')])
+                    elementlist[self.ColumnIndex('SMID')] = (
+                        elementlist[self.ColumnIndex('S')]
+                        - (0.5
+                           * elementlist[self.ColumnIndex('L')]))
                 a._AppendDataEntry(self.sequence[i], elementlist)
 
             a.smax = max(a.GetColumn('S'))
