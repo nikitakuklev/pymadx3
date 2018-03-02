@@ -371,6 +371,7 @@ def WriteMachine(machine, filename, verbose=False):
     f.write('! pymadx.Builder Machine \n')
     f.write('! number of elements = ' + str(len(machine.elements)) + '\n')
     f.write('! total length       = ' + str(machine.length) + ' m\n\n')
+    f.write('set, format="22.16e";\n')
     
     for fn in files:
         fn = fn.split('/')[-1]
