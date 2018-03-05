@@ -16,6 +16,7 @@ Copyright Royal Holloway, University of London 2017.
 
 from . import Beam
 from . import Builder
+from . import Compare
 from . import Convert
 from . import Data
 from . import Plot
@@ -24,6 +25,7 @@ from . import PtcAnalysis
 
 __all__ = ['Beam',
            'Builder',
+           'Compare',
            'Convert',
            'Data',
            'Plot',
