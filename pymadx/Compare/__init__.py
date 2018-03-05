@@ -1,1 +1,1 @@
-from _MadxMadxComparison import MADXvsMADX
+from _MadxMadxComparison import MADXVsMADX

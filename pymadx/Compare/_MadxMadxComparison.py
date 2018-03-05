@@ -84,7 +84,7 @@ PlotSigmaP = _make_plotter(_SIGMA_P, "S / m", r"$\sigma_{xp,yp}$ / rad", "SigmaP
 PlotMean   = _make_plotter(_MEAN,    "S / m", r"$\bar{x}, \bar{y}$ / m", "Mean")
 
 
-def MADXvsMADX(first, second, first_name=None,
+def MADXVsMADX(first, second, first_name=None,
                second_name=None, **kwargs):
     """
     Display all the optical function plots for the two input optics files.
