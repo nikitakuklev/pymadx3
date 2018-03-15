@@ -567,12 +567,14 @@ class _Convert(_Elements):
             # TODO: Need code in here to handle variation in poleface rotation. Not urgent for now.
             if self.Transport.ElementRegistry.elements[eleIndex]['data'][1] != element['data'][1]:  # Field
                 oldvalue = self.Transport.ElementRegistry.elements[eleIndex]['data'][1]
-                self.Transport.ElementRegistry.elements[eleIndex]['data'][1] = element['data'][1]
-                eleDict['updated'] = True
-                if self.Transport.machineprops.benddef:  # Transport can switch dipole input definition
+                if not self.Transport.machineprops.benddef:  # Transport can switch dipole input definition
                     par = 'field'
+                    self.Transport.ElementRegistry.elements[eleIndex]['data'][1] = element['data'][1]
+                    eleDict['updated'] = True
                 else:
                     par = 'angle'
+                    self.Transport.ElementRegistry.elements[eleIndex]['data'][1] = element['data'][3]
+                    eleDict['updated'] = True
                 data = [par, oldvalue, element['data'][3]]
                 eleDict['params'].append(data)
             if self.Transport.ElementRegistry.elements[eleIndex]['length'] != element['length']:
