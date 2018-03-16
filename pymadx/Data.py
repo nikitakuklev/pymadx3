@@ -401,26 +401,22 @@ class Tfs(object):
             sOffset     = 0
             if start > 0 and 'S' in self.columns:
                 prepareNewS = True
-                # note S is at the end of an element, so take the element before for offset ( start - 1 )
                 # if 'S' is in the columns, 'SORIGINAL' will be too
-                sOffset = self.GetRowDict(self.sequence[start-1])['SORIGINAL']
+                sStart = self.GetRowDict(self.sequence[start-1])['S']
+                sEnd   = self.GetRowDict(self.sequence[stop])['S']
+
             # prepare S coordinate and append to each list per element
             for i in range(index.start,index.stop,index.step):
-                # Get data associated with the element at index i
-                # copy instead of modify existing
-                elementlist = list(self.data[self.sequence[i]])
+                elementlist = list(self.data[self.sequence[i]]) # copy instead of modify existing
                 if prepareNewS:
-                    # S marks the end of the element.  When we
-                    # reverse, 'S' will mark the start of the element,
-                    # so we add the length to get back to the end.
-                    elementlist[self.ColumnIndex('S')] = (
-                        sOffset
-                        - elementlist[self.ColumnIndex('SORIGINAL')]
-                        + elementlist[self.ColumnIndex('L')])
-                    elementlist[self.ColumnIndex('SMID')] = (
-                        elementlist[self.ColumnIndex('S')]
-                        - (0.5
-                           * elementlist[self.ColumnIndex('L')]))
+                    # maintain the original s from the original data
+                    if start > stop:
+                        elementlist[self.ColumnIndex('S')]    = abs(sEnd - elementlist[self.ColumnIndex('S')]) + elementlist[self.ColumnIndex('L')]
+                        elementlist[self.ColumnIndex('SMID')] = abs(sEnd - elementlist[self.ColumnIndex('SMID')]) + elementlist[self.ColumnIndex('L')]
+                    else:
+                        elementlist[self.ColumnIndex('S')]    = abs(sStart - elementlist[self.ColumnIndex('S')])
+                        elementlist[self.ColumnIndex('SMID')] = abs(sStart - elementlist[self.ColumnIndex('SMID')])
+
                 a._AppendDataEntry(self.sequence[i], elementlist)
 
             a.smax = max(a.GetColumn('S'))
@@ -1361,7 +1357,7 @@ class Aperture(Tfs):
                 while sSplits[0] < sStart:
                     sSplits = sSplits[1:] # remove any elements before the start position of this element
             sSplitStart = _np.array(sSplits) #copy the starts
-            sSplitStart = _np.insert(sSplitStart, 0, sStart) # prepend s of first element
+            sSplitStart = _np.insert(sSplitStart, 0, sStart) # prepnd s of first element
             # work out the length of each section
             lSplits = sSplits - sStart
 
