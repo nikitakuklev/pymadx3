@@ -403,7 +403,11 @@ class Tfs(object):
                 prepareNewS = True
                 # if 'S' is in the columns, 'SORIGINAL' will be too
                 sStart = self.GetRowDict(self.sequence[start-1])['S']
-                sEnd   = self.GetRowDict(self.sequence[stop])['S']
+                if stop==len(self):
+                    #Zero counted, make sure stop index not outside of range
+                    sEnd   = self.GetRowDict(self.sequence[stop-1])['S']
+                else:
+                    sEnd   = self.GetRowDict(self.sequence[stop])['S']
 
             # prepare S coordinate and append to each list per element
             for i in range(index.start,index.stop,index.step):
