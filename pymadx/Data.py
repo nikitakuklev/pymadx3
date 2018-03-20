@@ -225,10 +225,15 @@ class Tfs(object):
         self.names = self.columns
 
     def _CalculateSigma(self):
+        # constants
         if 'GAMMA' not in self.header:
             self.header['BETA'] = 1.0 # assume super relativistic
         else:
             self.header['BETA'] = _np.sqrt(1.0 - (1.0/(self.header['GAMMA']**2)))
+        beta = self.header['BETA'] # relativistic beta
+
+        # for extending TFS beyond madx supplied columns if necessary
+        newcolumns = []
 
         # check this file has the appropriate variables else, return without calculating
         # use a set to check if all variables are in a given list easily
@@ -283,29 +288,29 @@ class Tfs(object):
         betxindex = self.ColumnIndex('BETX')
         betyindex = self.ColumnIndex('BETY')
 
-        # constants
-        #sige = self.header['SIGE']
-        beta = self.header['BETA'] # relativistic beta
-        #ex   = self.header['EX']
-        #ey   = self.header['EY']
-        newcolumns = []
-
+        # extend class with columns of (beta * dispersion) to match madx at low energy
+        # also extend for beam sizes
         if calculateSpace:
-            newcolumns.extend(['SIGMAX', 'SIGMAY'])
-            self.formats.extend(['%le','%le'])
+            newcolumns.extend(['DXBETA', 'DYBETA', 'SIGMAX', 'SIGMAY'])
+            self.formats.extend(['%le','%le','%le','%le'])
         if calculatePrime:
-            newcolumns.extend(['SIGMAXP', 'SIGMAYP'])
-            self.formats.extend(['%le','%le'])
+            newcolumns.extend(['DPXBETA', 'DPYBETA', 'SIGMAXP', 'SIGMAYP'])
+            self.formats.extend(['%le','%le','%le','%le'])
         self.columns.extend(newcolumns)
 
         for elementname in self.sequence:
             # beam size calculations (using relation deltaE/E = beta^2 * deltaP/P)
             d = self.data[elementname]
             if calculateSpace:
-                xdispersionterm = (d[dxindex] * sige / beta**2)**2
-                ydispersionterm = (d[dyindex] * sige / beta**2)**2
+                dxbeta = d[dxindex]*beta
+                dybeta = d[dyindex]*beta
+                xdispersionterm = (dxbeta * sige / beta**2)**2
+                ydispersionterm = (dybeta * sige / beta**2)**2
                 sigx = _np.sqrt((d[betxindex] * ex) + xdispersionterm)
                 sigy = _np.sqrt((d[betyindex] * ey) + ydispersionterm)
+                # append in the same order that the columns were extended above
+                d.append(dxbeta)
+                d.append(dybeta)
                 d.append(sigx)
                 d.append(sigy)
 
@@ -313,10 +318,15 @@ class Tfs(object):
             if calculatePrime:
                 gammax = (1.0 + d[alfxindex]**2) / d[betxindex] # twiss gamma
                 gammay = (1.0 + d[alfyindex]**2) / d[betyindex]
-                xdispersionterm = (d[dpxindex] * sige / beta**2)**2
-                ydispersionterm = (d[dpyindex] * sige / beta**2)**2
+                dpxbeta = d[dpxindex]*beta
+                dpybeta = d[dpyindex]*beta
+                xdispersionterm = (dpxbeta * sige / beta**2)**2
+                ydispersionterm = (dpybeta * sige / beta**2)**2
                 sigxp  = _np.sqrt((gammax * ex) + xdispersionterm)
                 sigyp  = _np.sqrt((gammay * ey) + ydispersionterm)
+                # append in the same order that the columns were extended above
+                d.append(dpxbeta)
+                d.append(dpybeta)
                 d.append(sigxp)
                 d.append(sigyp)
 
