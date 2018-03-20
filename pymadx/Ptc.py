@@ -109,7 +109,10 @@ def LoadInrays(fileName):
         else : 
             t = 0.0
 
-        pt = float(inre_pt.group(1))
+        if inre_pt:
+            pt = float(inre_pt.group(1))
+        else:
+            pt = 0.0
 
         i.AddParticle(x,px,y,py,t,pt)
 
