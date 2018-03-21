@@ -38,6 +38,7 @@ def _GetOpticalDataFromTfs(tfsobject):
     d['betx']  = tfsobject.GetColumn('BETX')
     d['bety']  = tfsobject.GetColumn('BETY')
     d['dispx'] = tfsobject.GetColumn('DX')
+    d['dispxbeta'] = tfsobject.GetColumn('DXBETA')
     #d['dispy'] = tfsobject.GetColumn('DY') #don't use
     d['x']     = tfsobject.GetColumn('X')
     d['y']     = tfsobject.GetColumn('Y')
@@ -125,7 +126,7 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
     axoptics.plot(d['s'], yx, 'b-', label='x')
     axoptics.plot(d['s'], yy, 'g-', label='y')
     if dispersion:
-        axoptics.plot([], [],'r--', label=r'$\mathrm{D}_{x} (S)$') #fake plot for legend
+        axoptics.plot([], [],'r--', label=r'$\mathrm{D}_{x} / \beta (S)$') #fake plot for legend
     axoptics.set_xlabel('S (m)')
     if squareroot:
         axoptics.set_ylabel(r'$\sqrt{\beta}$ ($\sqrt{\mathrm{m}}$)')
@@ -137,7 +138,7 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
     if dispersion:
         ax2 = axoptics.twinx()
         ax2.plot(d['s'],d['dispx'],'r--')
-        ax2.set_ylabel('Dispersion (m)')
+        ax2.set_ylabel(r'Dispersion / $\beta$ (m)')
 
     #add lattice to plot
     if machine:
