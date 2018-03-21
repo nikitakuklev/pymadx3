@@ -58,7 +58,7 @@ def PlotCentroids(tfsfile, title='', outputfilename=None, machine=True):
     d    = _GetOpticalDataFromTfs(madx)
     smax = madx.smax
 
-    f    = _plt.figure(figsize=(11,5))
+    f    = _plt.figure(figsize=(9,5))
     axoptics = f.add_subplot(111)
 
     #optics plots
@@ -113,7 +113,7 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
     d    = _GetOpticalDataFromTfs(madx)
     smax = madx.smax
 
-    f    = _plt.figure(figsize=(11,5))
+    f    = _plt.figure(figsize=(9,5))
     axoptics = f.add_subplot(111)
 
     #optics plots
@@ -171,7 +171,7 @@ def PlotAperture(aperture, title='', outputfilename=None, machine=None, plot="xy
     if plot not in allowed:
         raise ValueError("Invalid option plot: "+plot+". Use 'x', 'y' or 'xy'")
 
-    f = _plt.figure(figsize=(11,5))
+    f = _plt.figure(figsize=(9,5))
 
     s = aper.GetColumn('S')
     x,y = aper.GetExtentAll()
