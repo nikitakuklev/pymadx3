@@ -404,5 +404,35 @@ class PtcAnalysis(object):
                 row.extend([sigm_alx[i],sigm_aly[i]])
                 writer.writerow(row)
 
-            
+        self.opticalFunctions = {
+            'Segment'       : sampler,
+            'S'             : S,
+            'beta_x'        : betx,
+            'beta_y'        : bety,
+            'alph_x'        : alphx,
+            'alph_y'        : alphy,
+            'disp_x'        : dispx,
+            'disp_xp'       : dispxp,
+            'disp_y'        : dispy,
+            'disp_yp'       : dispyp,
+            'emitt_x'       : emittx,
+            'emitt_y'       : emitty,
+            'sigma_x'       : sigmax,
+            'sigma_y'       : sigmay,
+            'sigma_xp'      : sigmaxp,
+            'sigma_yp'      : sigmayp,
+            'sigma_x_xp'    : sigmaxxp,
+            'sigma_y_yp'    : sigmayyp,
+            'mean_x'        : meanx,
+            'mean_y'        : meany,
+            'mean_xp'       : meanxp,
+            'mean_yp'       : meanyp,
+            'wgt'           : Wgt,
+            'sigma_emitt_x' : sigm_emx,
+            'sigma_emitt_y' : sigm_emy,
+            'sigma_beta_x'  : sigm_btx,
+            'sigma_beta_y'  : sigm_bty,
+            'sigma_alph_x'  : sigm_alx,
+            'sigma_alph_y'  : sigm_aly
+            }
         
