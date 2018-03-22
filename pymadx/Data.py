@@ -604,6 +604,10 @@ class Tfs(object):
         return d
 
     def GetSegment(self,segmentnumber):
+        if type(segmentnumber) is str:
+            segmentnumber = self.segments.index(segmentnumber)+1
+        if segmentnumber not in range(1,len(self.segments)+1):
+            raise ValueError("Invalid segment number "+str(segmentnumber))
         a = Tfs()
         a._CopyMetaData(self)
         segmentindex = self.columns.index('SEGMENT')
