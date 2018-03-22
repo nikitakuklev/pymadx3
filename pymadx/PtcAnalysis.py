@@ -34,15 +34,15 @@ class PtcAnalysis(object):
     
     def SamplerLoop(self):
         #for segment in ptcOutput.segments:
-        for isampler in (0,self.ptcOutput.isegment,1):
-            samplerData = self.ptcOutput.GetSegment(isampler)
+        for isampler in range(len(self.ptcOutput.segments)):
+            samplerData = self.ptcOutput.GetSegment(isampler+1)
             
             xrms  = samplerData.GetColumn('X').std()
             yrms  = samplerData.GetColumn('Y').std()
             pxrms = samplerData.GetColumn('PX').std()
             pyrms = samplerData.GetColumn('PY').std()
 
-            print isampler, xrms, pxrms, yrms, pyrms
+            print isampler+1, xrms, pxrms, yrms, pyrms
 
     def CalculateOpticalFunctions(self, output):
         """
@@ -83,10 +83,10 @@ class PtcAnalysis(object):
 
         
         #for segment in ptcOutput.segments:
-        for isampler in range(0,self.ptcOutput.isegment,1):
-            #samplerData = self.ptcOutput.GetSegment(segment)
+        nsegments = len(self.ptcOutput.segments)
+        for isampler in range(1,len(self.ptcOutput.segments)+1):
             samplerData = self.ptcOutput.GetSegment(isampler)
-            print 'segment:', (isampler+1) ,'/', self.ptcOutput.isegment
+            print 'segment:', isampler ,'/', nsegments
         
             x  = samplerData.GetColumn('X')
             y  = samplerData.GetColumn('Y') 
