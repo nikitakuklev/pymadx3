@@ -34,14 +34,18 @@ def _GetOpticalDataFromTfs(tfsobject):
     Utility to pull out the relevant optical functions into a simple dictionary.
     """
     d = {}
-    d['s']     = tfsobject.GetColumn('S')
-    d['betx']  = tfsobject.GetColumn('BETX')
-    d['bety']  = tfsobject.GetColumn('BETY')
-    d['dispx'] = tfsobject.GetColumn('DX')
+    d['s']         = tfsobject.GetColumn('S')
+    d['betx']      = tfsobject.GetColumn('BETX')
+    d['bety']      = tfsobject.GetColumn('BETY')
+    d['dispx']     = tfsobject.GetColumn('DX')
     d['dispxbeta'] = tfsobject.GetColumn('DXBETA')
-    #d['dispy'] = tfsobject.GetColumn('DY') #don't use
-    d['x']     = tfsobject.GetColumn('X')
-    d['y']     = tfsobject.GetColumn('Y')
+    #d['dispy']    = tfsobject.GetColumn('DY') #don't use
+    d['x']         = tfsobject.GetColumn('X')
+    d['y']         = tfsobject.GetColumn('Y')
+    d['sigmax']    = tfsobject.GetColumn('SIGMAX')
+    d['sigmay']    = tfsobject.GetColumn('SIGMAY')
+    d['sigmaxp']   = tfsobject.GetColumn('SIGMAXP')
+    d['sigmayp']   = tfsobject.GetColumn('SIGMAYP')
     return d
 
 def PlotCentroids(tfsfile, title='', outputfilename=None, machine=True):
@@ -132,6 +136,51 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
         axoptics.set_ylabel(r'$\sqrt{\beta}$ ($\sqrt{\mathrm{m}}$)')
     else:
         axoptics.set_ylabel(r'$\beta$ (m)')
+    axoptics.legend(loc=0,fontsize='small') #best position
+
+    #plot dispersion - only in horizontal
+    if dispersion:
+        ax2 = axoptics.twinx()
+        ax2.plot(d['s'],d['dispx'],'r--')
+        ax2.set_ylabel(r'Dispersion / $\beta$ (m)')
+
+    #add lattice to plot
+    if machine:
+        AddMachineLatticeToFigure(f,madx)
+
+    _plt.suptitle(title,size='x-large')
+    _plt.xlim((0 - 0.05*smax, 1.05*smax))
+    if outputfilename != None:
+        if '.' in outputfilename:
+            outputfilename = outputfilename.split('.')[0]
+        _plt.savefig(outputfilename+'.pdf')
+        _plt.savefig(outputfilename+'.png')
+
+def PlotSigma(tfsfile, title='', outputfilename=None, machine=True, dispersion=False):
+    """
+    Plot sqrt(beta x,y) as a function of S. By default, a machine diagram is shown at
+    the top of the plot.
+
+    Optionally set dispersion=True to plot x dispersion as second axis.
+    Optionally turn off machine overlay at top with machine=False
+    Specify outputfilename (without extension) to save the plot as both pdf and png.
+    """
+    import pymadx.Data as _Data
+    madx = _Data.CheckItsTfs(tfsfile)
+    d    = _GetOpticalDataFromTfs(madx)
+    smax = madx.smax
+
+    f    = _plt.figure(figsize=(9,5))
+    axoptics = f.add_subplot(111)
+    
+    yx = _np.sqrt(d['sigmax'])
+    yy = _np.sqrt(d['sigmay'])
+    axoptics.plot(d['s'], yx, 'b-', label='x')
+    axoptics.plot(d['s'], yy, 'g-', label='y')
+    if dispersion:
+        axoptics.plot([], [],'r--', label=r'$\mathrm{D}_{x} / \beta (S)$') #fake plot for legend
+    axoptics.set_xlabel('S (m)')
+    axoptics.set_ylabel(r'$\sigma$ (m)')
     axoptics.legend(loc=0,fontsize='small') #best position
 
     #plot dispersion - only in horizontal

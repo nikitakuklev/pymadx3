@@ -758,6 +758,18 @@ class Tfs(object):
         except ImportError:
             print "No centroid plotting available due to missing dependencies!"
 
+    def PlotSigma(self, title='', outputfilename=None, machine=True, dispersion=False):
+        """
+        Plot the beam size.
+        """
+        try:
+            import pymadx.Plot as _Plot
+            if outputfilename is None:
+                outputfilename = "{}_sigma".format((self.filename.split("."))[0])
+            _Plot.PlotSigma(self, title, outputfilename, machine, dispersion)
+        except ImportError:
+            print "No beta plotting available due to missing dependencies!"
+
 
     def IndexFromGmadName(self, gmadname, verbose=False):
         '''
