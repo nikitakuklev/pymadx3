@@ -173,8 +173,8 @@ def PlotSigma(tfsfile, title='', outputfilename=None, machine=True, dispersion=F
     f    = _plt.figure(figsize=(9,5))
     axoptics = f.add_subplot(111)
     
-    yx = _np.sqrt(d['sigmax'])
-    yy = _np.sqrt(d['sigmay'])
+    yx = d['sigmax']
+    yy = d['sigmay']
     axoptics.plot(d['s'], yx, 'b-', label='x')
     axoptics.plot(d['s'], yy, 'g-', label='y')
     if dispersion:
