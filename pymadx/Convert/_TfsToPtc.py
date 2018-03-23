@@ -115,18 +115,10 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
         hgap  = madx.data[name][hgapindex]
         k1l   = madx.data[name][k1lindex]
 
-        if k1l != 0:
+        if k1l:
             kws['k1'] = k1l / l
-        if e1 != 0:
-            kws['e1'] = e1
-            if fint != 0:
-                kws['fint'] = fint
-        if e2 != 0:
-            kws['e2'] = e2
-            if fintx != 0:
-                kws['fintx'] = fintx
-        if hgap != 0:
-            kws['hgap'] = hgap
+
+        
 
         if t == 'DRIFT':
             a.AddDrift(rname,l,**kws)
@@ -144,10 +136,39 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
             a.AddOctupole(rname,l,k3=k3,**kws)
 
         elif t == 'SBEND':
+            kws['e1'] = e1
+            kws['fint'] = fint
+            kws['e2'] = e2
+
+            if fintx == -1:
+                if fint:
+                    kws['fintx'] = fint
+                else:
+                    kws['fintx'] = 0
+            else:
+                kws['fintx'] = fintx
+
+            kws['hgap'] = hgap
+
             angle = madx.data[name][angleindex]
             a.AddDipole(rname,category='sbend',length=l,angle=angle,**kws)
 
         elif t == 'RBEND':
+            kws['e1'] = e1
+            kws['fint'] = fint
+
+            kws['e2'] = e2
+
+            if fintx == -1:
+                if fint:
+                    kws['fintx'] = fint
+                else:
+                    kws['fintx'] = 0
+            else:
+                kws['fintx'] = fintx
+
+            kws['hgap'] = hgap
+
             angle = madx.data[name][angleindex]
             a.AddDipole(rname,category='rbend',length=l,angle=angle,**kws)
 
