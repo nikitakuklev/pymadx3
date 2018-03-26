@@ -355,6 +355,8 @@ class Tfs(object):
         #return single item or slice of lattice
         if type(index) == slice:
             start,stop,step = index.start, index.stop, index.step #note slices are immutable
+            if step < 0:
+                raise ValueError("Negative steps are not supported.")
             #test values incase of ':' use
             if step != None and type(step) != int:
                 raise ValueError("Invalid step "+step)
@@ -371,10 +373,6 @@ class Tfs(object):
                 # [::step]
                 start = 0
                 stop  = len(self)
-            elif start == None and stop == None and step < 0:
-                # [::-step]
-                start = len(self) - 1
-                stop  = -1 # range limit needs to be past 0
             elif start != None and stop == None and step > 0:
                 # [start::step]
                 start = self._EnsureItsAnIndex(start)
@@ -384,10 +382,6 @@ class Tfs(object):
                 start = self._EnsureItsAnIndex(start)
                 stop  = len(self)
                 step  = 1
-            elif start != None and stop == None and step < 0:
-                # [start::-step]
-                start = self._EnsureItsAnIndex(start)
-                stop  = -1
             elif start == None and stop != None and step > 0:
                 # [:stop:step]
                 start = 0
@@ -397,10 +391,6 @@ class Tfs(object):
                 start = 0
                 stop  = self._EnsureItsAnIndex(stop)
                 step  = 1
-            elif start == None and stop != None and step < 0:
-                # [:stop:-step]
-                start = 0
-                stop  = self._EnsureItsAnIndex(stop)
             index = slice(start,stop,step)
             #construct and return a new instance of the class
             a = Tfs()
