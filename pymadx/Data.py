@@ -355,7 +355,7 @@ class Tfs(object):
         #return single item or slice of lattice
         if type(index) == slice:
             start,stop,step = index.start, index.stop, index.step #note slices are immutable
-            if step < 0:
+            if step is not None and step < 0:
                 raise ValueError("Negative steps are not supported.")
             #test values incase of ':' use
             if step != None and type(step) != int:
