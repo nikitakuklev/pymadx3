@@ -421,15 +421,22 @@ class Tfs(object):
 
             # prepare S coordinate and append to each list per element
             for i in range(index.start,index.stop,index.step):
-                elementlist = list(self.data[self.sequence[i]]) # copy instead of modify existing
+                # copy instead of modify existing
+                elementlist = list(self.data[self.sequence[i]])
                 if prepareNewS:
                     # maintain the original s from the original data
                     if start > stop:
-                        elementlist[self.ColumnIndex('S')]    = abs(sEnd - elementlist[self.ColumnIndex('S')]) + elementlist[self.ColumnIndex('L')]
-                        elementlist[self.ColumnIndex('SMID')] = abs(sEnd - elementlist[self.ColumnIndex('SMID')]) + elementlist[self.ColumnIndex('L')]
+                        elementlist[self.ColumnIndex('S')] = (
+                            abs(sEnd - elementlist[self.ColumnIndex('S')])
+                            + elementlist[self.ColumnIndex('L')])
+                        elementlist[self.ColumnIndex('SMID')] = (
+                            abs(sEnd - elementlist[self.ColumnIndex('SMID')])
+                            + elementlist[self.ColumnIndex('L')])
                     else:
-                        elementlist[self.ColumnIndex('S')]    = abs(sStart - elementlist[self.ColumnIndex('S')])
-                        elementlist[self.ColumnIndex('SMID')] = abs(sStart - elementlist[self.ColumnIndex('SMID')])
+                        elementlist[self.ColumnIndex('S')] = (
+                            abs(sStart - elementlist[self.ColumnIndex('S')]))
+                        elementlist[self.ColumnIndex('SMID')] = (
+                            abs(sStart - elementlist[self.ColumnIndex('SMID')]))
 
                 a._AppendDataEntry(self.sequence[i], elementlist)
 
