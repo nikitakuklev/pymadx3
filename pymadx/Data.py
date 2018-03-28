@@ -287,7 +287,7 @@ class Tfs(object):
         if calculateSpace:
             if self.ptctwiss:
                 dxindex = self.ColumnIndex('DISP1')
-                dyindex = self.ColumnIndex('DISP2')
+                dyindex = self.ColumnIndex('DISP3')
             else:
                 dxindex = self.ColumnIndex('DX')
                 dyindex = self.ColumnIndex('DY')
@@ -298,11 +298,11 @@ class Tfs(object):
         alfyindex = -1
         if calculatePrime:
             if self.ptctwiss:
-                dpxindex = self.ColumnIndex('DISP1P')
-                dpyindex = self.ColumnIndex('DISP2P')
+                dpxindex = self.ColumnIndex('DISP2')
+                dpyindex = self.ColumnIndex('DISP4')
             else:
                 dpxindex = self.ColumnIndex('DPX')
-                dpyindex  = self.ColumnIndex('DPY')
+                dpyindex = self.ColumnIndex('DPY')
             alfxindex = self.ColumnIndex('ALFX')
             alfyindex = self.ColumnIndex('ALFY')
 

@@ -25,8 +25,8 @@ _ALPHA = [("ALFX", r"$\alpha_{x}$"),
 _DISP = [("DXBETA", r"$D_{x}$ / $\beta$"),
          ("DYBETA", r"$D_{y}$ / $\beta$")]
 
-_DISP_P = [("DPX", r"$D_{p_{x}}$"),
-           ("DPY", r"$D_{p_{y}}$")]
+_DISP_P = [("DPXBETA", r"$D_{p_{x}}$"),
+           ("DPYBETA", r"$D_{p_{y}}$")]
 
 _SIGMA = [("SIGMAX", r"$\sigma_{x}$"),
           ("SIGMAY", r"$\sigma_{y}$")]
