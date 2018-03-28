@@ -37,24 +37,33 @@ _SIGMA_P = [("SIGMAXP", r"$\sigma_{xp}$"),
 _MEAN = [("X", r"$\bar{x}$"),
          ("Y", r"$\bar{y}$")]
 
+
+def _parse_tfs_input(tfs_in, name):
+    """Return tfs_in as a Tfs instance, which should either be a path
+    to a TFS file or a Tfs instance, and in either case, generate a
+    name if None is provided, and return that as well."""
+    if isinstance(tfs_in, basestring):
+        if not _path.isfile(tfs_in):
+            raise IOError("file \"{}\" not found!".format(tfs_in))
+        name = (_path.splitext(_path.basename(tfs_in))[0]
+                if name is None else name)
+        return _Data.Tfs(tfs_in), name
+    try:
+        name = tfs_in.filename if name is None else name
+        return tfs_in, name
+    except AttributeError:
+        raise TypeError(
+            "Expected Tfs input is neither a "
+            "file path nor a Tfs instance: {}".format(tfs_in))
+
+
 # use closure to avoid tonnes of boilerplate code as happened with
 # MadxBdsimComparison.py
 def _make_plotter(plot_info_tuples, x_label, y_label, title):
     def f_out(first, second, first_name=None, second_name=None, **kwargs):
         """first and second should be tfs files."""
-        if not _path.isfile(first):
-            raise IOError("file \"{}\" not found!".format(first))
-        if not _path.isfile(second):
-            raise IOError("file \"{}\" not found!".format(second))
-
-        # If no names provided then just use the filenames.
-        first_name = (_path.splitext(_path.basename(first))[0]
-                      if first_name is None else first_name)
-        second_name = (_path.splitext(_path.basename(second))[0]
-                       if second_name is None else second_name)
-
-        first  = _Data.Tfs(first)
-        second = _Data.Tfs(second)
+        first, first_name = _parse_tfs_input(first, first_name)
+        second, second_name = _parse_tfs_input(second, second_name)
 
         plot = _plt.figure(title, **kwargs)
         # Loop over the variables in plot_info_tuples and draw the plots.
