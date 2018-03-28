@@ -141,7 +141,7 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
     #plot dispersion - only in horizontal
     if dispersion:
         ax2 = axoptics.twinx()
-        ax2.plot(d['s'],d['dispx'],'r--')
+        ax2.plot(d['s'],d['dispxbeta'],'r--')
         ax2.set_ylabel(r'Dispersion / $\beta$ (m)')
 
     #add lattice to plot

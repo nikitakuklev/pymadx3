@@ -22,8 +22,8 @@ _BETA = [("BETX", r'$\beta_{x}$'),
 _ALPHA = [("ALFX", r"$\alpha_{x}$"),
           ("ALFY", r"$\alpha_{y}$")]
 
-_DISP = [("DX", r"$D_{x}$"),
-         ("DY", r"$D_{y}$")]
+_DISP = [("DXBETA", r"$D_{x}$ / $\beta$"),
+         ("DYBETA", r"$D_{y}$ / $\beta$")]
 
 _DISP_P = [("DPX", r"$D_{p_{x}}$"),
            ("DPY", r"$D_{p_{y}}$")]
