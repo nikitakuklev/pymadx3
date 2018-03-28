@@ -71,6 +71,7 @@ class Tfs(object):
         self.filename    = filename
         self.smax        = 0
         self.smin        = 0
+        self.ptctwiss    = False # whether data was generated via ptctwiss
         self._verbose    = False
         if 'verbose' in kwargs:
             self._verbose = kwargs['verbose']
@@ -180,6 +181,11 @@ class Tfs(object):
 
         f.close()
 
+        try:
+            self.ptctwiss = self.header['NAME'] == "PTC_TWISS"
+        except KeyError:
+            pass # no name key in header
+
         #additional processing
         self.index = range(0,len(self.data),1)
         if 'S' in self.columns:
@@ -237,10 +243,17 @@ class Tfs(object):
 
         # check this file has the appropriate variables else, return without calculating
         # use a set to check if all variables are in a given list easily
-        requiredVariablesB1 = set(['DX', 'DY', 'BETX', 'BETY'])
+        rvb1vars = ['DX', 'DY', 'BETX', 'BETY']
+        if self.ptctwiss:
+            rvb1vars.extend(['DISP1', 'DISP2'])
+        requiredVariablesB1 = set(rvb1vars)
+        
         calculateSpace = requiredVariablesB1.issubset(self.columns)
 
-        requiredVariablesB2 = set(['DPX', 'DPY', 'ALFX', 'ALFY', 'BETX', 'BETY'])
+        rvb2vars = ['DPX', 'DPY', 'ALFX', 'ALFY', 'BETX', 'BETY']
+        if self.ptctwiss:
+            rvb2vars.extend(['DISP1P', 'DISP2P'])
+        requiredVariablesB2 = set(rvb2vars)
         calculatePrime = requiredVariablesB2.issubset(self.columns)
 
         ex   = 1e-9
@@ -272,16 +285,24 @@ class Tfs(object):
         dxindex = -1
         dyindex = -1
         if calculateSpace:
-            dxindex   = self.ColumnIndex('DX')
-            dyindex   = self.ColumnIndex('DY')
+            if self.ptctwiss:
+                dxindex = self.ColumnIndex('DISP1')
+                dyindex = self.ColumnIndex('DISP2')
+            else:
+                dxindex = self.ColumnIndex('DX')
+                dyindex = self.ColumnIndex('DY')
 
         dpxindex  = -1
         dpyindex  = -1
         alfxindex = -1
         alfyindex = -1
         if calculatePrime:
-            dpxindex = self.ColumnIndex('DPX')
-            dpyindex  = self.ColumnIndex('DPY')
+            if self.ptctwiss:
+                dpxindex = self.ColumnIndex('DISP1P')
+                dpyindex = self.ColumnIndex('DISP2P')
+            else:
+                dpxindex = self.ColumnIndex('DPX')
+                dpyindex  = self.ColumnIndex('DPY')
             alfxindex = self.ColumnIndex('ALFX')
             alfyindex = self.ColumnIndex('ALFY')
 
@@ -302,8 +323,12 @@ class Tfs(object):
             # beam size calculations (using relation deltaE/E = beta^2 * deltaP/P)
             d = self.data[elementname]
             if calculateSpace:
-                dxbeta = d[dxindex]*beta
-                dybeta = d[dyindex]*beta
+                if self.ptctwiss:
+                    dxbeta = d[dxindex]
+                    dybeta = d[dyindex]
+                else:
+                    dxbeta = d[dxindex]*beta
+                    dybeta = d[dyindex]*beta
                 xdispersionterm = (dxbeta * sige / beta**2)**2
                 ydispersionterm = (dybeta * sige / beta**2)**2
                 sigx = _np.sqrt((d[betxindex] * ex) + xdispersionterm)
@@ -318,8 +343,12 @@ class Tfs(object):
             if calculatePrime:
                 gammax = (1.0 + d[alfxindex]**2) / d[betxindex] # twiss gamma
                 gammay = (1.0 + d[alfyindex]**2) / d[betyindex]
-                dpxbeta = d[dpxindex]*beta
-                dpybeta = d[dpyindex]*beta
+                if self.ptctwiss:
+                    dpxbeta = d[dpxindex]
+                    dpybeta = d[dpyindex]
+                else:
+                    dpxbeta = d[dpxindex]*beta
+                    dpybeta = d[dpyindex]*beta
                 xdispersionterm = (dpxbeta * sige / beta**2)**2
                 ydispersionterm = (dpybeta * sige / beta**2)**2
                 sigxp  = _np.sqrt((gammax * ex) + xdispersionterm)
