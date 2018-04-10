@@ -644,12 +644,12 @@ class Tfs(object):
         return a
 
     def EditComponent(self, index, variable, value):
-        '''
+        """
         Edits variable of component at index and sets it to value.  Can
         only take indices as every single element in the sequence has
         a unique definition, and components which may appear
         degenerate/reused are in fact not in this data model.
-        '''
+        """
         variableIndex = self.columns.index(variable)
         componentName = self.sequence[index]
         self.data[componentName][variableIndex] = value
@@ -723,7 +723,6 @@ class Tfs(object):
         text in the their name.
 
         This returns a Tfs instance with all the same capabilities as this one.
-
         """
         a = Tfs()
         a._CopyMetaData(self)
@@ -802,14 +801,15 @@ class Tfs(object):
 
 
     def IndexFromGmadName(self, gmadname, verbose=False):
-        '''
+        """
         Returns the indices of elements which match the supplied gmad name.
-        Useful because tfs2gmad strips punctuation from the component names, and irritating otherwise to work back.
-        When multiple elements of the name match, returns the indices of all the components in a list.
+        Useful because tfs2gmad strips punctuation from the component names, 
+        and irritating otherwise to work back. When multiple elements of the 
+        name match, returns the indices of all the components in a list.
         Arguments:
         gmadname     :    The gmad name of a component to search for.
         verbose      :    prints out matching name indices and S locations.  Useful for discriminating between identical names.
-        '''
+        """
         indices = []
         #Because underscores are allowed in gmad names:
         punctuation = _string.punctuation.replace('_', '')
@@ -831,7 +831,7 @@ class Tfs(object):
             raise ValueError(gmadname + ' not found in list')
 
     def ComponentPerturbs(self, indexInSequence, terse=True):
-        '''
+        """
         Returns names of variables which would perturb a particle.
         Some components written out in TFS are redundant,
         so it's useful to know which components perturb a particle's motion.
@@ -841,7 +841,7 @@ class Tfs(object):
 
         indexInSequence - index of component to be checked.
         terse           - print out the parameters which perturb if False
-        '''
+        """
 
         return self.ElementPerturbs(self[indexInSequence], terse)
 
@@ -882,7 +882,9 @@ class Tfs(object):
             return perturbingParameters
 
     def RenameElement(self, index, new):
-        """Rename indexed element."""
+        """
+        Rename indexed element.
+        """
         # I don't fully understand how defensive this method needs to
         # be, so I err on the side of caution and prevent any name
         # which already exists in either self.sequence or self.data
@@ -899,7 +901,8 @@ class Tfs(object):
         self.data[new] = self.data.pop(old)
 
     def SplitElement(self, SSplit):
-        '''Splits the element found at SSplit given, performs the necessary
+        """
+        Splits the element found at SSplit given, performs the necessary
         operations on the lattice to leave the model functionally
         identical and returns the indices of the first and second
         component.  Element new name will be the same as the original
@@ -912,7 +915,7 @@ class Tfs(object):
         WARNING: DO NOT SPLIT THE ELEMENT WHICH MARKS THE BEGINNING OF
         YOUR LATTICE.  YOUR OPTICS WILL BE WRONG!
 
-        '''
+        """
 
         # the element to be split:
         originalIndex = self.IndexFromNearestS(SSplit)
@@ -978,13 +981,13 @@ class Tfs(object):
         return firstIndex, secondIndex
 
     def WrapAroundElement(self, item):
-        '''
-        Define new starting point for lattice.  The arg `item' can be
+        """
+        Define new starting point for lattice.  The arg `item` can be
         either the name of the element or its index and will
         will become the new beginning of the lattice, and elements
         that came before the new start are appended to the end.
         S and SMID are updated as necessary.
-        '''
+        """
 
         if isinstance(item, basestring):
             index = self.IndexFromName(item)

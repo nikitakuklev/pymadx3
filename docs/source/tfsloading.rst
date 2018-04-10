@@ -118,7 +118,6 @@ is returned::
   a = pymadx.Data.Tfs("mytwissfile.tar.gz")
   a[3]         # 4th element in sequence (0,1,2,3!)
   a[3:10]      # 4th to 11th elements (tfs instance returned)
-  a[3:10:-1]   # similarly but in steps on -1 ie reversed
   a['IP1':300] # find element named IP1 (exactly) and start from that until the #301th element
   a['IP3':]    # find element named IP3 (exactly) and take from there to the end of the file
   a['L230A']   # returns a Python dictionary for element named L230A
