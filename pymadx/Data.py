@@ -1101,7 +1101,7 @@ class Aperture(Tfs):
         except ValueError:
             pass
 
-    def Plot(self, title='', outputfilename=None, machine=None, plot="xy", plotapertype=False):
+    def Plot(self, title='', outputfilename=None, machine=None, plot="xy", plotapertype=True):
         """
         This plots the aperture extent in x and y.
 

@@ -232,12 +232,12 @@ def Aperture(aperture, title='', outputfilename=None, machine=None, plot="xy", p
     if "x" in plot.lower():
         line1, = _plt.plot(s, x, 'b-', label='X', alpha=0.6)
         if plotapertype:
-            _plt.scatter(s, x, color=c, s=6)
+            _plt.scatter(s, x, c=c, s=6)
 
     if "y" in plot.lower():
         line2, = _plt.plot(s, y, 'g-', label='Y', alpha=0.6)
         if plotapertype:
-            _plt.scatter(s, y, color=c, s=6)
+            _plt.scatter(s, y, c=c, s=6)
 
     _plt.xlabel('S (m)')
     _plt.ylabel('Aperture (m)')
@@ -260,31 +260,34 @@ def Aperture(aperture, title='', outputfilename=None, machine=None, plot="xy", p
 
 def _ApertypeColorMap():
     #Some nice colors
-    color_codes = ['#C03028',
-                   '#F8D030',
-                   '#6890F0',
-                   '#F85888',
-                   '#A8B820',
-                   '#F08030',
-                   '#7038F8',
-                   '#78C850',
-                   '#A8A878']
+    _colourCodes = ['#C03028',
+                    '#F8D030',
+                    '#6890F0',
+                    '#F85888',
+                    '#A8B820',
+                    '#F08030',
+                    '#7038F8',
+                    '#78C850',
+                    '#A8A878']
+
+    #_colourCodes = [_HexToRGB(c) for c in _colourCodes]
 
     # MADX aperture types
-    _madxAperTypes = [ 'CIRCLE',
-                   'RECTANGLE',
-                   'ELLIPSE',
-                   'RECTCIRCLE',
-                   'LHCSCREEN',
-                   'MARGUERITE',
-                   'RECTELLIPSE',
-                   'RACETRACK',
-                   'OCTAGON']
-    typeToCol = {}
-    for i in range(len(_madxAperTypes)):
-        typeToCol[_madxAperTypes[i]] = color_codes[i]
-
+    _madxAperTypes = ['CIRCLE',
+                      'RECTANGLE',
+                      'ELLIPSE',
+                      'RECTCIRCLE',
+                      'LHCSCREEN',
+                      'MARGUERITE',
+                      'RECTELLIPSE',
+                      'RACETRACK',
+                      'OCTAGON']
+    typeToCol = dict(zip(_madxAperTypes, _colourCodes))
     return typeToCol
+
+def _HexToRGB(h):
+    h = h.strip('#')
+    return tuple(int(h[i:i+2], 16) for i in (0, 2 ,4))
 
 def _ApertypeToColor(apertype, cmap=_ApertypeColorMap()):
     color = (0,0,0)
