@@ -230,12 +230,12 @@ def Aperture(aperture, title='', outputfilename=None, machine=None, plot="xy", p
         c = map(_ApertypeToColor, t)
 
     if "x" in plot.lower():
-        #line1, = _plt.plot(s, x, 'b-', label='X')
+        line1, = _plt.plot(s, x, 'b-', label='X', alpha=0.6)
         if plotapertype:
             _plt.scatter(s, x, color=c, s=6)
 
     if "y" in plot.lower():
-        #line2, = _plt.plot(s, y, 'g-', label='Y')
+        line2, = _plt.plot(s, y, 'g-', label='Y', alpha=0.6)
         if plotapertype:
             _plt.scatter(s, y, color=c, s=6)
 
@@ -250,9 +250,7 @@ def Aperture(aperture, title='', outputfilename=None, machine=None, plot="xy", p
     if machine != None:
         AddMachineLatticeToFigure(_plt.gcf(), machine)
 
-    _plt.tight_layout()
-
-    _plt.suptitle(title, size='x-large')
+    #_plt.suptitle(title, size='x-large')
 
     if outputfilename != None:
         if '.' in outputfilename:
@@ -293,8 +291,7 @@ def _ApertypeToColor(apertype, cmap=_ApertypeColorMap()):
     try:
         color = cmap[apertype.upper()]
     except:
-        print "Warning, unrecognised apertype: "+apertype+". Default to white color."
-        color =(1,1,1)
+        color =(0.8,0.8,0.8) # greyish
 
     return color
 
