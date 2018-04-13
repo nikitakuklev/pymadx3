@@ -1117,7 +1117,7 @@ class Aperture(Tfs):
         """
         try:
             import pymadx.Plot as _Plot
-            _Plot.PlotAperture(self, title, outputfilename, machine, plot=plot, plotapertype=plotapertype)
+            _Plot.Aperture(self, title, outputfilename, machine, plot=plot, plotapertype=plotapertype)
         except ImportError:
             pass
 

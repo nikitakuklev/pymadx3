@@ -201,7 +201,7 @@ def PlotSigma(tfsfile, title='', outputfilename=None, machine=True, dispersion=F
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
-def PlotAperture(aperture, title='', outputfilename=None, machine=None, plot="xy", plotapertype=False):
+def Aperture(aperture, title='', outputfilename=None, machine=None, plot="xy", plotapertype=True):
     """
     Plots the aperture extents vs. S from a pymadx.Data.Aperture instance.
 
