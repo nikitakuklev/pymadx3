@@ -48,7 +48,7 @@ def _GetOpticalDataFromTfs(tfsobject):
     d['sigmayp']   = tfsobject.GetColumn('SIGMAYP')
     return d
 
-def PlotCentroids(tfsfile, title='', outputfilename=None, machine=True):
+def Centroids(tfsfile, title='', outputfilename=None, machine=True):
     """
     Plot the centroid (mean) x and y from the a Tfs file or pymadx.Tfs instance.
 
@@ -84,7 +84,7 @@ def PlotCentroids(tfsfile, title='', outputfilename=None, machine=True):
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
-def PlotSurvey(tfsfile, title='', outputfilename=None):
+def Survey(tfsfile, title='', outputfilename=None):
     """
     Plot the x and z coordinates from a tfs file.
     """
@@ -103,7 +103,7 @@ def PlotSurvey(tfsfile, title='', outputfilename=None):
     _plt.ylabel('Z (m)')
 
 
-def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=False, squareroot=True):
+def Beta(tfsfile, title='', outputfilename=None, machine=True, dispersion=False, squareroot=True):
     """
     Plot sqrt(beta x,y) as a function of S. By default, a machine diagram is shown at
     the top of the plot.
@@ -156,7 +156,7 @@ def PlotBeta(tfsfile, title='', outputfilename=None, machine=True, dispersion=Fa
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
-def PlotSigma(tfsfile, title='', outputfilename=None, machine=True, dispersion=False):
+def Sigma(tfsfile, title='', outputfilename=None, machine=True, dispersion=False):
     """
     Plot sqrt(beta x,y) as a function of S. By default, a machine diagram is shown at
     the top of the plot.
@@ -201,15 +201,14 @@ def PlotSigma(tfsfile, title='', outputfilename=None, machine=True, dispersion=F
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
-def Aperture(aperture, title='', outputfilename=None, machine=None, plot="xy", plotapertype=True):
+def Aperture(aperture, machine=None, outputfilename=None, plot="xy", plotapertype=True):
     """
     Plots the aperture extents vs. S from a pymadx.Data.Aperture instance.
 
     Inputs:
       aperture (pymadx.Data.Aperture) - the aperture model to plot from
-      title (str) - The title of the resultant plot (default: None)
-      outputfilename (str) - Name without extension of the output file if desired (default: None)
       machine (str or pymadx.Data.Tfs) - TFS file or TFS istance to plot a machine lattice from (default: None)
+      outputfilename (str) - Name without extension of the output file if desired (default: None)
       plot (str) - Indicates whcih aperture to plot - 'x' for X, 'y' for Y and 'xy' for both (default: 'xy')
       plotapertype (bool) - If enabled plots the aperture type at every definted aperture point as a color-coded dot (default: False)
     """
@@ -250,14 +249,43 @@ def Aperture(aperture, title='', outputfilename=None, machine=None, plot="xy", p
     if machine != None:
         AddMachineLatticeToFigure(_plt.gcf(), machine)
 
-    #_plt.suptitle(title, size='x-large')
-
     if outputfilename != None:
         if '.' in outputfilename:
             outputfilename = outputfilename.split('.')[0]
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
 
+def ApertureN1(aperture, machine=None, outputfilename=None):
+    """
+    Plot the N1 aperture value from MADX. 
+
+    Requires N1 and S column.
+
+    Optional "machine" argument is string to or pymadx.Data.Tfs instance
+    for twiss description to provide a machine diagram on top.
+    """
+    
+    import pymadx.Data as _Data
+    aper = _Data.CheckItsTfsAperture(aperture)
+
+    f = _plt.figure(figsize=(9,5))
+
+    s = aper.GetColumn('S')
+    n = aper.GetColumn('N1')
+
+    _plt.plot(s,n)
+    _plt.xlabel('S (m)')
+    _plt.ylabel(r'N1 ($\sigma$)')
+
+    if machine != None:
+        AddMachineLatticeToFigure(_plt.gcf(), machine)
+
+    if outputfilename != None:
+        if '.' in outputfilename:
+            outputfilename = outputfilename.split('.')[0]
+        _plt.savefig(outputfilename+'.pdf')
+        _plt.savefig(outputfilename+'.png')
+        
 def _ApertypeColorMap():
     #Some nice colors
     _colourCodes = ['#C03028',

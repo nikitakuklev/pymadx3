@@ -1088,7 +1088,7 @@ class Aperture(Tfs):
         except ValueError:
             pass
 
-    def Plot(self, title='', outputfilename=None, machine=None, plot="xy", plotapertype=True):
+    def Plot(self, machine=None, outputfilename=None, plot="xy", plotapertype=True):
         """
         This plots the aperture extent in x and y.
 
@@ -1102,11 +1102,20 @@ class Aperture(Tfs):
           plotapertype (bool) - If enabled plots the aperture type at every definted aperture point as a color-coded dot (default: False)
 
         """
-        try:
-            import pymadx.Plot as _Plot
-            _Plot.Aperture(self, title, outputfilename, machine, plot=plot, plotapertype=plotapertype)
-        except ImportError:
-            pass
+        import pymadx.Plot as _Plot
+        _Plot.Aperture(self, machine, outputfilename, plot=plot, plotapertype=plotapertype)
+
+    def PlotN1(self, machine=None, outputfilename=None):
+        """
+        Plot the N1 aperture value from MADX. 
+        
+        Requires N1 and S column.
+        
+        Optional "machine" argument is string to or pymadx.Data.Tfs instance
+        for twiss description to provide a machine diagram on top.
+        """
+        import pymadx.Plot as _Plot
+        _Plot.ApertureN1(self, machine, outputfilename)
 
     def CheckKnownApertureTypes(self):
         failed = False
