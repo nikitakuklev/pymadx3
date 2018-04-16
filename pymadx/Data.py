@@ -764,41 +764,28 @@ class Tfs(object):
 
         squareroot -> whether to square root the beta functions or not (default = True)
         """
-        try:
-            import pymadx.Plot as _Plot
-            if outputfilename is None:
-                outputfilename = "{}_beta".format((self.filename.split("."))[0])
-            _Plot.PlotBeta(self, title, outputfilename, machine,
-                           dispersion, squareroot)
-        except ImportError:
-            print "No beta plotting available due to missing dependencies!"
-
+        import pymadx.Plot as _Plot
+        if outputfilename is None:
+            outputfilename = "{}_beta".format((self.filename.split("."))[0])
+        _Plot.Beta(self, title, outputfilename, machine, dispersion, squareroot)
 
     def PlotCentroids(self, title='', outputfilename=None, machine=True):
         """
         Plot the centroid in the horizontal and vertical from the file if they exist.
         """
-        try:
-            import pymadx.Plot as _Plot
-            if outputfilename is None:
-                outputfilename = "{}_centroid".format(
-                    (self.filename.split("."))[0])
-            _Plot.PlotCentroids(self,title,outputfilename,machine)
-        except ImportError:
-            print "No centroid plotting available due to missing dependencies!"
+        import pymadx.Plot as _Plot
+        if outputfilename is None:
+            outputfilename = "{}_centroid".format((self.filename.split("."))[0])
+        _Plot.Centroids(self,title,outputfilename,machine)
 
     def PlotSigma(self, title='', outputfilename=None, machine=True, dispersion=False):
         """
         Plot the beam size.
         """
-        try:
-            import pymadx.Plot as _Plot
-            if outputfilename is None:
-                outputfilename = "{}_sigma".format((self.filename.split("."))[0])
-            _Plot.PlotSigma(self, title, outputfilename, machine, dispersion)
-        except ImportError:
-            print "No beta plotting available due to missing dependencies!"
-
+        import pymadx.Plot as _Plot
+        if outputfilename is None:
+            outputfilename = "{}_sigma".format((self.filename.split("."))[0])
+        _Plot.Sigma(self, title, outputfilename, machine, dispersion)
 
     def IndexFromGmadName(self, gmadname, verbose=False):
         """
