@@ -67,6 +67,11 @@ class Beam(dict):
         elif distrtype == 'ptc':
             self.isPTCDistribution = True
             setattr(self, 'SetDistribFileName',  self._SetDistribFileName)
+
+    def WriteToFile(self, filename):
+        f = open(filename, 'w')
+        f.write(self.ReturnBeamString())
+        f.close()
         
     def ReturnBeamString(self):
         s = 'beam, particle = {}, energy = {}'.format(self['particle'],
