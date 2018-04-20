@@ -1013,6 +1013,49 @@ class Tfs(object):
         self.sequence = self.sequence[index:] + self.sequence[:index]
         self.sequence = self.sequence[0:-1]
 
+    def ConcatenateMachine(self, *args):
+        """
+        This is used to concatenate machines.
+        """
+        # Get final position of the machine
+        lastSpos = self.GetColumn('S')[-1]
+
+        for machineIndex,machine in enumerate(args):
+            if isinstance(machine, _np.str):
+                machine = CheckItsTfs(machine)
+
+            # copy the machine. concatenating self to self doesn't update s positions correctly
+            machine = _copy.deepcopy(machine)
+
+            # check names sets are equal
+            if len(set(self.names).difference(set(machine.names))) != 0:
+                raise AttributeError("Cannot concatenate machine, variable names do not match")
+
+            sind = self.names.index('S')
+            sindOrig = self.names.index('SORIGINAL')
+            sindMid = self.names.index('SMID')
+
+            for elementindex in range(machine.nitems):
+                element = machine[elementindex]
+                uniqueName = element['UNIQUENAME']
+
+                # check if the element name is already in the sequence
+                if element['UNIQUENAME'] in self.data.keys():
+                    uniqueName += "_" + _np.str(machineIndex+1)
+
+                self.data[uniqueName] = machine.data[element['UNIQUENAME']]
+
+                # update elements s positions with last s position of previous machine
+                self.data[uniqueName][sind] += lastSpos
+                self.data[uniqueName][sindOrig] += lastSpos
+                self.data[uniqueName][sindMid] += lastSpos
+
+                self.sequence.append(uniqueName)
+                self.nitems += 1
+
+            # update last s position from this machine
+            lastSpos += self.GetColumn('S')[-1]
+
 def CheckItsTfs(tfsfile):
     """
     Ensure the provided file is a Tfs instance.  If it's a string, ie path to
