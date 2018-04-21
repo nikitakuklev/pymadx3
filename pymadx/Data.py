@@ -1055,6 +1055,8 @@ class Tfs(object):
 
             # update last s position from this machine
             lastSpos += self.GetColumn('S')[-1]
+        self.smax = self.GetColumn('S')[-1]
+        self.header['LENGTH'] = self.GetColumn('S')[-1]
 
 def CheckItsTfs(tfsfile):
     """
