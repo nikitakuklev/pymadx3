@@ -14,7 +14,7 @@ import os.path as _path
 import pymadx.Data as _Data
 import pymadx.Plot as _Plot
 
-import pytransport.Reader as _Reader
+from pytransport import Reader as _Reader
 
 # Predefined lists of tuples for making the standard plots,
 # format = (optical_var_name, optical_var_error_name, legend_name)
@@ -116,7 +116,10 @@ def MADXVsTRANSPORT(first, second, first_name=None,
     ]
 
     if saveAll:
-        output_filename = "optics-report.pdf"
+        if outputFileName is not None:
+            output_filename = outputFileName
+        else:
+            output_filename = "optics-report.pdf"
         with _PdfPages(output_filename) as pdf:
             for figure in figures:
                 pdf.savefig(figure)
