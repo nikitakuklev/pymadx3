@@ -702,8 +702,8 @@ class Tfs(object):
 
     def GetCollimators(self):
         """
-        Returns a Tfs instance containing any type of collimator (both RCOLLIMATOR
-        and ECOLLIMATOR)
+        Returns a Tfs instance containing any type of collimator (including
+        COLLLIMATOR, RCOLLIMATOR and ECOLLIMATOR).
         """
         if 'KEYWORD' in self.columns:
             i = self.ColumnIndex('KEYWORD')
