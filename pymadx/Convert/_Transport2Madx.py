@@ -78,8 +78,6 @@ class _Convert(_Elements):
         """
         Load a Transport file.
         """
-        temp = _Reader.Reader()
-
         if not isinstance(inputfile, _np.str):
             raise TypeError("Input must be a string")
 
@@ -89,8 +87,8 @@ class _Convert(_Elements):
         isOutput = _General.CheckIsOutput(inputfile)  # Is a TRANSPORT standard output file.
         self.Writer.DebugPrintout("File Read.")
         if isOutput:
-            lattice, output = temp.GetLatticeAndOptics(inputfile)
-            fits, fitres = temp.GetFits(inputfile)
+            lattice = _Reader.GetLattice(inputfile)
+            fits, fitres = _Reader.GetFits(inputfile)
             self.Transport = _General.OutputFitsToRegistry(self.Transport, fitres)
             self.Writer.DebugPrintout('Adding any fitting output to the fitting registry (self.FitRegistry)')
 
