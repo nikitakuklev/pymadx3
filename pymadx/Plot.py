@@ -466,6 +466,8 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
             DrawRect(element,'k')
         elif kw == 'ECOLLIMATOR':
             DrawRect(element,'k')
+        elif kw == 'COLLIMATOR':
+            DrawRect(element,'k')
         elif kw == 'SEXTUPOLE':
             DrawHex(element, u'#ffcc00') #yellow
         elif kw == 'OCTUPOLE':
