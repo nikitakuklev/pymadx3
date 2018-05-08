@@ -385,7 +385,6 @@ class _Convert(_Elements):
                 if typeNum > 0:
                     if self.Transport.data[0][0] == 'OUTPUT':
                         self._ElementPrepper(line, linenum, 'output')
-                        self._UpdateElementsFromFits()
                     else:
                         line = _General.RemoveIllegals(line)
                         self._ElementPrepper(line, linenum, 'input')
@@ -402,7 +401,7 @@ class _Convert(_Elements):
                 else:
                     errorline = 'reason unknown.'
                 self.Writer.DebugPrintout(errorline)
-
+        self._UpdateElementsFromFits()
         self.Writer.DebugPrintout(
             'Converting registry elements to pybdsim compatible format and adding to machine builder.\n')
 
@@ -506,114 +505,3 @@ class _Convert(_Elements):
             if lastElementWasADrift:
                 self.Writer.DebugPrintout('\tConvert delayed drift(s)')
                 self.Drift(linedictDrift)
-
-    def _UpdateElementsFromFits(self):
-        # Functions that update the elements in the element registry.
-        # For debugging purposes, they return dictionaries of the element type,
-        # length change details, and which parameters were updated and the values in a list which
-        # follows the pattern of [parameter name (e.g. 'field'),oldvalue,newvalue]
-
-        # Length update common to nearly all elements, seperate function to prevent duplication
-        # fitIndex was used in the past. Pass in anyway in case of future need, just delete for now.
-        def _updateLength(eleIndex, fitIndex, element):
-            del fitIndex
-            oldlength = self.Transport.ElementRegistry.elements[eleIndex]['length']
-            lengthDiff = self.Transport.ElementRegistry.elements[eleIndex]['length'] - element['length']
-            self.Transport.ElementRegistry.elements[eleIndex]['length'] = element['length']  # Update length
-            self.Transport.ElementRegistry.length[eleIndex:] += lengthDiff  # Update running length of subsequent elements.
-            self.Transport.ElementRegistry._totalLength += lengthDiff  # Update total length
-            lendict = {'old': _np.round(oldlength, 5),
-                       'new': _np.round(element['length'], 5)}
-            return lendict
-
-        def _updateDrift(eleIndex, fitIndex, element):
-            eleDict = {'updated': False,
-                       'element': 'Drift',
-                       'params': []}
-
-            # Only length can be varied
-            if self.Transport.ElementRegistry.elements[eleIndex]['length'] != element['length']:
-                lendict = _updateLength(eleIndex, fitIndex, element)
-                eleDict['updated'] = True
-                eleDict['length'] = lendict
-            return eleDict
-
-        def _updateQuad(eleIndex, fitIndex, element):
-            eleDict = {'updated': False,
-                       'element': 'Quadrupole',
-                       'params': []}
-
-            if self.Transport.ElementRegistry.elements[eleIndex]['data'][1] != element['data'][1]:  # Field
-                oldvalue = self.Transport.ElementRegistry.elements[eleIndex]['data'][1]
-                self.Transport.ElementRegistry.elements[eleIndex]['data'][1] = element['data'][1]
-                eleDict['updated'] = True
-                data = ['field', oldvalue, element['data'][1]]
-                eleDict['params'].append(data)
-
-            if self.Transport.ElementRegistry.elements[eleIndex]['length'] != element['length']:
-                self.Transport.ElementRegistry.elements[eleIndex]['data'][0] = element['data'][0]  # Length in data
-                lendict = _updateLength(eleIndex, fitIndex, element)
-                eleDict['updated'] = True
-                eleDict['length'] = lendict
-            return eledict
-
-        def _updateDipole(eleIndex, fitIndex, element):
-            eleDict = {'updated': False,
-                       'element': 'Dipole',
-                       'params': []}
-
-            # TODO: Need code in here to handle variation in poleface rotation. Not urgent for now.
-            if self.Transport.ElementRegistry.elements[eleIndex]['data'][1] != element['data'][1]:  # Field
-                oldvalue = self.Transport.ElementRegistry.elements[eleIndex]['data'][1]
-                if not self.Transport.machineprops.benddef:  # Transport can switch dipole input definition
-                    par = 'field'
-                    self.Transport.ElementRegistry.elements[eleIndex]['data'][1] = element['data'][1]
-                    eleDict['updated'] = True
-                else:
-                    par = 'angle'
-                    self.Transport.ElementRegistry.elements[eleIndex]['data'][1] = element['data'][3]
-                    eleDict['updated'] = True
-                data = [par, oldvalue, element['data'][3]]
-                eleDict['params'].append(data)
-            if self.Transport.ElementRegistry.elements[eleIndex]['length'] != element['length']:
-                self.Transport.ElementRegistry.elements[eleIndex]['data'][0] = element['data'][0]  # Length in data
-                lendict = _updateLength(eleIndex, fitIndex, element)
-                eleDict['updated'] = True
-                eleDict['length'] = lendict
-            return eledict
-
-        for index, name in enumerate(self.Transport.FitRegistry._uniquenames):
-            fitstart = self.Transport.FitRegistry.GetElementStartSPosition(name)
-            elestart = self.Transport.ElementRegistry.GetElementStartSPosition(name)
-            fitindex = self.Transport.FitRegistry.GetElementIndex(name)
-            eleindex = self.Transport.ElementRegistry.GetElementIndex(name)
-            for fitnum, fit in enumerate(fitstart):
-                for elenum, ele in enumerate(elestart):
-                    if (_np.round(ele, 5) == _np.round(fit, 5)) and \
-                            (not self.Transport.ElementRegistry.elements[eleindex[elenum]]['isZeroLength']):
-                        fitelement = self.Transport.FitRegistry.elements[fitindex[fitnum]]
-                        if fitelement['elementnum'] == 3:
-                            eledict = _updateDrift(eleindex[elenum], fitindex[fitnum], fitelement)
-                        elif fitelement['elementnum'] == 4:
-                            eledict = _updateDipole(eleindex[elenum], fitindex[fitnum], fitelement)
-                        elif fitelement['elementnum'] == 5:
-                            eledict = _updateQuad(eleindex[elenum], fitindex[fitnum], fitelement)
-
-                        if eledict['updated']:
-                            self.Writer.DebugPrintout(
-                                "\tElement " + _np.str(eleindex[elenum]) + " was updated from fitting.")
-                            self.Writer.DebugPrintout("\tOptics Output line:")
-                            self.Writer.DebugPrintout(
-                                "\t\t'" + self.Transport.FitRegistry.lines[fitindex[fitnum]] + "'")
-                            if eledict.has_key('length'):
-                                lenline = "\t" + eledict['element'] + " length updated to "
-                                lenline += _np.str(eledict['length']['new'])
-                                lenline += " (from " + _np.str(eledict['length']['old']) + ")."
-                                self.Writer.DebugPrintout(lenline)
-                            for param in eledict['params']:
-                                parline = "\t" + eledict['element'] + " " + param[0]
-                                parline += " updated to " + _np.str(param[2]) + " (from " + _np.str(param[1]) + ")."
-                                self.Writer.DebugPrintout(parline)
-                                # self.Writer.DebugPrintout("\n")
-
-                        break
