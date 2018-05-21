@@ -910,6 +910,11 @@ class Tfs(object):
         originalS = self[originalName]['S']
         originalHKick = self[originalName]['HKICK']
         originalVKick = self[originalName]['VKICK']
+        originalAngle = self[originalName]['ANGLE']
+        originalKLs = {"K{}L".format(i): self[originalName]['K{}L'.format(i)]
+                       for i in range(1, 7)}
+        originalKSLs = {"K{}SL".format(i): self[originalName]['K{}SL'.format(i)]
+                       for i in range(1, 7)}
         elementType = self[originalName]['KEYWORD']
 
         # First of the two elements that the original is split into.
@@ -952,11 +957,26 @@ class Tfs(object):
         self.EditComponent(secondIndex, 'UNIQUENAME', secondUniqueName)
 
         # Assign the appropriate amount of kick to each of the two components
-        ratio = firstLength/originalLength
-        self.EditComponent(firstIndex, 'HKICK', ratio * originalHKick)
-        self.EditComponent(firstIndex, 'VKICK', ratio * originalVKick)
-        self.EditComponent(secondIndex, 'HKICK', (1 - ratio) * originalHKick)
-        self.EditComponent(secondIndex, 'VKICK', (1 - ratio) * originalVKick)
+        firstRatio = firstLength/originalLength
+        secondRatio = 1 - firstRatio
+        self.EditComponent(firstIndex, 'HKICK', firstRatio * originalHKick)
+        self.EditComponent(firstIndex, 'VKICK', firstRatio * originalVKick)
+        self.EditComponent(firstIndex, 'ANGLE', firstRatio * originalAngle)
+        self.EditComponent(firstIndex, 'E2', 0.5 * firstRatio * originalAngle)
+        self.EditComponent(firstIndex, 'FINTX', 0.0)
+
+        self.EditComponent(secondIndex, 'HKICK', secondRatio * originalHKick)
+        self.EditComponent(secondIndex, 'VKICK', secondRatio * originalVKick)
+        self.EditComponent(secondIndex, 'ANGLE', secondRatio * originalAngle)
+        self.EditComponent(secondIndex, 'E1', 0.5 * secondRatio * originalAngle)
+        self.EditComponent(secondIndex, 'FINT', 0.0)
+
+        for name, value in originalKLs.iteritems():
+            self.EditComponent(firstIndex, name, firstRatio * value)
+            self.EditComponent(secondIndex, name, secondRatio * value)
+        for name, value in originalKSLs.iteritems():
+            self.EditComponent(firstIndex, name, firstRatio * value)
+            self.EditComponent(secondIndex, name, secondRatio * value)
 
         assert self[secondName]["S"] == originalS
         assert self[firstName]["L"] + self[secondName]["L"] == originalLength
