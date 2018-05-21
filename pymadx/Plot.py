@@ -4,17 +4,9 @@ Ploting script for madx TFS files using the pymadx Tfs class
 """
 
 import numpy as _np
-
-useMPL = True
-#protect against matplotlib import errors
-try:
-    import matplotlib         as _matplotlib
-    import matplotlib.patches as _patches
-    import matplotlib.pyplot  as _plt
-except ImportError:
-    useMPL = False
-    print "pymadx.Plot -> WARNING - plotting will not work!"
-    print "matplotlib.pyplot doesn't exist"
+import matplotlib         as _matplotlib
+import matplotlib.patches as _patches
+import matplotlib.pyplot  as _plt
 
 class _My_Axes(_matplotlib.axes.Axes):
     """
@@ -26,8 +18,7 @@ class _My_Axes(_matplotlib.axes.Axes):
         _matplotlib.axes.Axes.drag_pan(self, button, 'x', x, y) # pretend key=='x'
 
 #register the new class of axes
-if useMPL:
-    _matplotlib.projections.register_projection(_My_Axes)
+_matplotlib.projections.register_projection(_My_Axes)
 
 def _GetOpticalDataFromTfs(tfsobject):
     """
