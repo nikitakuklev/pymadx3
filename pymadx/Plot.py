@@ -391,8 +391,6 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
         print "The required columns are: ", requiredKeys
         raise IOError
 
-    axs = figure.get_axes() # get the existing graph
-
     axoptics  = figure.get_axes()[0]
     _AdjustExistingAxes(figure, tightLayout=tightLayout)
     axmachine = _PrepareMachineAxes(figure)

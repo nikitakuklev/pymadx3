@@ -529,7 +529,6 @@ class Tfs(object):
 
         return the name of the beamline element clostest to S
         """
-
         i = self.IndexFromNearestS(S)
         return self.sequence[i]
 
