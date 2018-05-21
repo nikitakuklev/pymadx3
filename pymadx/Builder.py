@@ -147,7 +147,7 @@ class Machine(object):
 
     def __repr__(self):
         s = ''
-        s += 'pybdism.Builder.Machine instance\n'
+        s += 'pymadx.Builder.Machine instance\n'
         s += str(len(self.sequence)) + ' items in sequence\n'
         s += str(len(self.elements)) + ' unique elements defined\n'
         return s
@@ -206,7 +206,7 @@ class Machine(object):
 
     def AddDipole(self, name='dp', category='sbend', length=0.1, angle=0.001, **kwargs):
         """
-        AddDiople(category='sbend')
+        AddDipole(category='sbend')
 
         category - 'sbend' or 'rbend' - sector or rectangular bend
         """
