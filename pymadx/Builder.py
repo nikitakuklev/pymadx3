@@ -144,6 +144,7 @@ class Machine(object):
         self.length    = 0.0
         self.angint    = 0.0
         self.beam      = _Beam() # always construct at least default beam
+        self.ptcaper   = []
 
     def __repr__(self):
         s = ''
@@ -266,6 +267,16 @@ class Machine(object):
     def AddOptions(self,*args,**kwargs):
         pass
 
+    def AddPTCTrackAperture(self, aperture=[]):
+        """
+        Add a PTC 6D max aperture for ptc_track command.
+        """
+        if len(aperture) > 0 and len(aperture) != 6:
+            raise IndexError("Aperture list must contain exactly 6 values")
+        # convert all to float to ensure it can be written
+        aper = [float(i) for i in aperture]
+        self.ptcaper = aper
+
 # General scripts below this point
 
 def WriteMachine(machine, filename, verbose=False):
@@ -355,12 +366,27 @@ def WriteMachine(machine, filename, verbose=False):
         f.write('! PTC JOB SPECIFICATION\n\n')
         f.write(machine.beam.ReturnPtcString())
 
+        ptcTrackstr = ''
+        # check attribute existance in case an old machine instance is supplied
+        if hasattr(machine, 'ptcaper'):
+            # check for correct no. of aperture dimensions
+            if len(machine.ptcaper) > 0 and len(machine.ptcaper) != 6:
+                raise IndexError("Aperture list must contain exactly 6 values")
+            # string with ptc track apertures if defined.
+            if len(machine.ptcaper) > 0:
+                ptcTrackstr = ', maxaper={'
+                for index,aper in enumerate(machine.ptcaper):
+                    ptcTrackstr += str(aper)
+                    if index != (len(machine.ptcaper)-1):
+                        ptcTrackstr += ', '
+                ptcTrackstr += '}'
+
         #write samplers - only for PTC jobs
         if len(machine.samplers) > 0:
             f.write('\n! SAMPLER DEFINITION\n\n')
             for sampler in machine.samplers:
                 f.write(str(sampler))
-            f.write('ptc_track, element_by_element, dump, turns=1, icase=5, onetable;\n')
+            f.write('ptc_track, element_by_element, dump, turns=1, icase=5, onetable' + ptcTrackstr + ';\n')
             f.write('PTC_TRACK_END;\n')
             f.write('ptc_end;\n')
         f.close()

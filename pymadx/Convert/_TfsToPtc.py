@@ -8,7 +8,7 @@ import pymadx.Data as _Data
 
 def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
              stopname=None,ignorezerolengthitems=True,samplers='all',
-             beampiperadius=0.2,beam=True):
+             beampiperadius=0.2,beam=True,ptctrackaperture=[]):
     """
     Prepare a madx model for PTC from a Tfs file containing the full
     twiss output from MADX.
@@ -203,7 +203,7 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
                 pass
 
     a.AddSampler(samplers)
-
+    a.AddPTCTrackAperture(ptctrackaperture)
     # Make beam file 
     if beam: 
         b = MadxTfsToPtcBeam(madx, ptcfilename, startname)
