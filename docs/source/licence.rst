@@ -2,7 +2,7 @@
 Licence & Disclaimer
 ====================
 
-pymadx Copyright (C) Royal Holloway, University of London 2017.
+pymadx Copyright (C) Royal Holloway, University of London 2018.
 
 CERN MADX
 ---------
