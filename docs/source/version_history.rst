@@ -2,6 +2,32 @@
 Version History
 ===============
 
+v 1.2 - 2018 / 05 / 23
+======================
+
+New Features
+------------
+
+* Write a beam class instance to a separate file.
+* Add ptc_track maximum aperture to a model.
+* Concatenate TFS instances.
+* N1 aperture plot as well as physical aperture plot.
+* Output file naming for plots for MADX MADX comparison.
+* MADX Transport comparison plots.
+
+General
+-------
+
+* Changes to some plot arguments.
+* 'Plot' removed from plot functions name as redundant.
+* Transport conversion moved to pytransport.
+  
+Bug Fixes
+---------
+
+* Machine plot now deals with 'COLLIMATOR' type correctly.
+
+
 v 1.1 - 2018 / 04 / 10
 ======================
 
