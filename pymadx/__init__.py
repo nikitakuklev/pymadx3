@@ -10,9 +10,11 @@ Authors:
  * Jochem Snuverink
  * Stuart Walker
 
-Copyright Royal Holloway, University of London 2017.
+Copyright Royal Holloway, University of London 2018.
 
 """
+
+__version__ = "1.2"
 
 from . import Beam
 from . import Builder
