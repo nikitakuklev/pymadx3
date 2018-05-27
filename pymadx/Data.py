@@ -4,6 +4,7 @@ Classes to load and manipulate data from MADX.
 
 import bisect as _bisect
 import copy as _copy
+import gzip as _gzip
 import numpy as _np
 import re as _re
 import string as _string
@@ -94,13 +95,16 @@ class Tfs(object):
         Read the tfs file and prepare data structures. If 'tar' or 'gz are in
         the filename, the file will be opened still compressed.
         """
-        if ('tar' in filename) or ('gz' in filename):
+        if tarfile.is_tarfile(filename): # assume compressed tarball of 1 file
             print 'pymadx.Tfs.Load> zipped file'
-            tar = tarfile.open(filename,'r')
-            f = tar.extractfile(tar.getmember(tar.getnames()[-1])) # extract the last memeber
+            tar = tarfile.open(filename, 'r')
+            f = tar.extractfile(tar.getmember(tar.getnames()[-1])) # extract the last member
+        elif filename.endswith('.gz'): # gzipped file
+            print 'pymadx.Tfs.Load> zipped file'
+            f = _gzip.open(filename, 'r')
         else:
             print 'pymadx.Tfs.Load> normal file'
-            f = open(filename)
+            f = open(filename, 'r')
 
         #first pass at file - need to check if it has 'NAME' column
         #if it has name, use that, otherwise use an integer
