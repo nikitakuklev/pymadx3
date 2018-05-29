@@ -467,12 +467,10 @@ class Tfs(object):
             a.smin = min(a.GetColumn('S'))
             return a
 
-        elif type(index) == int or type(index) == _np.int64:
+        try: # Try using the index as an integer
             return self.GetRowDict(self.sequence[index])
-        elif type(index) == str:
+        except TypeError: # Try using the index as a name
             return self.GetRowDict(index)
-        else:
-            raise ValueError("argument not an index or a slice")
 
     def _CheckName(self,name):
         if self.data.has_key(name):
