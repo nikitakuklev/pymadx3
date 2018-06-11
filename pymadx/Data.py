@@ -383,6 +383,9 @@ class Tfs(object):
         self._iterindex += 1
         return self.GetRowDict(self.sequence[self._iterindex])
 
+    def __contains__(self, name):
+        return name in self.GetColumn("NAME")
+
     def __getitem__(self,index):
         #index can be a slice object, string or integer - deal with in this order
         #return single item or slice of lattice
