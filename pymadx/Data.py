@@ -235,31 +235,7 @@ class Tfs(object):
         self.names = self.columns
 
     def _CalculateSigma(self):
-        # constants
-        if 'GAMMA' not in self.header:
-            self.header['BETA'] = 1.0 # assume super relativistic
-        else:
-            self.header['BETA'] = _np.sqrt(1.0 - (1.0/(self.header['GAMMA']**2)))
-        beta = self.header['BETA'] # relativistic beta
-
-        # for extending TFS beyond madx supplied columns if necessary
-        newcolumns = []
-
-        # check this file has the appropriate variables else, return without calculating
-        # use a set to check if all variables are in a given list easily
-        rvb1vars = ['DX', 'DY', 'BETX', 'BETY']
-        if self.ptctwiss:
-            rvb1vars.extend(['DISP1', 'DISP2'])
-        requiredVariablesB1 = set(rvb1vars)
-        
-        calculateSpace = requiredVariablesB1.issubset(self.columns)
-
-        rvb2vars = ['DPX', 'DPY', 'ALFX', 'ALFY', 'BETX', 'BETY']
-        if self.ptctwiss:
-            rvb2vars.extend(['DISP1P', 'DISP2P'])
-        requiredVariablesB2 = set(rvb2vars)
-        calculatePrime = requiredVariablesB2.issubset(self.columns)
-
+        # check for emittance and energy spread
         ex   = 1e-9
         ey   = 1e-9
         sige = 1e-4
@@ -268,8 +244,72 @@ class Tfs(object):
         requiredVariablesH2 = set(['EXN', 'EYN', 'GAMMA'])
         method2 = requiredVariablesH2.issubset(self.header.keys())
         if not (method1 or method2):
-            return #no emittance information to calcualte sigma
+            return #no emittance information to calculate sigma
 
+        def getColumnIndex(opticalFuncNames):
+            madxName = opticalFuncNames[0]
+            ptcName  = opticalFuncNames[1]
+
+            # return index of madx or ptc variable
+            if madxName in self.columns:
+                return self.ColumnIndex(madxName)
+            elif ptcName in self.columns:
+                # if the equivalent madx named column does not already exist
+                # append it to the instance and update with the correct data
+                if not madxName in self.columns:
+                    self.formats.extend(['%le'])
+                    self.columns.extend([madxName])
+                    ptcIndex = self.ColumnIndex(ptcName)
+                    for elementname in self.sequence:
+                        d = self.data[elementname]
+                        d.append(d[ptcIndex])
+                # return the original PTC column
+                return self.ColumnIndex(ptcName)
+            else:
+                print("Columns "+madxIndex+" and "+ptcName+" missing from tfs file")
+                return None
+
+        # optical function list format:
+        # [madxVariableName,  ptcVariableName]
+        betxColumn = ['BETX', 'BETA11']
+        betyColumn = ['BETY', 'BETA22']
+        alfxColumn = ['ALFX', 'ALFA11']
+        alfyColumn = ['ALFY', 'ALFA22']
+        dxColumn   = ['DX',   'DISP1']
+        dyColumn   = ['DY',   'DISP3']
+        dpxColumn  = ['DPX',  'DISP2']
+        dpyColumn  = ['DPY',  'DISP4']
+
+        # get indices to the columns we'll need in the data
+        betxindex = getColumnIndex(betxColumn)
+        betyindex = getColumnIndex(betyColumn)
+        alfxindex = getColumnIndex(alfxColumn)
+        alfyindex = getColumnIndex(alfyColumn)
+        dxindex   = getColumnIndex(dxColumn)
+        dyindex   = getColumnIndex(dyColumn)
+        dpxindex  = getColumnIndex(dpxColumn)
+        dpyindex  = getColumnIndex(dpyColumn)
+
+        # lists of all required variables for the sigma calculations
+        spaceColumns = [betxindex, betyindex, dxindex, dyindex]
+        primeColumns = [betxindex, betyindex, alfxindex, alfyindex, dpxindex, dpyindex]
+
+        calculateSpace = True
+        calculatePrime = True
+        if None in spaceColumns:
+            calculateSpace = False
+        if None in primeColumns:
+            calculatePrime = False
+
+        if not (calculateSpace or calculatePrime):
+            return # can't calculate either
+
+        # constants
+        if 'GAMMA' not in self.header:
+            self.header['BETA'] = 1.0 # assume super relativistic
+        else:
+            self.header['BETA'] = _np.sqrt(1.0 - (1.0/(self.header['GAMMA']**2)))
+        beta = self.header['BETA'] # relativistic beta
         if method1:
             ex   = self.header['EX']
             ey   = self.header['EY']
@@ -279,39 +319,8 @@ class Tfs(object):
             ey   = self.header['EYN']*self.header['GAMMA']
             sige = 0
 
-        #if not requiredVariablesH.issubset(self.header.keys()):
-        #    return
-
-        if not (calculateSpace or calculatePrime):
-            return # can't calculate either
-
-        # get indices to the columns we'll need in the data
-        dxindex = -1
-        dyindex = -1
-        if calculateSpace:
-            if self.ptctwiss:
-                dxindex = self.ColumnIndex('DISP1')
-                dyindex = self.ColumnIndex('DISP3')
-            else:
-                dxindex = self.ColumnIndex('DX')
-                dyindex = self.ColumnIndex('DY')
-
-        dpxindex  = -1
-        dpyindex  = -1
-        alfxindex = -1
-        alfyindex = -1
-        if calculatePrime:
-            if self.ptctwiss:
-                dpxindex = self.ColumnIndex('DISP2')
-                dpyindex = self.ColumnIndex('DISP4')
-            else:
-                dpxindex = self.ColumnIndex('DPX')
-                dpyindex = self.ColumnIndex('DPY')
-            alfxindex = self.ColumnIndex('ALFX')
-            alfyindex = self.ColumnIndex('ALFY')
-
-        betxindex = self.ColumnIndex('BETX')
-        betyindex = self.ColumnIndex('BETY')
+        # for extending TFS beyond madx supplied columns if necessary
+        newcolumns = []
 
         # extend class with columns of (beta * dispersion) to match madx at low energy
         # also extend for beam sizes

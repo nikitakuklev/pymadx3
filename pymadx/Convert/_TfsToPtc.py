@@ -47,45 +47,59 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
         print 'stopindex <= startindex'
         stopindex = startindex + 1
 
-    try:
-        lindex          = madx.ColumnIndex('L')
-        angleindex      = madx.ColumnIndex('ANGLE')
-        ksIindex        = madx.ColumnIndex('KSI')
-        k0lindex        = madx.ColumnIndex('K0L')
-        k0slindex       = madx.ColumnIndex('K0SL')
-        k1lindex        = madx.ColumnIndex('K1L')
-        k2lindex        = madx.ColumnIndex('K2L')
-        k3lindex        = madx.ColumnIndex('K3L')
-        k4lindex        = madx.ColumnIndex('K4L')
-        k5lindex        = madx.ColumnIndex('K5L')
-        k6lindex        = madx.ColumnIndex('K6L')
-        k1slindex       = madx.ColumnIndex('K1SL')
-        k2slindex       = madx.ColumnIndex('K2SL')
-        k3slindex       = madx.ColumnIndex('K3SL')
-        k4slindex       = madx.ColumnIndex('K4SL')
-        k5slindex       = madx.ColumnIndex('K5SL')
-        k6slindex       = madx.ColumnIndex('K6SL')
-        tiltindex       = madx.ColumnIndex('TILT')
-        tindex          = madx.ColumnIndex('KEYWORD')
-        alphaxindex     = madx.ColumnIndex('ALFX')
-        alphayindex     = madx.ColumnIndex('ALFY')
-        betaxindex      = madx.ColumnIndex('BETX')
-        betayindex      = madx.ColumnIndex('BETY')
-        vkickangleindex = madx.ColumnIndex('VKICK')
-        hkickangleindex = madx.ColumnIndex('HKICK')
-        e1index         = madx.ColumnIndex('E1')
-        e2index         = madx.ColumnIndex('E2')
-        fintindex       = madx.ColumnIndex('FINT')
-        fintxindex      = madx.ColumnIndex('FINTX')
-        hgapindex       = madx.ColumnIndex('HGAP')
+    requiredColumns = ['L', 'ANGLE', 'KSI', 'K0L', 'K0SL', 'K1L', 'K2L', 'K3L','K4L','K5L','K6L',
+                       'K1SL', 'K2SL','K3SL','K4SL','K5SL','K6SL', 'TILT', 'KEYWORD',
+                       'ALFX', 'ALFY', 'BETX', 'BETY', 'VKICK', 'HKICK', 'E1', 'E2', 'FINT', 'FINTX', 'HGAP']
 
-    except ValueError:
-        print 'Missing columns from tfs file - insufficient information to convert file'
-        print 'Required columns : L, ANGLE, KSI, K1L...K6L, K1SL...K6SL, TILT, KEYWORD, ALFX, ALFY, BETX, BETY, VKICK, HKICK'
-        print 'Given columns    : '
-        print madx.columns
+    missing = [column for column in requiredColumns if column not in madx.columns]
 
-        
+    # raise a value error if a column is missing, otherwise the conversion will continue
+    if len(missing) > 0:
+        error = "Missing columns from tfs file - insufficient information to convert file\r\n"
+        error += "Columns missing: "
+        for column in missing:
+            error += column + " "
+        error += "\r\n"
+        error += "Given columns  : "
+        for index,column in enumerate(madx.columns):
+            error += column
+            if index != len(madx.columns)-1:
+                error += ", "
+        raise ValueError(error)
+
+    # now assume all are columns present
+
+    lindex          = madx.ColumnIndex('L')
+    angleindex      = madx.ColumnIndex('ANGLE')
+    ksIindex        = madx.ColumnIndex('KSI')
+    k0lindex        = madx.ColumnIndex('K0L')
+    k0slindex       = madx.ColumnIndex('K0SL')
+    k1lindex        = madx.ColumnIndex('K1L')
+    k2lindex        = madx.ColumnIndex('K2L')
+    k3lindex        = madx.ColumnIndex('K3L')
+    k4lindex        = madx.ColumnIndex('K4L')
+    k5lindex        = madx.ColumnIndex('K5L')
+    k6lindex        = madx.ColumnIndex('K6L')
+    k1slindex       = madx.ColumnIndex('K1SL')
+    k2slindex       = madx.ColumnIndex('K2SL')
+    k3slindex       = madx.ColumnIndex('K3SL')
+    k4slindex       = madx.ColumnIndex('K4SL')
+    k5slindex       = madx.ColumnIndex('K5SL')
+    k6slindex       = madx.ColumnIndex('K6SL')
+    tiltindex       = madx.ColumnIndex('TILT')
+    tindex          = madx.ColumnIndex('KEYWORD')
+    alphaxindex     = madx.ColumnIndex('ALFX')
+    alphayindex     = madx.ColumnIndex('ALFY')
+    betaxindex      = madx.ColumnIndex('BETX')
+    betayindex      = madx.ColumnIndex('BETY')
+    vkickangleindex = madx.ColumnIndex('VKICK')
+    hkickangleindex = madx.ColumnIndex('HKICK')
+    e1index         = madx.ColumnIndex('E1')
+    e2index         = madx.ColumnIndex('E2')
+    fintindex       = madx.ColumnIndex('FINT')
+    fintxindex      = madx.ColumnIndex('FINTX')
+    hgapindex       = madx.ColumnIndex('HGAP')
+
     # iterate through input file and construct machine
     for i in range(startindex,stopindex):
         name = madx.sequence[i]
