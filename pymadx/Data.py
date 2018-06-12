@@ -266,7 +266,7 @@ class Tfs(object):
                 # return the original PTC column
                 return self.ColumnIndex(ptcName)
             else:
-                print("Columns "+madxIndex+" and "+ptcName+" missing from tfs file")
+                # print("Columns "+madxName+" and "+ptcName+" missing from tfs file")
                 return None
 
         # optical function list format:
