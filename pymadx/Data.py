@@ -830,7 +830,7 @@ class Tfs(object):
         else:
             raise ValueError(gmadname + ' not found in list')
 
-    def ComponentPerturbs(self, indexInSequence, terse=True):
+    def ComponentPerturbs(self, indexInSequence):
         """
         Returns names of variables which would perturb a particle.
         Some components written out in TFS are redundant,
@@ -843,9 +843,9 @@ class Tfs(object):
         terse           - print out the parameters which perturb if False
         """
 
-        return self.ElementPerturbs(self[indexInSequence], terse)
+        return self.ElementPerturbs(self[indexInSequence])
 
-    def ElementPerturbs(self, component, terse=True):
+    def ElementPerturbs(self, component):
         """
         Search an invidivual dictionary representing a row in the TFS file
         for as to whether it perturbs.
@@ -868,13 +868,6 @@ class Tfs(object):
             perturbingParameters.append('VKICK')
         if abs(component['HKICK']) > 0:
             perturbingParameters.append('HKICK')
-
-        if terse == False:
-            if perturbingParameters:
-                print "--Element: " + componentName + " @ index " + str(componentIndex) + " parameters:"
-                for variable in perturbingParameters:
-                    print variable + "= ", component[variable]
-                    print "Length = ", component['L']
 
         if (not perturbingParameters):
             return False
