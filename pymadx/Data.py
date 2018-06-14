@@ -76,6 +76,9 @@ class Tfs(object):
         self._verbose    = False
         if 'verbose' in kwargs:
             self._verbose = kwargs['verbose']
+        self._calculatessigma = True
+        if 'calculatesigma' in kwargs:
+            self._calculatessigma = kwargs['calculatesigma']
         if type(filename) == str:
             self.Load(filename, self._verbose)
         elif type(filename) == Tfs:
@@ -231,7 +234,8 @@ class Tfs(object):
 
                 element.append(apertype)
 
-        self._CalculateSigma()
+        if self._calculatessigma:
+            self._CalculateSigma()
         self.names = self.columns
 
     def _CalculateSigma(self):
@@ -266,7 +270,7 @@ class Tfs(object):
                 # return the original PTC column
                 return self.ColumnIndex(ptcName)
             else:
-                # print("Columns "+madxName+" and "+ptcName+" missing from tfs file")
+                print("Columns "+madxName+" and "+ptcName+" missing from tfs file")
                 return None
 
         # optical function list format:
@@ -1122,6 +1126,8 @@ class Aperture(Tfs):
 
     """
     def __init__(self, *args, **kwargs):
+        # set so TFS class doesn't calculate sigma as optics shouldn't exist in aperture tfs file
+        kwargs.update({'calculatesigma':False})
         Tfs.__init__(self, *args, **kwargs)
         self.debug = False
         if 'debug' in kwargs:
