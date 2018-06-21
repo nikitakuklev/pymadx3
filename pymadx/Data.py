@@ -997,52 +997,6 @@ class Tfs(object):
                 + self[secondName]["VKICK"]) == originalVKick
         return firstIndex, secondIndex
 
-    def WrapAroundElement(self, item):
-        """
-        Define new starting point for lattice.  The arg `item` can be
-        either the name of the element or its index and will
-        will become the new beginning of the lattice, and elements
-        that came before the new start are appended to the end.
-        S and SMID are updated as necessary.
-        """
-
-        if isinstance(item, basestring):
-            index = self.IndexFromName(item)
-        else:
-            index = item
-
-        # Get the element which will be the new start's S and SMID
-        # values.  These will be used for updating all the other
-        # element's S and SMID.
-        newStartS = self[index]['S']
-        newStartSMid = self[index]['SMID']
-        # Have to change SORIGINAL otherwise slicing won't work:
-        newStartSOriginal = self[index]['SORIGINAL']
-        # Getting the sequences for the new first and second
-        # parts.
-        newStart = self.sequence[index:]
-        newEnd = self.sequence[:index]
-
-        smax = self.smax
-        for i in range(index, len(self)):
-            elementS = self[i]['S']
-            elementSMid = self[i]['SMID']
-            elementSOriginal = self[i]['SORIGINAL']
-            self.EditComponent(i, 'S', elementS - newStartS)
-            self.EditComponent(i, 'SMID', elementSMid - newStartSMid)
-            self.EditComponent(i, 'SORIGINAL', elementSOriginal - newStartSOriginal)
-        for i in range(index):
-            elementS = self[i]['S']
-            elementSMid = self[i]['SMID']
-            elementSOriginal = self[i]['SORIGINAL']
-            self.EditComponent(i, 'S', elementS + (smax - newStartS))
-            self.EditComponent(i, 'SMID', elementSMid + (smax - newStartSMid))
-            self.EditComponent(i, 'SORIGINAL', elementSOriginal +
-                               (smax - newStartSOriginal))
-
-        self.sequence = self.sequence[index:] + self.sequence[:index]
-        self.sequence = self.sequence[0:-1]
-
     def ConcatenateMachine(self, *args):
         """
         This is used to concatenate machines.
