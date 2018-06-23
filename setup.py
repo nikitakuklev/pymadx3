@@ -11,11 +11,11 @@ except ImportError:
 
 setup(
     name='pymadx',
-    version='1.3',
+    version='1.3.0',
     packages=find_packages(exclude=["docs", "tests", "obsolete"]),
     # Not sure how strict these need to be...
     install_requires=["matplotlib >= 1.7.1",
-                      "numpy >= 1.3.0",
+                      "numpy >= 1.4",
                       "pytransport"],
     # Some version of python2.7
     python_requires="==2.7.*",
