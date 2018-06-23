@@ -60,21 +60,29 @@ def IndexOfElement(tfsinstance,markername):
         print 'Unknown element name'
     return i
 
-def GetSixTrackAperType(aper1,aper2,aper3,aper4):
+def GetSixTrackAperType(aper1, aper2, aper3, aper4):
+    """Return the Aperture type given the four aperture paramters.
+    This is required because SixTrack aperture description files do
+    not explictily state the aperture type.  It is instead encoded in
+    the aperture parameters."""
+    # I got this information from
+    # http://lhc-collimation-project.web.cern.ch/lhc-collimation-project/BeamLossPattern/Code/BeamLossPattern_2005-06-17.tgz
+    # on the page http://lhc-collimation-project.web.cern.ch/lhc-collimation-project/BeamLossPattern.htm#Source
+    # By extracting the above tarball and inspecting Aperture.cpp, the
+    # logic implemented below is found.
     if aper1 == 0 and aper2 == 0 and aper3 == 0 and aper4== 0:
         return ''
-    elif aper1 == aper3 and aper2 == aper4:
+    elif aper1 == aper3 and aper2 == aper4: # Line 221 of Aperture.cpp
         return 'ELLIPSE'
-    elif aper1 == aper3 and aper2 < aper4:
+    elif aper1 == aper3 and aper2 < aper4: #
         return 'LHCSCREEN'
     elif aper1 < aper3 and aper2 == aper4:
         return 'LHCSCREEN'
     elif aper1 == 0 and aper2 == 0:
-        return 'RACETRACK'
+        return 'RACETRACK' # Line 252 of Aperture.cpp
     elif aper3 == 0:
         return 'RECTANGLE'
-    else:
-        s = "WARNING: The given aperture is not classified among the known types\n"
-        s += "A1 = " + str(aper1) + ", A2 = " +  str(aper2) + ", A3 = "
-        s += str(aper3) + ", A4 = " + str(aper4)
-        raise AttributeError(s)
+    msg = ("Sixtrack aperture not recognised:"
+           " (A1, A2, A3, A4) = ({}, {}, {}, {})".format(aper1, aper2,
+                                                         aper3, aper4))
+    raise ValueError(msg)
