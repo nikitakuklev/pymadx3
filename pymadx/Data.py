@@ -1069,7 +1069,7 @@ _madxAperTypes = { 'CIRCLE',
 
 class Aperture(Tfs):
     """
-    A class based on (ie inherits) the Tfs class for reading aperture information.
+    Inherits Tfs for reading aperture information.
     This allows madx aperture information in Tfs format to be loaded, filtered and
     queried. This also provides the ability to suggest whether an element should be
     split and therefore what the aperture should be.
