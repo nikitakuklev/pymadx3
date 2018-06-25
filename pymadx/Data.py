@@ -807,8 +807,8 @@ class Tfs(object):
     def IndexFromGmadName(self, gmadname, verbose=False):
         """
         Returns the indices of elements which match the supplied gmad name.
-        Useful because tfs2gmad strips punctuation from the component names, 
-        and irritating otherwise to work back. When multiple elements of the 
+        Useful because tfs2gmad strips punctuation from the component names,
+        and irritating otherwise to work back. When multiple elements of the
         name match, returns the indices of all the components in a list.
         Arguments:
         gmadname     :    The gmad name of a component to search for.
@@ -1138,10 +1138,10 @@ class Aperture(Tfs):
 
     def PlotN1(self, machine=None, outputfilename=None):
         """
-        Plot the N1 aperture value from MADX. 
-        
+        Plot the N1 aperture value from MADX.
+
         Requires N1 and S column.
-        
+
         Optional "machine" argument is string to or pymadx.Data.Tfs instance
         for twiss description to provide a machine diagram on top.
         """
