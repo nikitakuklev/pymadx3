@@ -1306,6 +1306,25 @@ class Aperture(Tfs):
         else:
             return index
 
+    def GetLatchedAperturesForSRange(self, start, end):
+        i_s_within_range = [(i, s) for i, s in
+                            enumerate(self.GetColumn("S"))
+                            if s >= start and s < end]
+        first_s = i_s_within_range[0][1]
+        if first_s > start:
+            first_i = i_s_within_range[0][0]
+            # Get the aperture immediately prior to the first one,
+            # outside the start range.
+            i_s_within_range = ([(first_i - 1, self[first_i - 1]['S'])]
+                                + i_s_within_range)
+        return [self.GetLatchedAperture(s) for _, s in i_s_within_range]
+
+    def GetLatchedAperture(self, s):
+        for i, element_s in enumerate(self.GetColumn("S")):
+            if s < element_s:
+                return self[i - 1]
+        raise ValueError("Unable to determine aperture.")
+
     def GetApertureAtS(self, sposition):
         """
         Return a dictionary of the aperture information specified at the closest
