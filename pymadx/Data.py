@@ -378,10 +378,13 @@ class Tfs(object):
 
     def __repr__(self):
         if self.filename is not None:
-            return "<pymadx.Data.Tfs, {} items in lattice ({})>".format(
+            return "<{}.{}, {} items in lattice ({})>".format(
+                __name__,
+                type(self).__name__,
                 self.nitems,
                 os.path.basename(self.filename))
-        return "<pymadx.Data.Tfs, {} items in lattice>".format(self.nitems)
+        return "<{}.{}, {} items in lattice>".format(
+            __name__, type(self).__name__, self.nitems)
 
     def __len__(self):
         return len(self.sequence)
