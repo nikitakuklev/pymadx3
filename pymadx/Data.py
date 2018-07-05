@@ -1351,31 +1351,27 @@ class Aperture(Tfs):
     def GetExtentAtS(self, sposition):
         """
         Get the x and y maximum +ve extent (assumed symmetric) for a given
-        s position.  Calls GetApertureAtS and then GetApertureExtent.
+        s position.
         """
-        rd = self.GetApertureAtS(sposition)
-        aper1 = rd('APER_1')
-        aper2 = rd('APER_2')
-        aper3 = rd('APER_3')
-        aper4 = rd('APER_4')
-        apertureType = rd('APERTYPE')
-
-        x,y     = GetApertureExtent(apertureType, aper1, aper2, aper3, aper4)
+        element = self.GetApertureAtS(sposition)
+        x,y = GetApertureExtent(element['APER_1'],
+                                element['APER_2'],
+                                element['APER_3'],
+                                element['APER_4'],
+                                element['APERTYPE'])
         return x,y
-
-    def GetApertureForElementNamed(self, name):
-        """
-        Return a dictionary of the aperture information by the name of the element.
-        """
-        return self.GetRow(name)
 
     def GetExtent(self, name):
         """
         Get the x and y maximum +ve extent (assumed symmetric) for a given
-        entry by name.  Calls GetApertureForElementNamed and then GetApertureExtent.
+        entry by name.
         """
-        element = self.GetApertureForElementNamed(name)
-        x,y     = GetApertureExtent(element)
+        element = self[name]
+        x,y = GetApertureExtent(element['APER_1'],
+                                element['APER_2'],
+                                element['APER_3'],
+                                element['APER_4'],
+                                element['APERTYPE'])
         return x,y
 
     def GetExtentAll(self):
