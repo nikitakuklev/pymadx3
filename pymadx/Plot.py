@@ -163,7 +163,7 @@ def Sigma(tfsfile, title='', outputfilename=None, machine=True, dispersion=False
 
     f    = _plt.figure(figsize=(9,5))
     axoptics = f.add_subplot(111)
-    
+
     yx = d['sigmax']
     yy = d['sigmay']
     axoptics.plot(d['s'], yx, 'b-', label='x')
@@ -248,14 +248,14 @@ def Aperture(aperture, machine=None, outputfilename=None, plot="xy", plotapertyp
 
 def ApertureN1(aperture, machine=None, outputfilename=None):
     """
-    Plot the N1 aperture value from MADX. 
+    Plot the N1 aperture value from MADX.
 
     Requires N1 and S column.
 
     Optional "machine" argument is string to or pymadx.Data.Tfs instance
     for twiss description to provide a machine diagram on top.
     """
-    
+
     import pymadx.Data as _Data
     aper = _Data.CheckItsTfsAperture(aperture)
 
@@ -276,7 +276,7 @@ def ApertureN1(aperture, machine=None, outputfilename=None):
             outputfilename = outputfilename.split('.')[0]
         _plt.savefig(outputfilename+'.pdf')
         _plt.savefig(outputfilename+'.png')
-        
+
 def _ApertypeColorMap():
     #Some nice colors
     _colourCodes = ['#C03028',
@@ -320,7 +320,6 @@ def _ApertypeToColor(apertype, cmap=_ApertypeColorMap()):
 def _AddColorLegend(colors, cmap=_ApertypeColorMap()):
     found_cols = set(colors)
     typemap = dict((v,k) for k,v in cmap.iteritems()) #invert to get apertype from color
-    handles = []
     for col in found_cols:
         _plt.scatter(None,None,color=col, label=typemap[col].lower())
 
@@ -343,7 +342,7 @@ def _PrepareMachineAxes(figure):
 def _AdjustExistingAxes(figure, fraction=0.9, tightLayout=True):
     """
     Fraction is fraction of height all subplots will be after adjustment.
-    Default is 0.9 for 90% of height. 
+    Default is 0.9 for 90% of height.
     """
     # we have to set tight layout before adjustment otherwise if called
     # later it will cause an overlap with the machine diagram
