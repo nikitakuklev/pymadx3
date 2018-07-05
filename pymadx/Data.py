@@ -1185,7 +1185,7 @@ class Aperture(Tfs):
         """
         Return a copy of this instance with any null aperture types removed.
 
-        Aperture type of "" will be removed.
+        Aperture type of "" and "NONE" will be removed.
         """
         atKey = 'APERTYPE'
         if atKey not in self.columns:
@@ -1195,7 +1195,7 @@ class Aperture(Tfs):
         a = Aperture(debug=self.debug, quiet=True)
         a._CopyMetaData(self)
         for item in self:
-            if item[atKey] == "":
+            if item[atKey] == "" or item[atKey] == "NONE":
                 pass #don't copy
             else:
                 #copy over as normal
