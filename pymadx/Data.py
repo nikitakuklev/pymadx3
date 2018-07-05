@@ -1343,7 +1343,7 @@ def GetApertureExtent(aper1, aper2, aper3, aper4, aper_type):
     returns x,y
     """
     # protect against empty aperture type
-    if aper_type == "":
+    if aper_type == "" or aper_type == "NONE":
         return 0,0
 
     if aper_type not in _madxAperTypes:
