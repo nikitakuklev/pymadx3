@@ -1510,13 +1510,12 @@ def CheckItsTfsAperture(tfsfile):
 
     tfsfile can be either a tfs instance or a string.
     """
-    if type(tfsfile) == str:
-        aper = Aperture(tfsfile)
-    elif type(tfsfile) == Aperture:
-        aper = tfsfile
-    else:
-        raise IOError("Not pymadx.Aperture.Aperture file type: "+str(tfsfile))
-    return aper
+    if isinstance(tfsfile, basestring):
+        return Aperture(tfsfile)
+    elif isinstance(tfsfile, Aperture):
+        return tfsfile
+    raise IOError("Not pymadx.Aperture.Aperture file type: {}".format(tfsfile))
+
 
 def PrintMADXApertureTypes():
     print 'Valid MADX aperture types are:'
