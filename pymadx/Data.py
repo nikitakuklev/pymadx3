@@ -1105,7 +1105,7 @@ class Aperture(Tfs):
             s = item['S']
             if s in self.cache.keys():
                 #if existing one is zero and other isn't replace it
-                if ZeroAperture(self.cache[s]) and NonZeroAperture(item):
+                if _ZeroAperture(self.cache[s]) and _NonZeroAperture(item):
                     self.cache[s] = item
             else:
                 self.cache[s] = item
@@ -1472,7 +1472,7 @@ def GetApertureExtent(aper1, aper2, aper3, aper4, aper_type):
     return x,y
 
 
-def NonZeroAperture(item):
+def _NonZeroAperture(item):
     tolerance = 1e-9
     test1 = item['APER_1'] > tolerance
     test2 = item['APER_2'] > tolerance
@@ -1481,7 +1481,7 @@ def NonZeroAperture(item):
 
     return test1 or test2 or test3 or test4
 
-def ZeroAperture(item):
+def _ZeroAperture(item):
     tolerance = 1e-9
     test1 = item['APER_1'] < tolerance
     test2 = item['APER_2'] < tolerance
