@@ -1382,7 +1382,22 @@ class Aperture(Tfs):
         returns x,y where x and y are 1D numpy arrays
         """
         x,y = GetApertureExtents(self)
+        aper1 = self.GetColumn('APER_1')
+        aper2 = self.GetColumn('APER_2')
+        aper3 = self.GetColumn('APER_3')
+        aper4 = self.GetColumn('APER_4')
+        apertureType = self.GetColumn('APERTYPE')
 
+        x = []
+        y = []
+        for i, _ in enumerate(self):
+            xt,yt = GetApertureExtent(aper1[i], aper2[i], aper3[i], aper4[i],
+                                      apertureType[i])
+            x.append(xt)
+            y.append(yt)
+
+        x = _np.array(x)
+        y = _np.array(y)
         return x,y
 
     def ReplaceType(self, existingType, replacementType):
@@ -1420,29 +1435,6 @@ def PrintMADXApertureTypes():
     for t in _madxAperTypes:
         print t
 
-def GetApertureExtents(aperture):
-    """
-    Loop over a pymadx.Aperture.Aperture instance and calculate the maximum
-    +ve extent (assumed symmetric) in x and y.
-
-    returns x,y where x and y and 1D numpy arrays
-    """
-    aper1 = aperture.GetColumn('APER_1')
-    aper2 = aperture.GetColumn('APER_2')
-    aper3 = aperture.GetColumn('APER_3')
-    aper4 = aperture.GetColumn('APER_4')
-    apertureType = aperture.GetColumn('APERTYPE')
-
-    x = []
-    y = []
-    for i in range(len(aperture)):
-        xt,yt = GetApertureExtent(aper1[i], aper2[i], aper3[i], aper4[i], apertureType[i])
-        x.append(xt)
-        y.append(yt)
-
-    x = _np.array(x)
-    y = _np.array(y)
-    return x,y
 
 def GetApertureExtent(aper1, aper2, aper3, aper4, aper_type):
     """
