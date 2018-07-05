@@ -1381,7 +1381,6 @@ class Aperture(Tfs):
 
         returns x,y where x and y are 1D numpy arrays
         """
-        x,y = GetApertureExtents(self)
         aper1 = self.GetColumn('APER_1')
         aper2 = self.GetColumn('APER_2')
         aper3 = self.GetColumn('APER_3')
