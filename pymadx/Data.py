@@ -1156,11 +1156,14 @@ class Aperture(Tfs):
         ts = set(self.GetColumn('APERTYPE'))
         for t in ts:
             if t not in _madxAperTypes:
-                if t.isspace() or not t:
-                    pass #quiet for empty strings or strings with only whitespace (can be default)
+                if t == "NONE" or t.isspace() or not t:
+                    # ignore blank type or NONE type.
+                    pass
                 else:
                     failed = True
-                    print 'Warning: Aperture type \"',t,'\" is not a valid MADX aperture type.'
+                    msg = ('Warning: Aperture type "{}" '
+                           'is not a valid MADX Aperture type. ').format(t)
+                    print msg
 
         if failed:
             PrintMADXApertureTypes()
