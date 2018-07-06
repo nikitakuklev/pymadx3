@@ -1181,8 +1181,93 @@ class Aperture(Tfs):
         a._UpdateCache()
         return a
 
-    def GetUniqueSPositions(self):
-        return self.RemoveDuplicateSPositions()
+
+    def SampleAperture(self):
+        points_apertures_map = {} # what we return.
+
+        i_thin_apertures = self._GetThinApertures()
+        i_thick_apertures = self._GetThickApertures()
+        i_thick_no_apertures = self._GetThickNoApertures()
+
+        for i in i_thick_apertures:
+            end = self[i]['S']
+            start = end - self[i]['L']
+            for point in _np.linspace(start, end, 20):
+                points_apertures_map[point] = self[i]
+
+        for i in i_thick_no_apertures:
+            end = self[i]['S']
+            start = end - self[i]['L']
+
+            aper_before = i - 1
+            while self[aper_before]['APERTYPE'] in {"NONE", ""}:
+                aper_before -= 1
+
+            aper_after = i + 1
+            while self[aper_after]['APERTYPE'] in {"NONE", ""}:
+                aper_after -= 1
+
+            if self[aper_before]['APERTYPE'] == self[aper_after]['APERTYPE']:
+            # Then we can interpolate
+                interpolated_aperture = _interpolateApertures(
+                    [self[aper_before], self[aper_after]])
+                for point in _np.linspace(start, end, 20):
+                    points_apertures_map[point] = interpolated_aperture
+            else:
+                for point in _np.linspace(start, end, 20):
+                    points_apertures_map[point] = self[aper_before]
+        return points_apertures_map
+
+    def _GetThickNoApertures(self):
+        i_thick_elements = [i
+                           for i, l in enumerate(self.GetColumn('L'))
+                           if l > 0.0]
+        bad_apers = {"NONE", ""}
+        i_thick_no_apertures = [i for i in i_thick_elements
+                                if self[i]["APERTYPE"] in bad_apers]
+        return sorted(i_thick_no_apertures)
+
+    def _GetThickApertures(self):
+        """Get the elements which have valid apertures and non-zero lengths."""
+        i_thick_elements = [i
+                           for i, l in enumerate(self.GetColumn('L'))
+                           if l > 0.0]
+        bad_apers = {"NONE", ""}
+        i_thick_valid_apertures = [i for i in i_thick_elements
+                                   if self[i]["APERTYPE"] not in bad_apers]
+        return sorted(i_thick_valid_apertures)
+
+    def _GetThinApertures(self):
+        i_thin_elements = [i
+                           for i, l in enumerate(self.GetColumn('L'))
+                           if l == 0.0]
+        bad_apers = {"NONE", ""}
+        i_thin_valid_apertures = [i for i in i_thin_elements
+                                  if self[i]["APERTYPE"] not in bad_apers]
+        return sorted(i_thin_valid_apertures)
+
+    # def _GetApertureAtS(self, position):
+    #     """Try getting the aperture at the position, but only if the
+    #     element at the position has a valid aperture, otherwise raise
+    #     ValueError."""
+    #     i = self.IndexFromNearestS(s)
+    #     if self[i]['APERTYPE'] in _madxAperTypes:
+    #         return {(key, self[i][key]) for key in ["APERTYPE",
+    #                                                 "APER_1",
+    #                                                 "APER_2",
+    #                                                 "APER_3",
+    #                                                 "APER_4"]}
+    #     raise ValueError("invalid aperture type")
+
+
+    # def _GetInterpolatedAperture(self, position):
+    #     i = self.IndexFromNearestS(position)
+
+    # def _GetLatchedAperture(self, s, lastvalidaper):
+    #     for i, element_s in enumerate(self.GetColumn("S")):
+    #         if s < element_s:
+    #             return self[i - 1]
+    #     raise ValueError("Unable to determine aperture.")
 
     def RemoveDuplicateSPositions(self):
         """
@@ -1212,24 +1297,19 @@ class Aperture(Tfs):
         else:
             return index
 
-    def GetLatchedAperturesForSRange(self, start, end):
-        i_s_within_range = [(i, s) for i, s in
-                            enumerate(self.GetColumn("S"))
-                            if s >= start and s < end]
-        first_s = i_s_within_range[0][1]
-        if first_s > start:
-            first_i = i_s_within_range[0][0]
-            # Get the aperture immediately prior to the first one,
-            # outside the start range.
-            i_s_within_range = ([(first_i - 1, self[first_i - 1]['S'])]
-                                + i_s_within_range)
-        return [self.GetLatchedAperture(s) for _, s in i_s_within_range]
+    # def GetLatchedAperturesForSRange(self, start, end):
+    #     i_s_within_range = [(i, s) for i, s in
+    #                         enumerate(self.GetColumn("S"))
+    #                         if s >= start and s < end]
+    #     first_s = i_s_within_range[0][1]
+    #     if first_s > start:
+    #         first_i = i_s_within_range[0][0]
+    #         # Get the aperture immediately prior to the first one,
+    #         # outside the start range.
+    #         i_s_within_range = ([(first_i - 1, self[first_i - 1]['S'])]
+    #                             + i_s_within_range)
+    #     return [self.GetLatchedAperture(s) for _, s in i_s_within_range]
 
-    def GetLatchedAperture(self, s):
-        for i, element_s in enumerate(self.GetColumn("S")):
-            if s < element_s:
-                return self[i - 1]
-        raise ValueError("Unable to determine aperture.")
 
     def GetApertureAtS(self, sposition):
         """
@@ -1388,3 +1468,16 @@ def _ZeroAperture(item):
     test4 = item['APER_4'] < tolerance
 
     return test1 and test2 and test3 and test4
+
+def _interpolateApertures(items):
+    nitems = len(items)
+    assert len(set(item['APERTYPE'] for item in items)) == 1
+    aper1 = sum([item['APER_1'] for item in items]) / nitems
+    aper2 = sum([item['APER_2'] for item in items]) / nitems
+    aper3 = sum([item['APER_3'] for item in items]) / nitems
+    aper4 = sum([item['APER_4'] for item in items]) / nitems
+    return {"APERTYPE": item['APERTYPE'],
+            "APER_1": aper1,
+            "APER_2": aper2,
+            "APER_3": aper3,
+            "APER_4": aper4}
