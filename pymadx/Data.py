@@ -1481,3 +1481,39 @@ def _interpolateApertures(items):
             "APER_2": aper2,
             "APER_3": aper3,
             "APER_4": aper4}
+
+def _MeshElement(ele):
+    mesh_interval_length = 100 # 100mm = 10cm
+    end = ele['S'] * 1000 # * 1000 for mm.
+    length = ele['L'] * 1000
+    if length <= mesh_interval_length:
+        raise ValueError("Cannot mesh element with too small length!")
+    start = end - length
+    # Round start of element to nearest mesh point
+    start_mesh = round(start, -2)
+    end_mesh = round(end, -2)
+    # Get the first and last meshs point that are inside the element.
+    # logic to ensure [start_mesh, end_mesh).
+    if start_mesh < start:
+        start_mesh += mesh_interval_length
+    if end_mesh >= end:
+        end_mesh -= mesh_interval_length
+    try:
+        assert start_mesh >= start, "Mesh point outside element!"
+        assert end_mesh < end, "Mesh point outside element!"
+    except:
+        from IPython import embed; embed()
+    # start_mesh but distance from start of element.  this is much
+    # more useful for our purposes than a global S.
+    local_mesh_length = end_mesh - start_mesh
+    local_start_mesh = start_mesh - start
+    local_end_mesh = local_start_mesh + local_mesh_length
+
+    # We want end_mesh to be < 0.1 more than the lenght of the
+    # elmeent because arange naturally does not include the final
+    # element.  so this way we do not overstep beyond end of element.
+    return (_np.arange(local_start_mesh,
+                      # Add to end to get end to be included in array.
+                      local_end_mesh + mesh_interval_length,
+                      mesh_interval_length)
+            / 1000.0) # Convert back to metres!!!
