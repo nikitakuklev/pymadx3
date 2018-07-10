@@ -8,6 +8,7 @@ General utilities for day to day housekeeping
 """
 
 import os
+import math
 
 def CheckFileExists(filename):
     i = 1
@@ -60,28 +61,71 @@ def IndexOfElement(tfsinstance,markername):
         print 'Unknown element name'
     return i
 
-def GetSixTrackAperType(aper1, aper2, aper3, aper4):
+def GetSixTrackAperType(a1, a2, a3, a4):
     """Return the Aperture type given the four aperture paramters.
     This is required because SixTrack aperture description files do
     not explictily state the aperture type.  It is instead encoded in
+    the aperture parameters.  In general these will be RECTELLIPSEs"""
+
+    # Rectellipse is the intersection of an ellipse with a concentric rectangle.
+    # a1 = rectangle half-width (i.e. x)
+    # a2 = rectangle half-height (i.e. y)
+    # a3 = ellipse x semi-axis  (i.e. x)
+    # a4 = ellipse y semi-axis  (i.e. y)
+
+        """Return the Aperture type given the four aperture paramters.
+    This is required because SixTrack aperture description files do
+    not explictily state the aperture type.  It is instead encoded in
     the aperture parameters."""
-    # I got this information from
-    # http://lhc-collimation-project.web.cern.ch/lhc-collimation-project/BeamLossPattern/Code/BeamLossPattern_2005-06-17.tgz
-    # on the page http://lhc-collimation-project.web.cern.ch/lhc-collimation-project/BeamLossPattern.htm#Source
-    # By extracting the above tarball and inspecting Aperture.cpp, the
-    # logic implemented below is found.
-    if aper1 == 0 and aper2 == 0 and aper3 == 0 and aper4== 0:
-        return ''
-    elif aper1 == aper3 and aper2 == aper4: # Line 221 of Aperture.cpp
-        return 'ELLIPSE'
-    elif aper1 == aper3 and aper2 < aper4: #
-        return 'LHCSCREEN'
-    elif aper1 < aper3 and aper2 == aper4:
-        return 'LHCSCREEN'
-    elif aper1 == 0 and aper2 == 0:
-        return 'RACETRACK' # Line 252 of Aperture.cpp
-    elif aper3 == 0:
-        return 'RECTANGLE'
+
+    # Rectellipse is the intersection of an ellipse with a concentric rectangle.
+    # a1 = rectangle half-width (i.e. x)
+    # a2 = rectangle half-height (i.e. y)
+    # a3 = ellipse x semi-axis  (i.e. x)
+    # a4 = ellipse y semi-axis  (i.e. y)
+
+    # In general all the apertures are rectellipses except for two
+    # cases:
+
+    # a3=0 denotes st a rectangle (since a3=0 = empty set and thus has
+    # no meaning for a rectellipse).
+
+    # a1 == 0 and a2 == 0 apparently denotes a RACETRACK, but I'm not
+    # sure BeamLossPattern supports this (even though there is the source
+    # for it).
+
+    # # if the rectangle is bigger than the ellipse bring it down to size.
+    # if a1 > a3 and a3 != 0:
+    #     a1 = a3
+    # # This is saying teh same as above, but in different dimension.
+    # if a2 > a4 and a4 > 0:
+    #     a2 = a4
+    # # if the corned of the rectangle is inside the ellipse then make
+    # # the ellipse bigger so that it is definitely big enough.  I have
+    # # no idea why this step is here other than to copy others.
+    # if a1 != 0 and a2 != 0 and a3 != 0 and (a1/a3)**2 + (a2/a4)**2 < 0.99999999:
+    #     a3 = a1 * math.sqrt(2)
+    #     a4 = a1 * math.sqrt(2)
+    # # if a4 is negative or >0.5 then it must be a rectangle (because
+    # # a4 of those values can only reasonably be an angle). and if
+    # # it's a rectangle then a3 must be 0.
+    # if a4 < 0 or a4 > 0.5:
+    #     a3 = 0
+
+    # Rectellipse with the parameters which result in an ellipse
+    if a1 == a3 and a2 == a4:
+        return "RECTELLIPSE"
+    # rectellipse with horizontal edges on top (parallel to x-axis)
+    elif a1 == a3 and a2 < a4:
+        return "RECTELLIPSE"
+    # rectellipse with horizontal edges on top (parallel to y-axis)
+    elif a1 < a3 and a2 == a4:
+        return "RECTELLIPSE"
+    elif a1 == 0 and a2 == 0:
+        raise ValueError("Racetrack!  Not supported by BeamLossPattern!")
+    elif a3 == 0:
+        raise ValueError("Rectangle!  Not supported here yet!")
+
     msg = ("Sixtrack aperture not recognised:"
            " (A1, A2, A3, A4) = ({}, {}, {}, {})".format(aper1, aper2,
                                                          aper3, aper4))
