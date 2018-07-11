@@ -220,20 +220,6 @@ class Tfs(object):
         else:
             self.smax = 0
 
-        #Check to see if input Tfs is Sixtrack style (i.e no APERTYPE, and is instead implicit)
-        if 'APER_1' in self.columns and 'APERTYPE' not in self.columns:
-            self.columns.append('APERTYPE')
-            self.formats.append('%s')
-
-            for key, element in self.data.iteritems():
-                aper1 = element[self.columns.index('APER_1')]
-                aper2 = element[self.columns.index('APER_2')]
-                aper3 = element[self.columns.index('APER_3')]
-                aper4 = element[self.columns.index('APER_4')]
-                apertype = _GetSixTrackAperType(aper1,aper2,aper3,aper4)
-
-                element.append(apertype)
-
         if self._calculatessigma:
             self._CalculateSigma()
         self.names = self.columns
