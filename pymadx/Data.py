@@ -967,12 +967,14 @@ class Aperture(Tfs):
 
      """
 
-    def __init__(self, filename=None, verbose=False, beamLossPattern=False):
+    def __init__(self, filename=None, verbose=False,
+                 beamLossPattern=False, cache=True):
         Tfs.__init__(self, filename=filename, verbose=verbose)
 
         # the tolerance below which, the aperture is considered 0
         self._tolerance = 1e-6
-        self._UpdateCache()
+        if self._cache:
+            self._UpdateCache()
         if verbose:
             self.CheckKnownApertureTypes()
         if beamLossPattern:
@@ -1102,7 +1104,8 @@ class Aperture(Tfs):
                 #copy over as normal
                 key = self.sequence[self._iterindex]
                 a._AppendDataEntry(key, self.data[key])
-        a._UpdateCache()
+        if self._cache:
+            a._UpdateCache()
         return a
 
     def RemoveBelowValue(self, limits, keys='all'):
@@ -1139,7 +1142,8 @@ class Aperture(Tfs):
             if not abovelimittotal:
                 key = self.sequence[self._iterindex]
                 a._AppendDataEntry(key, self.data[key])
-        a._UpdateCache()
+        if self._cache:
+            a._UpdateCache()
         return a
 
     def RemoveAboveValue(self, limits=8, keys='all'):
@@ -1176,7 +1180,8 @@ class Aperture(Tfs):
             if not abovelimittotal:
                 key = self.sequence[self._iterindex]
                 a._AppendDataEntry(key, self.data[key])
-        a._UpdateCache()
+        if self._cache:
+            a._UpdateCache()
         return a
 
 
@@ -1277,10 +1282,13 @@ class Aperture(Tfs):
         Return a dictionary of the aperture information specified at the closest
         S position to that requested - may be before or after that point.
         """
-
-        a = Aperture(debug=self.debug, verbose=False)
-        a._CopyMetaData(self)
-        rowdict = self.cache[self._ssorted[self._GetIndexInCacheOfS(sposition)]]
+        if self._cache:
+            a = Aperture(debug=self.debug, verbose=False)
+            a._CopyMetaData(self)
+            rowdict = self.cache[self._ssorted[self._GetIndexInCacheOfS(sposition)]]
+        else:
+            i = self.IndexFromNearestS(sposition)
+            rowdict = self[i]
         #key = self.sequence[self._GetIndexInCacheOfS(sposition)]
         #a._AppendDataEntry(key, self.data[key])
         #a._UpdateCache()
