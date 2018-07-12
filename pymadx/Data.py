@@ -43,9 +43,9 @@ class Tfs(object):
 
     Examples:
 
-    >>> a.['IP.1'] #returns dict for element named "IP.1"
-    >>> a[:30]     #returns list of dicts for elements up to number 30
-    >>> a[345]     #returns dict for element number 345 in sequence
+    >>> a['IP.1']  # returns dict for element named "IP.1"
+    >>> a[:30]     # returns list of dicts for elements up to number 30
+    >>> a[345]     # returns dict for element number 345 in sequence
 
     """
     # The Tfs class data model:
