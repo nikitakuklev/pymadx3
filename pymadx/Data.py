@@ -978,9 +978,9 @@ class Aperture(Tfs):
         if verbose:
             self.CheckKnownApertureTypes()
         if beamLossPattern:
-            self._SetBeamLossPatternAperTypes()
+            self._ProcessBeamLossPatternApertures()
 
-    def _SetBeamLossPatternAperTypes(self):
+    def _ProcessBeamLossPatternApertures(self):
         # Check to see if input Tfs is Sixtrack style (i.e no APERTYPE,
         # and is instead implicit according to what I've seen in the
         # BeamLossPattern source.
@@ -995,6 +995,10 @@ class Aperture(Tfs):
                 aper4 = element[self.columns.index('APER_4')]
                 apertype = _GetSixTrackAperType(aper1,aper2,aper3,aper4)
                 element.append(apertype)
+        else:
+            raise TypeError("Apertype is present in input.")
+        for data in self:
+            ProcessSixTrackAper(data)
 
     def _UpdateCache(self):
         # create a cache of which aperture is at which s position
@@ -1486,3 +1490,42 @@ def _MeshElement(ele):
                       local_end_mesh + mesh_interval_length,
                       mesh_interval_length)
             / 1000.0) # Convert back to metres!!!
+def ProcessSixTrackAper(item):
+    """Processes the aperture so that it can be used for
+    interpolation.  E.g. the bounding rectangle should tightly wrap
+    the contained ellipse.  This has no impact on the aperture,
+    itself, but the resulting linearly interpolated apertures will
+    be more correct."""
+    # Note this is a reimplementation of the logic from
+    # BeamLossPattern.  I understand 3/4 of the following steps.  The
+    # step I don't understand is why, if the rectangle is inside the
+    # ellipse then, the ellipse must be increased in size by sqrt(2)
+    # (doubling of the area).  I do it anyway.
+    a1 = item["APER_1"]
+    a2 = item["APER_2"]
+    a3 = item["APER_3"]
+    a4 = item["APER_4"]
+
+    # if the rectangle is bigger than the ellipse bring it down to
+    # size to tightly wrap the contained ellipse.
+    if a1 > a3 and a3 != 0:
+        a1 = a3
+    # This is saying the same as above, but in different dimension.
+    if a2 > a4 and a4 > 0:
+        a2 = a4
+    # if the corner of the rectangle is inside the ellipse then make
+    # the ellipse bigger so that it is definitely big enough.  I have
+    # no idea why this step is here other than to copy others.
+    if a1 != 0 and a2 != 0 and a3 != 0 and (a1/a3)**2 + (a2/a4)**2 < 0.99999999:
+        a3 = a1 * math.sqrt(2)
+        a4 = a2 * math.sqrt(2)
+    # if a4 is negative or >0.5 then it must be a rectangle (because
+    # a4 of those values can only reasonably be an angle). and if
+    # it's a rectangle then a3 must be 0.
+    if a4 < 0 or a4 > 0.5:
+        a3 = 0
+
+    item["APER_1"] = a1
+    item["APER_2"] = a2
+    item["APER_3"] = a3
+    item["APER_4"] = a4
