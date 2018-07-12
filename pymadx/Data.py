@@ -1244,29 +1244,6 @@ class Aperture(Tfs):
                                   if self[i]["APERTYPE"] not in bad_apers]
         return sorted(i_thin_valid_apertures)
 
-    # def _GetApertureAtS(self, position):
-    #     """Try getting the aperture at the position, but only if the
-    #     element at the position has a valid aperture, otherwise raise
-    #     ValueError."""
-    #     i = self.IndexFromNearestS(s)
-    #     if self[i]['APERTYPE'] in _madxAperTypes:
-    #         return {(key, self[i][key]) for key in ["APERTYPE",
-    #                                                 "APER_1",
-    #                                                 "APER_2",
-    #                                                 "APER_3",
-    #                                                 "APER_4"]}
-    #     raise ValueError("invalid aperture type")
-
-
-    # def _GetInterpolatedAperture(self, position):
-    #     i = self.IndexFromNearestS(position)
-
-    # def _GetLatchedAperture(self, s, lastvalidaper):
-    #     for i, element_s in enumerate(self.GetColumn("S")):
-    #         if s < element_s:
-    #             return self[i - 1]
-    #     raise ValueError("Unable to determine aperture.")
-
     def RemoveDuplicateSPositions(self):
         """
         Takes the first aperture value for entries with degenerate S positions and
@@ -1294,20 +1271,6 @@ class Aperture(Tfs):
             return index - 1
         else:
             return index
-
-    # def GetLatchedAperturesForSRange(self, start, end):
-    #     i_s_within_range = [(i, s) for i, s in
-    #                         enumerate(self.GetColumn("S"))
-    #                         if s >= start and s < end]
-    #     first_s = i_s_within_range[0][1]
-    #     if first_s > start:
-    #         first_i = i_s_within_range[0][0]
-    #         # Get the aperture immediately prior to the first one,
-    #         # outside the start range.
-    #         i_s_within_range = ([(first_i - 1, self[first_i - 1]['S'])]
-    #                             + i_s_within_range)
-    #     return [self.GetLatchedAperture(s) for _, s in i_s_within_range]
-
 
     def GetApertureAtS(self, sposition):
         """
