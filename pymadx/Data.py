@@ -58,7 +58,7 @@ class Tfs(object):
     # components with identical names in the sequence will be
     # identical, but the optical functions at that point will in
     # general be different.
-    def __init__(self,filename=None,**kwargs):
+    def __init__(self,filename=None, verbose=False):
         object.__init__(self) #this allows type comparison for this class
         self.index       = []
         self.header      = {}
@@ -74,14 +74,10 @@ class Tfs(object):
         self.smin        = 0
         self.ptctwiss    = False # whether data was generated via ptctwiss
         self._verbose    = False
-        if 'verbose' in kwargs:
-            self._verbose = kwargs['verbose']
-        self._calculatessigma = True
-        if 'calculatesigma' in kwargs:
-            self._calculatessigma = kwargs['calculatesigma']
-        if type(filename) == str:
-            self.Load(filename, self._verbose)
-        elif type(filename) == Tfs:
+
+        if isinstance(filename, basestring):
+            self.Load(filename, verbose=verbose)
+        elif isinstance(filename, Tfs):
             self._DeepCopy(filename)
 
     def Clear(self):
@@ -220,11 +216,13 @@ class Tfs(object):
         else:
             self.smax = 0
 
-        if self._calculatessigma:
-            self._CalculateSigma()
+        self._CalculateSigma()
         self.names = self.columns
 
     def _CalculateSigma(self):
+        """Tries to calculate the sigmas.  If the relevant columns are
+        not present, e.g. in the case of Tfs Aperture, then this does
+        nothing."""
         # check for emittance and energy spread
         ex   = 1e-9
         ey   = 1e-9
@@ -256,7 +254,7 @@ class Tfs(object):
                 # return the original PTC column
                 return self.ColumnIndex(ptcName)
             else:
-                print("Columns "+madxName+" and "+ptcName+" missing from tfs file")
+                # print("Columns "+madxName+" and "+ptcName+" missing from tfs file")
                 return None
 
         # optical function list format:
@@ -957,30 +955,44 @@ _madxAperTypes = { 'CIRCLE',
                    'OCTAGON'}
 
 class Aperture(Tfs):
-    """
-    Inherits Tfs for reading aperture information.
-    This allows madx aperture information in Tfs format to be loaded, filtered and
-    queried. This also provides the ability to suggest whether an element should be
-    split and therefore what the aperture should be.
+    """Inherits Tfs, with added functionality specific to apertures:
+    changing aperture types, getting the aperture at a specific S,
+    etc.
 
-    This class maintains a cache of aperture information as a function of S position.
+    Keyword Arguments:
+    filename        -- TFS file to be loaded (default None)
+    verbose         -- (default False)
+    beamLossPattern -- Whether to apply beamLossPattern's
+    interpretation of APER numbers to infer APERTYPE (default False)
 
-    'quiet' being defined in kwargs will silence a warning about unknown aperture types.
+     """
 
-    """
-    def __init__(self, *args, **kwargs):
-        # set so TFS class doesn't calculate sigma as optics shouldn't exist in aperture tfs file
-        kwargs.update({'calculatesigma':False})
-        Tfs.__init__(self, *args, **kwargs)
-        self.debug = False
-        if 'debug' in kwargs:
-            self.debug = kwargs['debug']
+    def __init__(self, filename=None, verbose=False, beamLossPattern=False):
+        Tfs.__init__(self, filename=filename, verbose=verbose)
 
         # the tolerance below which, the aperture is considered 0
         self._tolerance = 1e-6
         self._UpdateCache()
-        if 'quiet' not in kwargs:
+        if verbose:
             self.CheckKnownApertureTypes()
+        if beamLossPattern:
+            self._SetBeamLossPatternAperTypes()
+
+    def _SetBeamLossPatternAperTypes(self):
+        # Check to see if input Tfs is Sixtrack style (i.e no APERTYPE,
+        # and is instead implicit according to what I've seen in the
+        # BeamLossPattern source.
+        if 'APER_1' in self.columns and 'APERTYPE' not in self.columns:
+            self.columns.append('APERTYPE')
+            self.formats.append('%s')
+
+            for key, element in self.data.iteritems():
+                aper1 = element[self.columns.index('APER_1')]
+                aper2 = element[self.columns.index('APER_2')]
+                aper3 = element[self.columns.index('APER_3')]
+                aper4 = element[self.columns.index('APER_4')]
+                apertype = _GetSixTrackAperType(aper1,aper2,aper3,aper4)
+                element.append(apertype)
 
     def _UpdateCache(self):
         # create a cache of which aperture is at which s position
@@ -1081,7 +1093,7 @@ class Aperture(Tfs):
             print('No APERTYPE column')
             return self
 
-        a = Aperture(debug=self.debug, quiet=True)
+        a = Aperture(debug=self.debug, verbose=False)
         a._CopyMetaData(self)
         for item in self:
             if item[atKey] == "" or item[atKey] == "NONE":
@@ -1117,8 +1129,8 @@ class Aperture(Tfs):
             else:
                 print key,' will be ignored as not in this aperture Tfs file'
 
-        # 'quiet' stops it complaining about not finding metadata
-        a = Aperture(debug=self.debug, quiet=True)
+        # 'verbose = False' stops it complaining about not finding metadata
+        a = Aperture(debug=self.debug, verbose=False)
         a._CopyMetaData(self)
         for item in self:
             apervals = _np.array([item[key] for key in aperkeys])
@@ -1154,8 +1166,8 @@ class Aperture(Tfs):
             print('No aperture values to check')
             return self
 
-        # 'quiet' stops it complaining about not finding metadata
-        a = Aperture(debug=self.debug, quiet=True)
+        # 'verbose=False' stops it complaining about not finding metadata
+        a = Aperture(debug=self.debug, verbose=False)
         a._CopyMetaData(self)
         for item in self:
             apervals = _np.array([item[key] for key in aperkeys])
@@ -1266,7 +1278,7 @@ class Aperture(Tfs):
             # no duplicates!
             return self
 
-        a = Aperture(debug=self.debug, quiet=True)
+        a = Aperture(debug=self.debug, verbose=False)
         a._CopyMetaData(self)
         u,indices = _np.unique(self.GetColumn('S'), return_index=True)
         for ind in indices:
@@ -1303,7 +1315,7 @@ class Aperture(Tfs):
         S position to that requested - may be before or after that point.
         """
 
-        a = Aperture(debug=self.debug, quiet=True)
+        a = Aperture(debug=self.debug, verbose=False)
         a._CopyMetaData(self)
         rowdict = self.cache[self._ssorted[self._GetIndexInCacheOfS(sposition)]]
         #key = self.sequence[self._GetIndexInCacheOfS(sposition)]
