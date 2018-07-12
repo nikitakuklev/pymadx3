@@ -973,7 +973,7 @@ class Aperture(Tfs):
 
         # the tolerance below which, the aperture is considered 0
         self._tolerance = 1e-6
-        if self._cache:
+        if cache:
             self._UpdateCache()
         if verbose:
             self.CheckKnownApertureTypes()
