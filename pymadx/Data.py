@@ -10,6 +10,7 @@ import re as _re
 import string as _string
 import tarfile
 import os.path
+from more_itertools import windowed
 
 from _General import GetSixTrackAperType as _GetSixTrackAperType
 from _General import Cast as _Cast
@@ -1497,7 +1498,14 @@ class _MachineMesh(object):
         self.index_to_local = index_to_local
 
     def SmoothApertureMesh(self, aperMesh):
-        from IPython import embed; embed()
+        smoothed_aperture = {}
+        for i, window in enumerate(windowed(self.global_points, 3)):
+            start = global_to_aperture[window[0]]
+            middle = global_to_aperture[window[1]]
+            end = global_to_aperture[window[2]]
+            new_middle = _AverageAperture([start, middle, end])
+            smoothed_aperture[window[1]] = new_middle
+        self.global_to_aperture = smoothed_aperture
 
     def GlobalExtents(self):
         xpoints = []
@@ -1609,3 +1617,19 @@ def ProcessSixTrackAper(item):
     item["APER_2"] = a2
     item["APER_3"] = a3
     item["APER_4"] = a4
+
+
+def _AverageAperture(apers):
+    a1 = sum([item['APER_1'] for item in apers])
+    a2 = sum([item['APER_2'] for item in apers])
+    a3 = sum([item['APER_3'] for item in apers])
+    a4 = sum([item['APER_4'] for item in apers])
+    atypes = [item['APER_TYPE'] for item in apers]
+    if not len(set(atypes)) == 1:
+        raise ValueError("Trying to avereage Disparate aperture types.")
+
+    return {'APER_1': a1,
+            'APER_2': a2,
+            'APER_3': a3,
+            'APER_4': a4,
+            'APERTYPE': apers[0]['APERTYPE']}
