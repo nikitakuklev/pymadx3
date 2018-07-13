@@ -1188,42 +1188,45 @@ class Aperture(Tfs):
             a._UpdateCache()
         return a
 
+    def SampleAperture(self, smooth=True, useCachedSample=False):
+        """Sample this aperture with respect to some tfs model"""
+        # regenerate if either explicitly asked to or options are different.
+        if (hasattr(self, "_cachedAperMesh") and useCachedSample
+            and smooth == self._smooth):
+            return self._cachedAperMesh
+        aperMesh = _MachineMesh(self)
 
-    def SampleAperture(self):
-        points_apertures_map = {} # what we return.
+        iThickApertures = self._GetThickApertures()
+        iThickNoApertures = self._GetThickNoApertures()
 
-        i_thin_apertures = self._GetThinApertures()
-        i_thick_apertures = self._GetThickApertures()
-        i_thick_no_apertures = self._GetThickNoApertures()
+        for i in iThickApertures:
+            for globalPoint in aperMesh.index_to_global[i]:
+                aperMesh.global_to_aperture[globalPoint] = self[i]
 
-        for i in i_thick_apertures:
-            end = self[i]['S']
-            start = end - self[i]['L']
-            for point in _np.linspace(start, end, 20):
-                points_apertures_map[point] = self[i]
+        for i in iThickNoApertures:
+            mid = self[i]['SMID']
 
-        for i in i_thick_no_apertures:
-            end = self[i]['S']
-            start = end - self[i]['L']
+            iAperBefore = i - 1
+            while self[iAperBefore]['APERTYPE'] in {"NONE", ""}:
+                iAperBefore -= 1
 
-            aper_before = i - 1
-            while self[aper_before]['APERTYPE'] in {"NONE", ""}:
-                aper_before -= 1
+            iAperAfter = i + 1
+            while self[iAperAfter]['APERTYPE'] in {"NONE", ""}:
+                iAperAfter -= 1
 
-            aper_after = i + 1
-            while self[aper_after]['APERTYPE'] in {"NONE", ""}:
-                aper_after -= 1
+            endBefore = self[iAperBefore]['S']
+            startAfter = self[iAperAfter]['S'] - self[iAperAfter]['L']
+            # If mid point closer to aperture in front then select that one.
+            if startAfter - mid > mid - endBefore:
+                nearestAper = self[iAperBefore]
+            else: # else use the aperture after
+                nearestAper = self[iAperAfter]
+            for globalPoint in aperMesh.index_to_global[i]:
+                aperMesh.global_to_aperture[globalPoint] = nearestAper
 
-            if self[aper_before]['APERTYPE'] == self[aper_after]['APERTYPE']:
-            # Then we can interpolate
-                interpolated_aperture = _interpolateApertures(
-                    [self[aper_before], self[aper_after]])
-                for point in _np.linspace(start, end, 20):
-                    points_apertures_map[point] = interpolated_aperture
-            else:
-                for point in _np.linspace(start, end, 20):
-                    points_apertures_map[point] = self[aper_before]
-        return points_apertures_map
+        self._cachedAperMesh = aperMesh
+        self._smooth = smooth
+        return self._cachedAperMesh
 
     def _GetThickNoApertures(self):
         i_thick_elements = [i
@@ -1455,41 +1458,118 @@ def _interpolateApertures(items):
             "APER_3": aper3,
             "APER_4": aper4}
 
+class _MachineMesh(object):
+    """Meshes a tfs instance and stores three dictionaries: global to
+    index, index to local coordinates, and index
+    to global coordinates.  an extra dictionary, global_to_aperture is
+    defined for mapping global points to apertures."""
+    # It is necessary to store some combination of the described
+    # information if we are ultimately going to map one set of
+    # apertures defined in a Tfs instance onto a different tfs
+    # instance.  This is because we can't guarantee a one-to-one
+    # correspondance between the elements in the Aperture instance and
+    # the Tfs (i.e. optical description) instance.
+    def __init__(self, tfs):
+        self._buildMeshMaps(tfs)
+        self.global_to_aperture = {}
+        self.global_points = sorted(self.global_to_index.keys())
+
+    def _buildMeshMaps(self, tfs):
+        # We use indices instead of names because they are unique
+        # whereas names are not necessarily so.
+        global_to_index = {}
+        index_to_global = {}
+        index_to_local = {}
+
+        for i, ele in enumerate(tfs):
+            if ele['L'] == 0:
+                continue
+            global_points, local_points = _MeshElement(ele)
+            # indexs aren't unique so store index as well..
+            index_to_global[i] = global_points
+            index_to_local[i] = local_points
+
+            for global_point in global_points:
+                global_to_index[global_point] = i
+
+        self.global_to_index = global_to_index
+        self.index_to_global = index_to_global
+        self.index_to_local = index_to_local
+
+    def SmoothApertureMesh(self, aperMesh):
+        from IPython import embed; embed()
+
+    def GlobalExtents(self):
+        xpoints = []
+        ypoints = []
+        for globalPoint in self.global_points:
+            a1 = self.global_to_aperture[globalPoint]["APER_1"]
+            a2 = self.global_to_aperture[globalPoint]["APER_2"]
+            a3 = self.global_to_aperture[globalPoint]["APER_3"]
+            a4 = self.global_to_aperture[globalPoint]["APER_4"]
+            apertype = self.global_to_aperture[globalPoint]["APERTYPE"]
+            x, y = GetApertureExtent(a1, a2, a3, a4, apertype)
+            xpoints.append(x)
+            ypoints.append(y)
+
+        return self.global_points, _np.array(xpoints), _np.array(ypoints)
+
 def _MeshElement(ele):
-    mesh_interval_length = 100 # 100mm = 10cm
-    end = ele['S'] * 1000 # * 1000 for mm.
-    length = ele['L'] * 1000
-    if length <= mesh_interval_length:
-        raise ValueError("Cannot mesh element with too small length!")
+    """Returns the global sampling positions with their local element
+    positions."""
+    # We want to sample every 0.1m, starting from 0.0.
+    # We go through the effort of converting to integers to
+    # avoid the pitfalls associated with floating point arithmetic,
+    # relevant here as there is no exact representation of
+    # 0.1 in base 2, and we are effectively adding 0.1 to itself multiple times
+    # (with the use of arange).  So we convert to integer arithmetic,
+    # do what we have to do, and then convert back at the end.
+    decimetres_per_metre = 10
+    mesh_interval_length = 1 # 1 = 10cm = 1dm
+
+    end = ele['S'] * decimetres_per_metre # * 10 for decimetres
+    length = ele['L'] * decimetres_per_metre
+
+    if length == 0:
+        raise ValueError("Element length = 0.")
+    elif length < mesh_interval_length:
+        return _np.empty(0), _np.empty(0)
+
     start = end - length
     # Round start of element to nearest mesh point
-    start_mesh = round(start, -2)
-    end_mesh = round(end, -2)
+    start_mesh = round(start)
+    end_mesh = round(end)
     # Get the first and last meshs point that are inside the element.
     # logic to ensure [start_mesh, end_mesh).
     if start_mesh < start:
         start_mesh += mesh_interval_length
     if end_mesh >= end:
         end_mesh -= mesh_interval_length
-    try:
-        assert start_mesh >= start, "Mesh point outside element!"
-        assert end_mesh < end, "Mesh point outside element!"
-    except:
-        from IPython import embed; embed()
+
+    if start_mesh < start or end_mesh >= end: # this should never happen
+        raise ValueError("Mesh point outside of element!")
+
     # start_mesh but distance from start of element.  this is much
     # more useful for our purposes than a global S.
     local_mesh_length = end_mesh - start_mesh
     local_start_mesh = start_mesh - start
     local_end_mesh = local_start_mesh + local_mesh_length
 
-    # We want end_mesh to be < 0.1 more than the lenght of the
-    # elmeent because arange naturally does not include the final
-    # element.  so this way we do not overstep beyond end of element.
-    return (_np.arange(local_start_mesh,
-                      # Add to end to get end to be included in array.
-                      local_end_mesh + mesh_interval_length,
-                      mesh_interval_length)
-            / 1000.0) # Convert back to metres!!!
+    # return both the local and global mesh.  The local is necessary
+    # because it tells us ultimately where we must split the element.
+    # The global is necessary because it allows us to match together
+    # two distinct TFS.
+    local_mesh = (_np.arange(local_start_mesh,
+                             # Add to end to get end to be included in array.
+                             local_end_mesh + mesh_interval_length,
+                             mesh_interval_length)
+                  / decimetres_per_metre) # Convert back to metres!!!
+    global_mesh = (_np.arange(start_mesh,
+                              end_mesh + mesh_interval_length,
+                              mesh_interval_length)
+                   / decimetres_per_metre)
+    return global_mesh, local_mesh
+
 def ProcessSixTrackAper(item):
     """Processes the aperture so that it can be used for
     interpolation.  E.g. the bounding rectangle should tightly wrap
