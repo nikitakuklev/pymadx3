@@ -83,8 +83,10 @@ def GetSixTrackAperType(a1, a2, a3, a4):
     # sure BeamLossPattern supports this (even though there is the source
     # for it).
 
+    if a1 == 0 and a2 == 0 and a3 == 0 and a4 == 0:
+        return ""
     # Rectellipse with the parameters which result in an ellipse
-    if a1 == a3 and a2 == a4:
+    elif a1 == a3 and a2 == a4:
         return "RECTELLIPSE"
     # rectellipse with horizontal edges on top (parallel to x-axis)
     elif a1 == a3 and a2 < a4:
