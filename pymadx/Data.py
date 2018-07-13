@@ -1624,7 +1624,7 @@ def _AverageAperture(apers):
     a2 = sum([item['APER_2'] for item in apers])
     a3 = sum([item['APER_3'] for item in apers])
     a4 = sum([item['APER_4'] for item in apers])
-    atypes = [item['APER_TYPE'] for item in apers]
+    atypes = [item['APERTYPE'] for item in apers]
     if not len(set(atypes)) == 1:
         raise ValueError("Trying to avereage Disparate aperture types.")
 
