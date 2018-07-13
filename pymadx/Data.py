@@ -1497,14 +1497,37 @@ class _MachineMesh(object):
         self.index_to_global = index_to_global
         self.index_to_local = index_to_local
 
-    def SmoothApertureMesh(self, aperMesh):
+    def _GetAllApertures(self):
+        apersOut = []
+        for globalPoint in self.global_points:
+            a1 = self.global_to_aperture[globalPoint]["APER_1"]
+            a2 = self.global_to_aperture[globalPoint]["APER_2"]
+            a3 = self.global_to_aperture[globalPoint]["APER_3"]
+            a4 = self.global_to_aperture[globalPoint]["APER_4"]
+            apersOut.append((globalPoint, a1, a2, a3, a4))
+        return apersOut
+
+    def SmoothApertureMesh(self):
         smoothed_aperture = {}
         for i, window in enumerate(windowed(self.global_points, 3)):
-            start = global_to_aperture[window[0]]
-            middle = global_to_aperture[window[1]]
-            end = global_to_aperture[window[2]]
+            start = self.global_to_aperture[float(window[0])]
+            middle = self.global_to_aperture[float(window[1])]
+            end = self.global_to_aperture[float(window[2])]
             new_middle = _AverageAperture([start, middle, end])
             smoothed_aperture[window[1]] = new_middle
+        # Do first and last now by hand.
+        start = self.global_to_aperture[self.global_points[-1]]
+        middle = self.global_to_aperture[self.global_points[0]]
+        end = self.global_to_aperture[self.global_points[1]]
+        new_middle = _AverageAperture([start, middle, end])
+        smoothed_aperture[self.global_points[0]] = new_middle
+
+        start = self.global_to_aperture[self.global_points[-2]]
+        middle = self.global_to_aperture[self.global_points[-1]]
+        end = self.global_to_aperture[self.global_points[0]]
+        new_middle = _AverageAperture([start, middle, end])
+        smoothed_aperture[self.global_points[-1]] = new_middle
+
         self.global_to_aperture = smoothed_aperture
 
     def GlobalExtents(self):
@@ -1620,10 +1643,10 @@ def ProcessSixTrackAper(item):
 
 
 def _AverageAperture(apers):
-    a1 = sum([item['APER_1'] for item in apers])
-    a2 = sum([item['APER_2'] for item in apers])
-    a3 = sum([item['APER_3'] for item in apers])
-    a4 = sum([item['APER_4'] for item in apers])
+    a1 = sum([item['APER_1'] for item in apers]) / len(apers)
+    a2 = sum([item['APER_2'] for item in apers]) / len(apers)
+    a3 = sum([item['APER_3'] for item in apers]) / len(apers)
+    a4 = sum([item['APER_4'] for item in apers]) / len(apers)
     atypes = [item['APERTYPE'] for item in apers]
     if not len(set(atypes)) == 1:
         raise ValueError("Trying to avereage Disparate aperture types.")
