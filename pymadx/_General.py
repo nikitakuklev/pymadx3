@@ -34,8 +34,8 @@ def NearestEvenInteger(number):
 def Cast(string):
     """
     Cast(string)
-    
-    tries to cast to a (python)float and if it doesn't work, 
+
+    tries to cast to a (python)float and if it doesn't work,
     returns a string
 
     """
