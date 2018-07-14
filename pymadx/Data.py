@@ -10,9 +10,7 @@ import re as _re
 import string as _string
 import tarfile
 import os.path
-from more_itertools import windowed
 
-from _General import GetSixTrackAperType as _GetSixTrackAperType
 from _General import Cast as _Cast
 
 class Tfs(object):
@@ -968,8 +966,7 @@ class Aperture(Tfs):
 
      """
 
-    def __init__(self, filename=None, verbose=False,
-                 beamLossPattern=False, cache=True):
+    def __init__(self, filename=None, verbose=False, cache=True):
         Tfs.__init__(self, filename=filename, verbose=verbose)
 
         # the tolerance below which, the aperture is considered 0
@@ -978,28 +975,6 @@ class Aperture(Tfs):
             self._UpdateCache()
         if verbose:
             self.CheckKnownApertureTypes()
-        if beamLossPattern:
-            self._ProcessBeamLossPatternApertures()
-
-    def _ProcessBeamLossPatternApertures(self):
-        # Check to see if input Tfs is Sixtrack style (i.e no APERTYPE,
-        # and is instead implicit according to what I've seen in the
-        # BeamLossPattern source.
-        if 'APER_1' in self.columns and 'APERTYPE' not in self.columns:
-            self.columns.append('APERTYPE')
-            self.formats.append('%s')
-
-            for key, element in self.data.iteritems():
-                aper1 = element[self.columns.index('APER_1')]
-                aper2 = element[self.columns.index('APER_2')]
-                aper3 = element[self.columns.index('APER_3')]
-                aper4 = element[self.columns.index('APER_4')]
-                apertype = _GetSixTrackAperType(aper1,aper2,aper3,aper4)
-                element.append(apertype)
-        else:
-            raise TypeError("Apertype is present in input.")
-        for data in self:
-            ProcessSixTrackAper(data)
 
     def _UpdateCache(self):
         # create a cache of which aperture is at which s position
@@ -1188,46 +1163,6 @@ class Aperture(Tfs):
         if self._cache:
             a._UpdateCache()
         return a
-
-    def SampleAperture(self, smooth=True, useCachedSample=False):
-        """Sample this aperture with respect to some tfs model"""
-        # regenerate if either explicitly asked to or options are different.
-        if (hasattr(self, "_cachedAperMesh") and useCachedSample
-            and smooth == self._smooth):
-            return self._cachedAperMesh
-        aperMesh = _MachineMesh(self)
-
-        iThickApertures = self._GetThickApertures()
-        iThickNoApertures = self._GetThickNoApertures()
-
-        for i in iThickApertures:
-            for globalPoint in aperMesh.index_to_global[i]:
-                aperMesh.global_to_aperture[globalPoint] = self[i]
-
-        for i in iThickNoApertures:
-            mid = self[i]['SMID']
-
-            iAperBefore = i - 1
-            while self[iAperBefore]['APERTYPE'] in {"NONE", ""}:
-                iAperBefore -= 1
-
-            iAperAfter = i + 1
-            while self[iAperAfter]['APERTYPE'] in {"NONE", ""}:
-                iAperAfter -= 1
-
-            endBefore = self[iAperBefore]['S']
-            startAfter = self[iAperAfter]['S'] - self[iAperAfter]['L']
-            # If mid point closer to aperture in front then select that one.
-            if startAfter - mid > mid - endBefore:
-                nearestAper = self[iAperBefore]
-            else: # else use the aperture after
-                nearestAper = self[iAperAfter]
-            for globalPoint in aperMesh.index_to_global[i]:
-                aperMesh.global_to_aperture[globalPoint] = nearestAper
-
-        self._cachedAperMesh = aperMesh
-        self._smooth = smooth
-        return self._cachedAperMesh
 
     def _GetThickNoApertures(self):
         i_thick_elements = [i
@@ -1445,214 +1380,3 @@ def _ZeroAperture(item):
     test4 = item['APER_4'] < tolerance
 
     return test1 and test2 and test3 and test4
-
-def _interpolateApertures(items):
-    nitems = len(items)
-    assert len(set(item['APERTYPE'] for item in items)) == 1
-    aper1 = sum([item['APER_1'] for item in items]) / nitems
-    aper2 = sum([item['APER_2'] for item in items]) / nitems
-    aper3 = sum([item['APER_3'] for item in items]) / nitems
-    aper4 = sum([item['APER_4'] for item in items]) / nitems
-    return {"APERTYPE": item['APERTYPE'],
-            "APER_1": aper1,
-            "APER_2": aper2,
-            "APER_3": aper3,
-            "APER_4": aper4}
-
-class _MachineMesh(object):
-    """Meshes a tfs instance and stores three dictionaries: global to
-    index, index to local coordinates, and index
-    to global coordinates.  an extra dictionary, global_to_aperture is
-    defined for mapping global points to apertures."""
-    # It is necessary to store some combination of the described
-    # information if we are ultimately going to map one set of
-    # apertures defined in a Tfs instance onto a different tfs
-    # instance.  This is because we can't guarantee a one-to-one
-    # correspondance between the elements in the Aperture instance and
-    # the Tfs (i.e. optical description) instance.
-    def __init__(self, tfs):
-        self._buildMeshMaps(tfs)
-        self.global_to_aperture = {}
-        self.global_points = sorted(self.global_to_index.keys())
-
-    def _buildMeshMaps(self, tfs):
-        # We use indices instead of names because they are unique
-        # whereas names are not necessarily so.
-        global_to_index = {}
-        index_to_global = {}
-        index_to_local = {}
-
-        for i, ele in enumerate(tfs):
-            if ele['L'] == 0:
-                continue
-            global_points, local_points = _MeshElement(ele)
-            # indexs aren't unique so store index as well..
-            index_to_global[i] = global_points
-            index_to_local[i] = local_points
-
-            for global_point in global_points:
-                global_to_index[global_point] = i
-
-        self.global_to_index = global_to_index
-        self.index_to_global = index_to_global
-        self.index_to_local = index_to_local
-
-    def _GetAllApertures(self):
-        apersOut = []
-        for globalPoint in self.global_points:
-            a1 = self.global_to_aperture[globalPoint]["APER_1"]
-            a2 = self.global_to_aperture[globalPoint]["APER_2"]
-            a3 = self.global_to_aperture[globalPoint]["APER_3"]
-            a4 = self.global_to_aperture[globalPoint]["APER_4"]
-            apersOut.append((globalPoint, a1, a2, a3, a4))
-        return apersOut
-
-    def SmoothApertureMesh(self):
-        smoothed_aperture = {}
-        for i, window in enumerate(windowed(self.global_points, 3)):
-            start = self.global_to_aperture[float(window[0])]
-            middle = self.global_to_aperture[float(window[1])]
-            end = self.global_to_aperture[float(window[2])]
-            new_middle = _AverageAperture([start, middle, end])
-            smoothed_aperture[window[1]] = new_middle
-        # Do first and last now by hand.
-        start = self.global_to_aperture[self.global_points[-1]]
-        middle = self.global_to_aperture[self.global_points[0]]
-        end = self.global_to_aperture[self.global_points[1]]
-        new_middle = _AverageAperture([start, middle, end])
-        smoothed_aperture[self.global_points[0]] = new_middle
-
-        start = self.global_to_aperture[self.global_points[-2]]
-        middle = self.global_to_aperture[self.global_points[-1]]
-        end = self.global_to_aperture[self.global_points[0]]
-        new_middle = _AverageAperture([start, middle, end])
-        smoothed_aperture[self.global_points[-1]] = new_middle
-
-        self.global_to_aperture = smoothed_aperture
-
-    def GlobalExtents(self):
-        xpoints = []
-        ypoints = []
-        for globalPoint in self.global_points:
-            a1 = self.global_to_aperture[globalPoint]["APER_1"]
-            a2 = self.global_to_aperture[globalPoint]["APER_2"]
-            a3 = self.global_to_aperture[globalPoint]["APER_3"]
-            a4 = self.global_to_aperture[globalPoint]["APER_4"]
-            apertype = self.global_to_aperture[globalPoint]["APERTYPE"]
-            x, y = GetApertureExtent(a1, a2, a3, a4, apertype)
-            xpoints.append(x)
-            ypoints.append(y)
-
-        return self.global_points, _np.array(xpoints), _np.array(ypoints)
-
-def _MeshElement(ele):
-    """Returns the global sampling positions with their local element
-    positions."""
-    # We want to sample every 0.1m, starting from 0.0.
-    # We go through the effort of converting to integers to
-    # avoid the pitfalls associated with floating point arithmetic,
-    # relevant here as there is no exact representation of
-    # 0.1 in base 2, and we are effectively adding 0.1 to itself multiple times
-    # (with the use of arange).  So we convert to integer arithmetic,
-    # do what we have to do, and then convert back at the end.
-    decimetres_per_metre = 10
-    mesh_interval_length = 1 # 1 = 10cm = 1dm
-
-    end = ele['S'] * decimetres_per_metre # * 10 for decimetres
-    length = ele['L'] * decimetres_per_metre
-
-    if length == 0:
-        raise ValueError("Element length = 0.")
-    elif length < mesh_interval_length:
-        return _np.empty(0), _np.empty(0)
-
-    start = end - length
-    # Round start of element to nearest mesh point
-    start_mesh = round(start)
-    end_mesh = round(end)
-    # Get the first and last meshs point that are inside the element.
-    # logic to ensure [start_mesh, end_mesh).
-    if start_mesh < start:
-        start_mesh += mesh_interval_length
-    if end_mesh >= end:
-        end_mesh -= mesh_interval_length
-
-    if start_mesh < start or end_mesh >= end: # this should never happen
-        raise ValueError("Mesh point outside of element!")
-
-    # start_mesh but distance from start of element.  this is much
-    # more useful for our purposes than a global S.
-    local_mesh_length = end_mesh - start_mesh
-    local_start_mesh = start_mesh - start
-    local_end_mesh = local_start_mesh + local_mesh_length
-
-    # return both the local and global mesh.  The local is necessary
-    # because it tells us ultimately where we must split the element.
-    # The global is necessary because it allows us to match together
-    # two distinct TFS.
-    local_mesh = (_np.arange(local_start_mesh,
-                             # Add to end to get end to be included in array.
-                             local_end_mesh + mesh_interval_length,
-                             mesh_interval_length)
-                  / decimetres_per_metre) # Convert back to metres!!!
-    global_mesh = (_np.arange(start_mesh,
-                              end_mesh + mesh_interval_length,
-                              mesh_interval_length)
-                   / decimetres_per_metre)
-    return global_mesh, local_mesh
-
-def ProcessSixTrackAper(item):
-    """Processes the aperture so that it can be used for
-    interpolation.  E.g. the bounding rectangle should tightly wrap
-    the contained ellipse.  This has no impact on the aperture,
-    itself, but the resulting linearly interpolated apertures will
-    be more correct."""
-    # Note this is a reimplementation of the logic from
-    # BeamLossPattern.  I understand 3/4 of the following steps.  The
-    # step I don't understand is why, if the rectangle is inside the
-    # ellipse then, the ellipse must be increased in size by sqrt(2)
-    # (doubling of the area).  I do it anyway.
-    a1 = item["APER_1"]
-    a2 = item["APER_2"]
-    a3 = item["APER_3"]
-    a4 = item["APER_4"]
-
-    # if the rectangle is bigger than the ellipse bring it down to
-    # size to tightly wrap the contained ellipse.
-    if a1 > a3 and a3 != 0:
-        a1 = a3
-    # This is saying the same as above, but in different dimension.
-    if a2 > a4 and a4 > 0:
-        a2 = a4
-    # if the corner of the rectangle is inside the ellipse then make
-    # the ellipse bigger so that it is definitely big enough.  I have
-    # no idea why this step is here other than to copy others.
-    if a1 != 0 and a2 != 0 and a3 != 0 and (a1/a3)**2 + (a2/a4)**2 < 0.99999999:
-        a3 = a1 * math.sqrt(2)
-        a4 = a2 * math.sqrt(2)
-    # if a4 is negative or >0.5 then it must be a rectangle (because
-    # a4 of those values can only reasonably be an angle). and if
-    # it's a rectangle then a3 must be 0.
-    if a4 < 0 or a4 > 0.5:
-        a3 = 0
-
-    item["APER_1"] = a1
-    item["APER_2"] = a2
-    item["APER_3"] = a3
-    item["APER_4"] = a4
-
-
-def _AverageAperture(apers):
-    a1 = sum([item['APER_1'] for item in apers]) / len(apers)
-    a2 = sum([item['APER_2'] for item in apers]) / len(apers)
-    a3 = sum([item['APER_3'] for item in apers]) / len(apers)
-    a4 = sum([item['APER_4'] for item in apers]) / len(apers)
-    atypes = [item['APERTYPE'] for item in apers]
-    if not len(set(atypes)) == 1:
-        raise ValueError("Trying to avereage Disparate aperture types.")
-
-    return {'APER_1': a1,
-            'APER_2': a2,
-            'APER_3': a3,
-            'APER_4': a4,
-            'APERTYPE': apers[0]['APERTYPE']}
