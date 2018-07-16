@@ -202,6 +202,7 @@ class Tfs(object):
                 self.data[name].append(self.data[name][sindex]) # copy S to SORIGINAL
                 self.data[name].append(sMid[i])
                 self.data[name].append(name)
+                self.data[name].append(i)
             self.columns.append('SORIGINAL')
             self.formats.append('%le')
             self.columns.append('SMID')
@@ -211,7 +212,9 @@ class Tfs(object):
             self.columns.append("UNIQUENAME")
             self.formats.append("%s")
             assert len(set(self.GetColumn("UNIQUENAME"))) == len(self)
-
+            self.columns.append("INDEX")
+            self.formats.append("%le")
+            assert (self.GetColumn("INDEX") == self.index).all()
         else:
             self.smax = 0
 
