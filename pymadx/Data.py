@@ -969,13 +969,12 @@ class Aperture(Tfs):
 
      """
 
-    def __init__(self, filename=None, verbose=False, cache=True):
+    def __init__(self, filename=None, verbose=False):
         Tfs.__init__(self, filename=filename, verbose=verbose)
 
         # the tolerance below which, the aperture is considered 0
         self._tolerance = 1e-6
-        if cache:
-            self._UpdateCache()
+        self._UpdateCache()
         if verbose:
             self.CheckKnownApertureTypes()
 
@@ -1078,7 +1077,7 @@ class Aperture(Tfs):
             print('No APERTYPE column')
             return self
 
-        a = Aperture(debug=self.debug, verbose=False)
+        a = Aperture(verbose=False)
         a._CopyMetaData(self)
         for item in self:
             if item[atKey] == "" or item[atKey] == "NONE":
@@ -1087,7 +1086,7 @@ class Aperture(Tfs):
                 #copy over as normal
                 key = self.sequence[self._iterindex]
                 a._AppendDataEntry(key, self.data[key])
-        if self._cache:
+        if self.cache:
             a._UpdateCache()
         return a
 
@@ -1116,7 +1115,7 @@ class Aperture(Tfs):
                 print key,' will be ignored as not in this aperture Tfs file'
 
         # 'verbose = False' stops it complaining about not finding metadata
-        a = Aperture(debug=self.debug, verbose=False)
+        a = Aperture(verbose=False)
         a._CopyMetaData(self)
         for item in self:
             apervals = _np.array([item[key] for key in aperkeys])
@@ -1125,7 +1124,7 @@ class Aperture(Tfs):
             if not abovelimittotal:
                 key = self.sequence[self._iterindex]
                 a._AppendDataEntry(key, self.data[key])
-        if self._cache:
+        if self.cache:
             a._UpdateCache()
         return a
 
@@ -1154,7 +1153,7 @@ class Aperture(Tfs):
             return self
 
         # 'verbose=False' stops it complaining about not finding metadata
-        a = Aperture(debug=self.debug, verbose=False)
+        a = Aperture(verbose=False)
         a._CopyMetaData(self)
         for item in self:
             apervals = _np.array([item[key] for key in aperkeys])
@@ -1163,7 +1162,7 @@ class Aperture(Tfs):
             if not abovelimittotal:
                 key = self.sequence[self._iterindex]
                 a._AppendDataEntry(key, self.data[key])
-        if self._cache:
+        if self.cache:
             a._UpdateCache()
         return a
 
@@ -1206,7 +1205,7 @@ class Aperture(Tfs):
             # no duplicates!
             return self
 
-        a = Aperture(debug=self.debug, verbose=False)
+        a = Aperture(verbose=False)
         a._CopyMetaData(self)
         u,indices = _np.unique(self.GetColumn('S'), return_index=True)
         for ind in indices:
@@ -1228,8 +1227,8 @@ class Aperture(Tfs):
         Return a dictionary of the aperture information specified at the closest
         S position to that requested - may be before or after that point.
         """
-        if self._cache:
-            a = Aperture(debug=self.debug, verbose=False)
+        if self.cache:
+            a = Aperture(verbose=False)
             a._CopyMetaData(self)
             rowdict = self.cache[self._ssorted[self._GetIndexInCacheOfS(sposition)]]
         else:
