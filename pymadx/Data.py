@@ -848,13 +848,11 @@ class Tfs(object):
 
         # these checks may be incomplete..  just the ones i know of.
 
-        # check the kls..  if length is zero then kls don't matter.
-        if component['L'] > 0:
-           for variable in component.keys():
-               kls = _re.compile(r'K[0-9]*S?L') # matches all integrated strengths.
-               if (_re.match(kls, variable) and
-                   abs(component[variable]) > 0):
-                   perturbingParameters.append(variable)
+        for variable in component.keys():
+            kls = _re.compile(r'K[0-9]*S?L') # matches all integrated strengths.
+            if (_re.match(kls, variable) and
+                abs(component[variable]) > 0):
+                perturbingParameters.append(variable)
 
         #check the kick angles.
         if abs(component['VKICK']) > 0:
