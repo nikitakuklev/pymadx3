@@ -129,6 +129,8 @@ class Tfs(object):
         segment_i = 0 #actual segment number in data may not be zero counting - use this variable
         segment_name = 'NA'
         #always include segments - put as first column in data
+        # We use the fact we only manually append these two columns to
+        # check at the end if loading the tfs failed.
         self.columns.append("SEGMENT")
         self.formats.append("%d")
         self.columns.append("SEGMENTNAME")
@@ -220,6 +222,10 @@ class Tfs(object):
 
         self._CalculateSigma()
         self.names = self.columns
+        if not {"ORIGIN", "DATE", "TIME", "TYPE"}.issubset(self.header):
+            # This isn't TFS.  These are guaranteed in the manual
+            # to be written to all TFS files.
+            raise ValueError("Malformed TFS.")
 
     def _CalculateSigma(self):
         """Tries to calculate the sigmas.  If the relevant columns are
