@@ -205,9 +205,22 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
             kn4sl = madx.data[name][k4slindex]
             kn5sl = madx.data[name][k5slindex]
             kn6sl = madx.data[name][k6slindex]
-            
-            a.AddMultipole(rname, knl=(kn0l, kn1l, kn2l, kn3l, kn4l, kn5l, kn6l), ksl=(kn0sl, kn1sl, kn2sl, kn3sl, kn4sl, kn5sl, kn6sl),**kws)
 
+            a.AddMultipole(
+                rname,
+                knl=(kn0l, kn1l, kn2l, kn3l, kn4l, kn5l, kn6l),
+                ksl=(kn0sl, kn1sl, kn2sl, kn3sl, kn4sl, kn5sl, kn6sl),
+                **kws)
+        elif t == 'HKICKER':
+            hkick = madx.data[name][hkickangleindex]
+            a.AddHKicker(rname, hkick=hkick, length=l)
+        elif t == 'VKICKER':
+            vkick = madx.data[name][vkickangleindex]
+            a.AddVKicker(rname, vkick=vkick, length=l)
+        elif t == 'TKICKER':
+            vkick = madx.data[name][vkickangleindex]
+            hkick = madx.data[name][hkickangleindex]
+            a.AddTKicker(rname, vkick=vkick, hkick=hkick, length=l)
         else:
             print 'MadxTfs2Ptc> unknown element type: ',t,' for element named: ',name
             if not zerolength:
