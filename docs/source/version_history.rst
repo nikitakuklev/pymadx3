@@ -2,6 +2,39 @@
 Version History
 ===============
 
+v 1.5 - 2018 / 08 / 24
+======================
+
+New Features
+------------
+
+* Support for tkicker.
+* Support for kickers in MADX to PTC.
+
+General
+-------
+
+* Improved aperture handling.
+
+Bug Fixes
+---------
+
+* Several bugs in Aperture class fixed.
+
+
+v 1.4 - 2018 / 06 / 23
+======================
+
+New Features
+------------
+
+* Support of just gzipped files as well as tar gzipped.
+
+General
+-------
+
+* Improved SixTrack aperture handling.
+
 v 1.2 - 2018 / 05 / 23
 ======================
 
