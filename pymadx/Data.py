@@ -8,8 +8,8 @@ import gzip as _gzip
 import numpy as _np
 import re as _re
 import string as _string
-import tarfile
-import os.path
+import tarfile as _tarfile
+import os.path as _path
 
 from _General import Cast as _Cast
 
@@ -93,9 +93,9 @@ class Tfs(object):
         Read the tfs file and prepare data structures. If 'tar' or 'gz are in
         the filename, the file will be opened still compressed.
         """
-        if tarfile.is_tarfile(filename): # assume compressed tarball of 1 file
+        if _tarfile.is_tarfile(filename): # assume compressed tarball of 1 file
             print 'pymadx.Tfs.Load> zipped file'
-            tar = tarfile.open(filename, 'r')
+            tar = _tarfile.open(filename, 'r')
             f = tar.extractfile(tar.getmember(tar.getnames()[-1])) # extract the last member
         elif filename.endswith('.gz'): # gzipped file
             print 'pymadx.Tfs.Load> zipped file'
@@ -374,7 +374,7 @@ class Tfs(object):
                 __name__,
                 type(self).__name__,
                 self.nitems,
-                os.path.basename(self.filename))
+                _path.basename(self.filename))
         return "<{}.{}, {} items in lattice>".format(
             __name__, type(self).__name__, self.nitems)
 
