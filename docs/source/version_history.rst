@@ -2,6 +2,16 @@
 Version History
 ===============
 
+v 1.6 - 2018 / ?? / ??
+======================
+
+General
+-------
+
+* Reimplemented machine diagram drawing to be more efficient when zooming and
+  fix zordering so bends and then quadrupoles are always on top.
+
+
 v 1.5 - 2018 / 08 / 24
 ======================
 

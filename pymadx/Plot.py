@@ -8,6 +8,9 @@ import matplotlib         as _matplotlib
 import matplotlib.patches as _patches
 import matplotlib.pyplot  as _plt
 
+from matplotlib.collections import PatchCollection as _PatchCollection
+
+
 class _My_Axes(_matplotlib.axes.Axes):
     """
     Inherit matplotlib.axes.Axes but override pan action for mouse.
@@ -410,64 +413,75 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
     #NOTE madx defines S as the end of the element by default
     #define temporary functions to draw individual objects
     def DrawBend(e,color='b',alpha=1.0):
-        br = _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color=color,alpha=alpha)
-        ax.add_patch(br)
+        return _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color=color,alpha=alpha)
     def DrawQuad(e,color='r',alpha=1.0):
         if e['K1L'] > 0 :
-            qr = _patches.Rectangle((e['S']-e['L'],0),e['L'],0.2,color=color,alpha=alpha)
+            return _patches.Rectangle((e['S']-e['L'],0),e['L'],0.2,color=color,alpha=alpha)
         elif e['K1L'] < 0:
-            qr = _patches.Rectangle((e['S']-e['L'],-0.2),e['L'],0.2,color=color,alpha=alpha)
+            return _patches.Rectangle((e['S']-e['L'],-0.2),e['L'],0.2,color=color,alpha=alpha)
         else:
             #quadrupole off
-            qr = _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color='#B2B2B2',alpha=0.5) #a nice grey in hex
-        ax.add_patch(qr)
+            return _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color='#B2B2B2',alpha=0.5) #a nice grey in hex
     def DrawHex(e,color,alpha=1.0):
         s = e['S']-e['L']
         l = e['L']
         edges = _np.array([[s,-0.1],[s,0.1],[s+l/2.,0.13],[s+l,0.1],[s+l,-0.1],[s+l/2.,-0.13]])
-        sr = _patches.Polygon(edges,color=color,fill=True,alpha=alpha)
-        ax.add_patch(sr)
+        return _patches.Polygon(edges,color=color,fill=True,alpha=alpha)
     def DrawRect(e,color,alpha=1.0):
-        rect = _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color=color,alpha=alpha)
-        ax.add_patch(rect)
+        return  _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color=color,alpha=alpha)
     def DrawLine(e,color,alpha=1.0):
         ax.plot([e['S']-e['L'],e['S']-e['L']],[-0.2,0.2],'-',color=color,alpha=alpha)
 
-    # plot beam line - make extra long in case of reversal - won't
-    ax.plot([tfs.smin,tfs.smax],[0,0],'k-',lw=1)
-    ax.set_ylim(-0.2,0.2)
-
-    # loop over elements and Draw on beamline
+    # loop over elements and prepare patches
+    # patches are turned into patch collection which is more efficient later
+    quads, bends, hkickers, vkickers, collimators, sextupoles, octupoles, multipoles, unknown = [],[],[],[],[],[],[],[],[]
     for element in tfs:
         kw = element['KEYWORD']
         if kw == 'QUADRUPOLE':
-            DrawQuad(element, u'#d10000') #red
+            quads.append(DrawQuad(element, u'#d10000')) #red
         elif kw == 'RBEND':
-            DrawBend(element, u'#0066cc') #blue
+            bends.append(DrawBend(element, u'#0066cc')) #blue
         elif kw == 'SBEND':
-            DrawBend(element, u'#0066cc') #blue
+            bends.append(DrawBend(element, u'#0066cc')) #blue
         elif kw == 'HKICKER':
-            DrawRect(element, u'#4c33b2') #purple
+            hkickers.append(DrawRect(element, u'#4c33b2')) #purple
         elif kw == 'VKICKER':
-            DrawRect(element, u'#ba55d3') #medium orchid
+            vkickers.append(DrawRect(element, u'#ba55d3')) #medium orchid
         elif kw == 'RCOLLIMATOR':
-            DrawRect(element,'k')
+            collimators.append(DrawRect(element,'k'))
         elif kw == 'ECOLLIMATOR':
-            DrawRect(element,'k')
+            collimators.append(DrawRect(element,'k'))
         elif kw == 'COLLIMATOR':
-            DrawRect(element,'k')
+            collimators.append(DrawRect(element,'k'))
         elif kw == 'SEXTUPOLE':
-            DrawHex(element, u'#ffcc00') #yellow
+            sextupoles.append(DrawHex(element, u'#ffcc00')) #yellow
         elif kw == 'OCTUPOLE':
-            DrawHex(element, u'#00994c') #green
+            octupoles.append(DrawHex(element, u'#00994c')) #green
         elif kw == 'DRIFT':
             pass
         elif kw == 'MULTIPOLE':
-            DrawHex(element,'grey',alpha=0.5)
+            multipoles.append(DrawHex(element,'grey',alpha=0.5))
         else:
             #unknown so make light in alpha
             if element['L'] > 1e-1:
-                DrawRect(element,'#cccccc',alpha=0.1) #light grey
+                unknown.append(DrawRect(element,'#cccccc',alpha=0.1)) #light grey
             else:
                 #relatively short element - just draw a line
                 DrawLine(element,'#cccccc',alpha=0.1)
+
+    # convert list of patches to patch collection, True means retain original colour
+    # zorder to make sure small bright things don't dominate (like sextupoles)
+    ax.add_collection(_PatchCollection(bends,       True, zorder=20))
+    ax.add_collection(_PatchCollection(quads,       True, zorder=19))
+    ax.add_collection(_PatchCollection(hkickers,    True, zorder=18))
+    ax.add_collection(_PatchCollection(vkickers,    True, zorder=17))
+    ax.add_collection(_PatchCollection(collimators, True, zorder=16))
+    ax.add_collection(_PatchCollection(sextupoles,  True, zorder=15))
+    ax.add_collection(_PatchCollection(octupoles,   True, zorder=14, edgecolor=None))
+    ax.add_collection(_PatchCollection(multipoles,  True, zorder=13, edgecolor=None))
+    ax.add_collection(_PatchCollection(unknown,     True, zorder=12, edgecolor=None))
+    
+    # plot beam line - make extra long in case of reversal
+    # set zorder on top
+    ax.plot([tfs.smin,tfs.smax],[0,0],'k-',lw=1, zorder=100)
+    ax.set_ylim(-0.2,0.2)
