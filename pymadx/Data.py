@@ -890,14 +890,14 @@ class Tfs(object):
         self.data[old][self.ColumnIndex("UNIQUENAME")] = new
         self.data[new] = self.data.pop(old)
 
-    def ConcatenateMachine(self, *args):
+    def ConcatenateMachine(self, *tfs):
         """
         This is used to concatenate machines.
         """
         # Get final position of the machine
         lastSpos = self.GetColumn('S')[-1]
 
-        for machineIndex,machine in enumerate(args):
+        for machineIndex,machine in enumerate(tfs):
             if isinstance(machine, _np.str):
                 machine = CheckItsTfs(machine)
 
