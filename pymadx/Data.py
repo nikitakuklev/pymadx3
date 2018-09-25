@@ -905,7 +905,7 @@ class Tfs(object):
             machine = _copy.deepcopy(machine)
 
             # check names sets are equal
-            if len(set(self.columns).difference(set(machine.names))) != 0:
+            if len(set(self.columns).difference(set(machine.columns))) != 0:
                 raise AttributeError("Cannot concatenate machine, variable names do not match")
 
             sind = self.columns.index('S')
