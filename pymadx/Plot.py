@@ -360,7 +360,7 @@ def _AdjustExistingAxes(figure, fraction=0.9, tightLayout=True):
         bbox.y1 = bbox.y1 * fraction
         ax.set_position(bbox)
 
-def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
+def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True, reverse=False, offset=None):
     """
     Add a diagram above the current graph in the figure that represents the
     accelerator based on a madx twiss file in tfs format.
@@ -372,6 +372,12 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
     A pymadx.Tfs class instance or a string specifying a tfs file can be
     supplied as the second argument interchangeably.
 
+    If the reverse flag is used, the lattice is plotted in reverse only. The tfs
+    instance doesn't change.
+
+    Offset can optionally be the name of an object in the lattice (exact name match).
+
+    If both offset and reverse are used, reverse happens first.
     """
     import pymadx.Data as _Data
     tfs = _Data.CheckItsTfs(tfsfile) #load the machine description
@@ -388,7 +394,7 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
     _AdjustExistingAxes(figure, tightLayout=tightLayout)
     axmachine = _PrepareMachineAxes(figure)
 
-    _DrawMachineLattice(axmachine,tfs)
+    _DrawMachineLattice(axmachine,tfs, reverse, offset)
 
     #put callbacks for linked scrolling
     def MachineXlim(ax):
@@ -406,36 +412,47 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True):
     axmachine.callbacks.connect('xlim_changed', MachineXlim)
     figure.canvas.mpl_connect('button_press_event', Click)
 
-def _DrawMachineLattice(axesinstance,pymadxtfsobject):
+def _DrawMachineLattice(axesinstance, pymadxtfsobject, reverse=False, offset=None):
     ax  = axesinstance #handy shortcut
     tfs = pymadxtfsobject
 
+    s0 = 0 #accumulated length variable that will be used by functions
+    l = 0 #length variable that will be used by functions
     #NOTE madx defines S as the end of the element by default
     #define temporary functions to draw individual objects
     def DrawBend(e,color='b',alpha=1.0):
-        return _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color=color,alpha=alpha)
+        return _patches.Rectangle((s0,-0.1),l,0.2,color=color,alpha=alpha)
     def DrawQuad(e,color='r',alpha=1.0):
         if e['K1L'] > 0 :
-            return _patches.Rectangle((e['S']-e['L'],0),e['L'],0.2,color=color,alpha=alpha)
+            return _patches.Rectangle((s0,0),l,0.2,color=color,alpha=alpha)
         elif e['K1L'] < 0:
-            return _patches.Rectangle((e['S']-e['L'],-0.2),e['L'],0.2,color=color,alpha=alpha)
+            return _patches.Rectangle((s0,-0.2),l,0.2,color=color,alpha=alpha)
         else:
             #quadrupole off
-            return _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color='#B2B2B2',alpha=0.5) #a nice grey in hex
+            return _patches.Rectangle((s0,-0.1),l,0.2,color='#B2B2B2',alpha=0.5) #a nice grey in hex
     def DrawHex(e,color,alpha=1.0):
-        s = e['S']-e['L']
-        l = e['L']
-        edges = _np.array([[s,-0.1],[s,0.1],[s+l/2.,0.13],[s+l,0.1],[s+l,-0.1],[s+l/2.,-0.13]])
+        edges = _np.array([[s0,-0.1],[s0,0.1],[s0+l/2.,0.13],[s0+l,0.1],[s0+l,-0.1],[s0+l/2.,-0.13]])
         return _patches.Polygon(edges,color=color,fill=True,alpha=alpha)
     def DrawRect(e,color,alpha=1.0):
-        return  _patches.Rectangle((e['S']-e['L'],-0.1),e['L'],0.2,color=color,alpha=alpha)
+        return  _patches.Rectangle((s0,-0.1),l,0.2,color=color,alpha=alpha)
     def DrawLine(e,color,alpha=1.0):
-        ax.plot([e['S']-e['L'],e['S']-e['L']],[-0.2,0.2],'-',color=color,alpha=alpha)
+        ax.plot([s0,s0],[-0.2,0.2],'-',color=color,alpha=alpha)
 
+    # decide on a sequence here
+    s0 = 0
+    sequence = tfs.sequence
+    if reverse:
+        sequence = sequence[::-1]
+    if offset is not None:
+        index = sequence.index(offset)
+        sequence = sequence[index:] + sequence[:index] # cycle it
+    
     # loop over elements and prepare patches
     # patches are turned into patch collection which is more efficient later
     quads, bends, hkickers, vkickers, collimators, sextupoles, octupoles, multipoles, unknown = [],[],[],[],[],[],[],[],[]
-    for element in tfs:
+    for name in sequence:
+        element = tfs[name]
+        l = element['L']
         kw = element['KEYWORD']
         if kw == 'QUADRUPOLE':
             quads.append(DrawQuad(element, u'#d10000')) #red
@@ -464,10 +481,11 @@ def _DrawMachineLattice(axesinstance,pymadxtfsobject):
         else:
             #unknown so make light in alpha
             if element['L'] > 1e-1:
-                unknown.append(DrawRect(element,'#cccccc',alpha=0.1)) #light grey
+                unknown.append(DrawRect(element,'#cccccc',alpha=0.2)) #light grey
             else:
                 #relatively short element - just draw a line
                 DrawLine(element,'#cccccc',alpha=0.1)
+        s0 += l
 
     # convert list of patches to patch collection, True means retain original colour
     # zorder to make sure small bright things don't dominate (like sextupoles)
