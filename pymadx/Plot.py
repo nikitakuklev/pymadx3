@@ -393,6 +393,7 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True, reverse=False, 
     axoptics  = figure.get_axes()[0]
     _AdjustExistingAxes(figure, tightLayout=tightLayout)
     axmachine = _PrepareMachineAxes(figure)
+    axmachine.margins(x=0.02)
 
     _DrawMachineLattice(axmachine,tfs, reverse, offset)
 
