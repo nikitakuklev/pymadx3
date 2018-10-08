@@ -380,10 +380,11 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True, reverse=False, 
 
     If the reverse flag is used, the lattice is plotted in reverse only. The tfs
     instance doesn't change.
-
+    
     Offset can optionally be the name of an object in the lattice (exact name match).
 
-    If both offset and reverse are used, reverse happens first.
+    If both offset and reverse are used, reverse happens first. The right click searching
+    works with the reverse and offset similarly.
     """
     import pymadx.Data as _Data
     tfs = _Data.CheckItsTfs(tfsfile) #load the machine description
@@ -411,8 +412,17 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True, reverse=False, 
     def Click(a) :
         if a.button == 3:
             try:
-                print 'Closest element: ',tfs.NameFromNearestS(a.xdata)
-            except ValueError:
+                x = a.xdata
+                if reverse:
+                    x = tfs.smax - x
+                if offset:
+                    ind = tfs.sequence.index(offset)
+                    xoffset = tfs[ind]['S']
+                    x += xoffset
+                    if x > tfs.smax:
+                        x -= tfs.smax
+                print 'Closest element: ',tfs.NameFromNearestS(x)
+            except:
                 pass # don't complain if the S is out of bounds
 
     MachineXlim(axmachine)
@@ -446,7 +456,6 @@ def _DrawMachineLattice(axesinstance, pymadxtfsobject, reverse=False, offset=Non
         ax.plot([s0,s0],[-0.2,0.2],'-',color=color,alpha=alpha)
 
     # decide on a sequence here
-    s0 = 0
     sequence = tfs.sequence
     if reverse:
         sequence = sequence[::-1]
