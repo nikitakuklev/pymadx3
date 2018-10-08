@@ -23,7 +23,7 @@ class _My_Axes(_matplotlib.axes.Axes):
 #register the new class of axes
 _matplotlib.projections.register_projection(_My_Axes)
 
-def _GetOpticalDataFromTfs(tfsobject):
+def _GetOpticalDataFromTfs(tfsobject, dispersion=True):
     """
     Utility to pull out the relevant optical functions into a simple dictionary.
     """
@@ -31,9 +31,10 @@ def _GetOpticalDataFromTfs(tfsobject):
     d['s']         = tfsobject.GetColumn('S')
     d['betx']      = tfsobject.GetColumn('BETX')
     d['bety']      = tfsobject.GetColumn('BETY')
-    d['dispx']     = tfsobject.GetColumn('DX')
-    d['dispxbeta'] = tfsobject.GetColumn('DXBETA')
-    #d['dispy']    = tfsobject.GetColumn('DY') #don't use
+    if dispersion:
+        d['dispx']     = tfsobject.GetColumn('DX')
+        d['dispxbeta'] = tfsobject.GetColumn('DXBETA')
+        #d['dispy']    = tfsobject.GetColumn('DY') #don't use
     d['x']         = tfsobject.GetColumn('X')
     d['y']         = tfsobject.GetColumn('Y')
     d['sigmax']    = tfsobject.GetColumn('SIGMAX')
