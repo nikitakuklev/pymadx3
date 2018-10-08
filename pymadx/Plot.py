@@ -109,7 +109,11 @@ def Beta(tfsfile, title='', outputfilename=None, machine=True, dispersion=False,
     """
     import pymadx.Data as _Data
     madx = _Data.CheckItsTfs(tfsfile)
-    d    = _GetOpticalDataFromTfs(madx)
+
+    d = {}
+    d['s']    = madx.GetColumn('S')
+    d['betx'] = madx.GetColumn('BETX')
+    d['bety'] = madx.GetColumn('BETY')
     smax = madx.smax
 
     f    = _plt.figure(figsize=(9,5))
@@ -135,6 +139,7 @@ def Beta(tfsfile, title='', outputfilename=None, machine=True, dispersion=False,
 
     #plot dispersion - only in horizontal
     if dispersion:
+        d['dispxbeta'] = madx.GetColumn('DX')
         ax2 = axoptics.twinx()
         ax2.plot(d['s'],d['dispxbeta'],'r--')
         ax2.set_ylabel(r'Dispersion / $\beta$ (m)')
