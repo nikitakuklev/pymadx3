@@ -890,6 +890,106 @@ class Tfs(object):
         self.data[old][self.ColumnIndex("UNIQUENAME")] = new
         self.data[new] = self.data.pop(old)
 
+    def SplitElement(self, SSplit):
+        """
+        Splits the element found at SSplit given, performs the necessary
+        operations on the lattice to leave the model functionally
+        identical and returns the indices of the first and second
+        component.  Element new name will be the same as the original
+        except appended with a number corresponding to its location in
+        the list of previously identically defined components used in
+        the sequence and either "split_1" or "split_2" depending on
+        which side of the split it is located.  It is necessary to
+        append both of these numbers to ensure robust name mangling.
+
+        WARNING: DO NOT SPLIT THE ELEMENT WHICH MARKS THE BEGINNING OF
+        YOUR LATTICE.  YOUR OPTICS WILL BE WRONG!
+
+        """
+
+        # the element to be split:
+        originalIndex = self.IndexFromNearestS(SSplit)
+        originalName = self.sequence[originalIndex]
+        originalLength = self[originalName]['L']
+        originalS = self[originalName]['S']
+        originalHKick = self[originalName]['HKICK']
+        originalVKick = self[originalName]['VKICK']
+        originalAngle = self[originalName]['ANGLE']
+        originalKLs = {"K{}L".format(i): self[originalName]['K{}L'.format(i)]
+                       for i in range(1, 7)}
+        originalKSLs = {"K{}SL".format(i): self[originalName]['K{}SL'.format(i)]
+                       for i in range(1, 7)}
+        elementType = self[originalName]['KEYWORD']
+
+        # First of the two elements that the original is split into.
+        # Remembering that in MADX S is at the end of the component.
+        firstS = SSplit
+        firstLength = originalLength - (originalS - SSplit)
+        firstName = originalName + str("_split_1")
+        firstUniqueName = firstName
+        firstIndex = originalIndex
+
+        # second of two elements that original is split into:
+        secondS = originalS
+        secondLength = originalS - SSplit
+        secondName = originalName + str("_split_2")
+        secondUniqueName = secondName
+        secondIndex = originalIndex + 1
+
+        # update the sequence
+        self.sequence[firstIndex] = firstName
+        self.sequence.insert(secondIndex, secondName)
+
+        # Making data entries for new components
+        self.data[firstName] = _copy.deepcopy(self.data[originalName])
+        self.data[secondName] = _copy.deepcopy(self.data[originalName])
+        del self.data[originalName]
+
+        # Apply the relevant edits to the newly split component.
+        self.EditComponent(firstIndex, 'L', firstLength)
+        self.EditComponent(firstIndex, 'S', firstS)
+        self.EditComponent(firstIndex, 'SMID', firstS - firstLength/2.0)
+        self.EditComponent(firstIndex, 'SORIGINAL', originalS)
+        self.EditComponent(firstIndex, 'NAME', firstName)
+        self.EditComponent(firstIndex, 'UNIQUENAME', firstUniqueName)
+
+        self.EditComponent(secondIndex, 'L', secondLength)
+        self.EditComponent(secondIndex, 'S', secondS)
+        self.EditComponent(secondIndex, 'SMID', secondS - secondLength/2.0)
+        self.EditComponent(secondIndex, 'SORIGINAL', originalS)
+        self.EditComponent(secondIndex, 'NAME', secondName)
+        self.EditComponent(secondIndex, 'UNIQUENAME', secondUniqueName)
+
+        # Assign the appropriate amount of kick to each of the two components
+        firstRatio = firstLength/originalLength
+        secondRatio = 1 - firstRatio
+        self.EditComponent(firstIndex, 'HKICK', firstRatio * originalHKick)
+        self.EditComponent(firstIndex, 'VKICK', firstRatio * originalVKick)
+        self.EditComponent(firstIndex, 'ANGLE', firstRatio * originalAngle)
+        self.EditComponent(firstIndex, 'E2', 0.5 * firstRatio * originalAngle)
+        self.EditComponent(firstIndex, 'FINTX', 0.0)
+
+        self.EditComponent(secondIndex, 'HKICK', secondRatio * originalHKick)
+        self.EditComponent(secondIndex, 'VKICK', secondRatio * originalVKick)
+        self.EditComponent(secondIndex, 'ANGLE', secondRatio * originalAngle)
+        self.EditComponent(secondIndex, 'E1', 0.5 * secondRatio * originalAngle)
+        self.EditComponent(secondIndex, 'FINT', 0.0)
+
+        for name, value in originalKLs.iteritems():
+            self.EditComponent(firstIndex, name, firstRatio * value)
+            self.EditComponent(secondIndex, name, secondRatio * value)
+        for name, value in originalKSLs.iteritems():
+            self.EditComponent(firstIndex, name, firstRatio * value)
+            self.EditComponent(secondIndex, name, secondRatio * value)
+
+        assert self[secondName]["S"] == originalS
+        assert self[firstName]["L"] + self[secondName]["L"] == originalLength
+        assert (self[firstName]["HKICK"]
+                + self[secondName]["HKICK"]) == originalHKick
+        assert (self[firstName]["VKICK"]
+                + self[secondName]["VKICK"]) == originalVKick
+        return firstIndex, secondIndex
+
     def ConcatenateMachine(self, *tfs):
         """
         This is used to concatenate machines.
