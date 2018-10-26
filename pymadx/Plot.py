@@ -465,7 +465,7 @@ def _DrawMachineLattice(axesinstance, pymadxtfsobject, reverse=False, offset=Non
     
     # loop over elements and prepare patches
     # patches are turned into patch collection which is more efficient later
-    quads, bends, hkickers, vkickers, collimators, sextupoles, octupoles, multipoles, unknown = [],[],[],[],[],[],[],[],[]
+    quads, bends, hkickers, vkickers, collimators, sextupoles, octupoles, multipoles, solenoids, unknown = [],[],[],[],[],[],[],[],[], []
     for name in sequence:
         element = tfs[name]
         l = element['L']
@@ -480,6 +480,8 @@ def _DrawMachineLattice(axesinstance, pymadxtfsobject, reverse=False, offset=Non
             hkickers.append(DrawRect(element, u'#4c33b2')) #purple
         elif kw == 'VKICKER':
             vkickers.append(DrawRect(element, u'#ba55d3')) #medium orchid
+        elif kw == 'SOLENOID':
+            solenoids.append(DrawRect(element, u'#ffa500')) #orange
         elif kw == 'RCOLLIMATOR':
             collimators.append(DrawRect(element,'k'))
         elif kw == 'ECOLLIMATOR':
@@ -514,7 +516,8 @@ def _DrawMachineLattice(axesinstance, pymadxtfsobject, reverse=False, offset=Non
     ax.add_collection(_PatchCollection(octupoles,   True, zorder=14, edgecolor=None))
     ax.add_collection(_PatchCollection(multipoles,  True, zorder=13, edgecolor=None))
     ax.add_collection(_PatchCollection(unknown,     True, zorder=12, edgecolor=None))
-    
+    ax.add_collection(_PatchCollection(solenoids,   True, zorder=11))
+
     # plot beam line - make extra long in case of reversal
     # set zorder on top
     ax.plot([tfs.smin,tfs.smax],[0,0],'k-',lw=1, zorder=100)
