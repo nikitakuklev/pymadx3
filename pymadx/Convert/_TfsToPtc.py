@@ -99,6 +99,8 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
     fintindex       = madx.ColumnIndex('FINT')
     fintxindex      = madx.ColumnIndex('FINTX')
     hgapindex       = madx.ColumnIndex('HGAP')
+    h1index         = madx.ColumnIndex('H1')
+    h2index         = madx.ColumnIndex('H2')
 
     # iterate through input file and construct machine
     for i in range(startindex,stopindex):
@@ -128,6 +130,8 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
         fintx = madx.data[name][fintxindex]
         hgap  = madx.data[name][hgapindex]
         k1l   = madx.data[name][k1lindex]
+        h1    = madx.data[name][h1index]
+        h2    = madx.data[name][h2index]
 
         if k1l:
             kws['k1'] = k1l / l
@@ -158,37 +162,51 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
             kws['fint'] = fint
             kws['e2'] = e2
 
-            if fintx == -1:
-                if fint:
-                    kws['fintx'] = fint
-                else:
-                    kws['fintx'] = 0
-            else:
+            # in madx, -1 means fintx was allowed to default to fint and we should do the same
+            # so if set to 0, this means we want it to be 0
+            if fintx != -1:
                 kws['fintx'] = fintx
 
-            kws['hgap'] = hgap
+            if h1 != 0:
+                kws['h1'] = h1
+            if h2 != 0:
+                kws['h2'] = h2
+            if hgap != 0:
+                kws['hgap'] = hgap
 
             angle = madx.data[name][angleindex]
             a.AddDipole(rname,category='sbend',length=l,angle=angle,**kws)
 
         elif t == 'RBEND':
-            kws['e1'] = e1
-            kws['fint'] = fint
-
-            kws['e2'] = e2
-
-            if fintx == -1:
-                if fint:
-                    kws['fintx'] = fint
-                else:
-                    kws['fintx'] = 0
-            else:
+            angle = madx.data[name][angleindex]
+            # set element length to be the chord length - tfs output rbend
+            # length is arc length
+            chordLength = l
+            if angle != 0:
+                chordLength = 2 * (l / angle) * _np.sin(angle / 2.)  # protect against 0 angle rbends
+            # subtract dipole angle/2 added on to poleface angles internally by
+            # madx
+            poleInAngle = e1 - 0.5 * angle
+            poleOutAngle = e2 - 0.5 * angle
+            if poleInAngle != 0:
+                kws['e1'] = poleInAngle
+            if poleOutAngle != 0:
+                kws['e2'] = poleOutAngle
+            if fint != 0:
+                kws['fint'] = fint
+            # in madx, -1 means fintx was allowed to default to fint and we should do the same
+            # so if set to 0, this means we want it to be 0
+            if fintx != -1:
                 kws['fintx'] = fintx
 
-            kws['hgap'] = hgap
+            if h1 != 0:
+                kws['h1'] = h1
+            if h2 != 0:
+                kws['h2'] = h2
+            if hgap != 0:
+                kws['hgap'] = hgap
 
-            angle = madx.data[name][angleindex]
-            a.AddDipole(rname,category='rbend',length=l,angle=angle,**kws)
+            a.AddDipole(rname,category='rbend',length=chordLength,angle=angle,**kws)
 
         elif t == 'MARKER':
             angle = madx.data[name][angleindex]
