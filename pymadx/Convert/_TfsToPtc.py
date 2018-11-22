@@ -149,6 +149,10 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
             k3 = madx.data[name][k3lindex] / l
             a.AddOctupole(rname,l,k3=k3,**kws)
 
+        elif t == 'SOLENOID':
+            ks = madx.data[name][ksIindex] / l
+            a.AddSolenoid(rname,l,ks=ks,**kws)
+
         elif t == 'SBEND':
             kws['e1'] = e1
             kws['fint'] = fint
