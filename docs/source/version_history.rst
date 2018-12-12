@@ -2,7 +2,7 @@
 Version History
 ===============
 
-v 1.6 - 2018 / ?? / ??
+v 1.6 - 2018 / 12 / 12
 ======================
 
 General
@@ -10,7 +10,11 @@ General
 
 * Reimplemented machine diagram drawing to be more efficient when zooming and
   fix zordering so bends and then quadrupoles are always on top.
-
+* Dispersion optional for optics plotting.
+* H1 and H2 now passed through conversion of MADX TFS to PTC input format.
+* Solenoid added to MADX TFS to PTC converter.
+* Revised bend conversion for MADX TFS to PTC converter.
+  
 
 v 1.5 - 2018 / 08 / 24
 ======================
