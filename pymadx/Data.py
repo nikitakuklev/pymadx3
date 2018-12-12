@@ -988,6 +988,9 @@ class Tfs(object):
                 + self[secondName]["HKICK"]) == originalHKick
         assert (self[firstName]["VKICK"]
                 + self[secondName]["VKICK"]) == originalVKick
+
+        for i, _ in enumerate(self):
+            self.EditComponent(i, "INDEX", i)
         return firstIndex, secondIndex
 
     def ConcatenateMachine(self, *tfs):
