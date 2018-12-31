@@ -50,7 +50,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pymadx'
-copyright = u'Royal Holloway, University of London 2018'
+copyright = u'Royal Holloway, University of London 2019'
 author = u'L Nevay, A Abramov, S Boogert, W Shields, J Snuverink, S Walker'
 
 # The version info for the project you're documenting, acts as replacement for
