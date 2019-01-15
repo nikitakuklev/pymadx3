@@ -409,7 +409,11 @@ def WriteMachine(machine, filename, verbose=False):
         f.write("call, file='"+fn+"';\n")
 
     # line in main file for outputting twiss params to .tfs file
-    if not machine.beam['distrType'] == 'ptc':
+    if machine.beam['distrType'] == 'ptctwiss':
+        f.write('\n')
+        f.write(machine.beam.ReturnPtcTwissString(basefilename))
+        f.write('ptc_end;\n')
+    elif not machine.beam['distrType'] == 'ptc':
         f.write('\n')
         f.write(machine.beam.ReturnTwissString(basefilename))
 

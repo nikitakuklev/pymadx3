@@ -5,7 +5,8 @@ Class to create a MADX beam definition.
 MADXDistributionTypes = [
     'reference',
     'madx',
-    'ptc'
+    'ptc',
+    'ptctwiss'
 ]
 
 MADXParticleTypes = [
@@ -55,7 +56,7 @@ class Beam(dict):
             raise ValueError("Unknown distribution type: '"+str(distrtype)+"'")
         
         self['distrType'] = distrtype 
-        if distrtype == 'madx':
+        if (distrtype == 'madx') or (distrtype == 'ptctwiss'):
             setattr(self, 'SetBetaX',            self._SetBetaX)
             setattr(self, 'SetBetaY',            self._SetBetaY) 
             setattr(self, 'SetAlphaX',           self._SetAlphaX)
@@ -84,6 +85,15 @@ class Beam(dict):
             s += ', sige = {};\n'.format(self['sigmaE'])
         except KeyError:
             s += ';\n'
+        return s
+
+    def ReturnPtcTwissString(self, basefilename='output'):
+        s = 'select, flag = ptc_twiss;\n'
+        s+= 'ptc_create_universe;\n'
+        s+= 'ptc_create_layout,model=2,method=6,nst=10,time=false,exact=true;\n'
+        s+= 'ptc_twiss, icase=5, no=2, deltap=0.0, file=' + basefilename + '.out,\n'
+        s+= 'betx=' + self['betx'] + ', alfx=' + self['alfx'] + ',\n'
+        s+= 'bety=' + self['bety'] + ', alfy=' + self['alfy'] + ';\n'
         return s
 
     def ReturnPtcString(self) : 

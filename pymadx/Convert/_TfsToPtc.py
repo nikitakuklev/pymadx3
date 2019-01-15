@@ -9,6 +9,18 @@ import pymadx.Data as _Data
 def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
              stopname=None,ignorezerolengthitems=True,samplers='all',
              beampiperadius=0.2,beam=True,ptctrackaperture=[]):
+    _TfsToPtc('ptctrack',inputfile,outputfilename, ptcfile, startname,
+             stopname,ignorezerolengthitems,samplers,
+             beampiperadius,beam,ptctrackaperture)
+
+def TfsToPtcTwiss(inputfile,outputfilename, startname=None,
+             stopname=None,ignorezerolengthitems=True,beampiperadius=0.2):
+    _TfsToPtc('ptctwiss',inputfile,outputfilename,'', startname,
+             stopname,ignorezerolengthitems,'',beampiperadius)
+
+def _TfsToPtc(ptctype,inputfile,outputfilename,ptcfile,startname=None,
+             stopname=None,ignorezerolengthitems=True,samplers='all',
+             beampiperadius=0.2,beam=True,ptctrackaperture=[]):
     """
     Prepare a madx model for PTC from a Tfs file containing the full
     twiss output from MADX.
@@ -250,14 +262,17 @@ def TfsToPtc(inputfile,outputfilename, ptcfile, startname=None,
                 a.AddDrift(rname,l)
             else:
                 pass
-
-    a.AddSampler(samplers)
-    a.AddPTCTrackAperture(ptctrackaperture)
+    if ptctype == 'ptctrack':
+        a.AddSampler(samplers)
+        a.AddPTCTrackAperture(ptctrackaperture)
     # Make beam file 
-    if beam: 
-        b = MadxTfsToPtcBeam(madx, ptcfilename, startname)
-        a.AddBeam(b)
-
+    if beam:
+        if ptctype == 'ptctrack':
+            b = MadxTfsToPtcBeam(madx, ptcfilename, startname)
+            a.AddBeam(b)
+        if ptctype == 'ptctwiss':
+            b = MadxTfsToPtcTwissBeam(madx, startname)
+            a.AddBeam(b)
     a.Write(outputfilename)
 
     return a
@@ -289,5 +304,48 @@ def MadxTfsToPtcBeam(tfs, ptcfilename,  startname=None):
     beam  = _Beam.Beam(particle, energy,'ptc', emitx=ex, emity=ey, sigmaE=sigmae)
 
     beam.SetDistribFileName(ptcfilename) 
+
+    return beam
+
+def MadxTfsToPtcTwissBeam(tfs, startname=None):
+    if startname == None:
+        startindex = 0
+    elif type(startname) == int:
+        startindex = startname
+    else:
+        startindex = tfs.IndexFromName(startname)
+
+    # MADX defines parameters at the end of elements so need to go 1 element
+    # back if we can.
+
+    if startindex > 0:
+        startindex -= 1
+
+    energy = float(tfs.header['ENERGY'])
+    gamma = float(tfs.header['GAMMA'])
+    particle = str.lower(tfs.header['PARTICLE'])
+    ex = tfs.header['EX']
+    ey = tfs.header['EY']
+    sigmae = float(tfs.header['SIGE'])
+    sigmat = float(tfs.header['SIGT'])
+
+    beam = _Beam.Beam(particle, energy, 'ptctwiss', emitx=ex, emity=ey, sigmaE=sigmae)
+
+    if (not 'BETX' in tfs.columns) or (not 'BETY' in tfs.columns):
+        raise AttributeError('BETX or BETY columns missing from TFS file. Beam cannot be converted.')
+    beam.SetBetaX(tfs.GetColumn('BETX')[0])
+    beam.SetBetaY(tfs.GetColumn('BETY')[0])
+
+    if (not 'ALFX' in tfs.columns):
+        print("ALFX column missing from TFS file. Setting ALFX to 0.")
+        beam.SetAlphaX(0)
+    else:
+        beam.SetAlphaX(tfs.GetColumn('ALFX')[0])
+
+    if (not 'ALFY' in tfs.columns):
+        print("ALFY column missing from TFS file. Setting ALFY to 0.")
+        beam.SetAlphaY(0)
+    else:
+        beam.SetAlphaY(tfs.GetColumn('ALFY')[0])
 
     return beam
