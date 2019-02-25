@@ -777,7 +777,7 @@ class Tfs(object):
         Will fail if these are not available.
         """
         d = self[elementname]
-        prefixes = ['', 'P', 'BET', 'ALF', 'SIGMA']
+        prefixes = ['', 'P', 'BET', 'ALF', 'SIGMA', 'D']
         xkeys = [p+'X' for p in prefixes]
         ykeys = [p+'Y' for p in prefixes]
         for xk,yk in zip(xkeys,ykeys):
