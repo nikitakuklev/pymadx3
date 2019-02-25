@@ -16,14 +16,14 @@ Copyright Royal Holloway, University of London 2019.
 
 __version__ = "1.6.0"
 
-from . import Beam
-from . import Builder
-from . import Compare
-from . import Convert
-from . import Data
-from . import Plot
-from . import Ptc
-from . import PtcAnalysis
+import Beam
+import Builder
+import Compare
+import Convert
+import Data
+import Plot
+import Ptc
+import PtcAnalysis
 
 __all__ = ['Beam',
            'Builder',
