@@ -2,6 +2,22 @@
 Version History
 ===============
 
+v 1.7 - 2019 / 02 / 27
+======================
+
+New Features
+------------
+
+* Return PTC beam definition from the Beam class.
+* Print basic beam summary from TFS file for given element.
+* Ability to split an element loaded from a TFS file correctly.
+
+General
+-------
+
+* Update copyright for 2019.
+
+
 v 1.6 - 2018 / 12 / 12
 ======================
 
