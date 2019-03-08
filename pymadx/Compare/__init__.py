@@ -1,2 +1,5 @@
 from _MadxMadxComparison import MADXVsMADX
-from _MadxTransportComparison import MADXVsTRANSPORT
+try:
+    from _MadxTransportComparison import MADXVsTRANSPORT
+except ImportError:
+    print "No pytransport functionality"

@@ -8,4 +8,7 @@ See individual methods for documentation
 from _Mad8ToMadx import Mad8ToMadx
 from _TfsToPtc import TfsToPtc
 from _TfsToPtc import TfsToPtcTwiss
-from _Transport2Madx import Transport2Madx
+try:
+    from _Transport2Madx import Transport2Madx
+except ImportError:
+    print "No pytransport functionality"
