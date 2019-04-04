@@ -2,6 +2,15 @@
 Version History
 ===============
 
+v 1.8 - 2019 / XX / XX
+======================
+
+Bug Fixes
+---------
+
+* Fix Data.Aperture.RemoveBelowValue logic, which also applies to GetNonZeroItems.
+
+
 v 1.7 - 2019 / 02 / 27
 ======================
 
