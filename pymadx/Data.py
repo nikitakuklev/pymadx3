@@ -1239,10 +1239,10 @@ class Aperture(Tfs):
         a = Aperture(verbose=False)
         a._CopyMetaData(self)
         for item in self:
-            apervals = _np.array([item[key] for key in aperkeys])
-            abovelimit = apervals < limitvals
-            abovelimittotal = abovelimit.any() # if any are true
-            if not abovelimittotal:
+            apervals   = _np.array([item[key] for key in aperkeys])
+            aboveLimit = apervals > limitvals
+            if aboveLimit.any():
+                # something finite so is specified
                 key = self.sequence[self._iterindex]
                 a._AppendDataEntry(key, self.data[key])
         if self.cache:
