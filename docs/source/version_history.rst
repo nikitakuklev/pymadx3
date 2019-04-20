@@ -2,13 +2,14 @@
 Version History
 ===============
 
-v 1.8 - 2019 / XX / XX
-======================
+v 1.7.1 - 2019 / 04 / 20
+========================
 
 Bug Fixes
 ---------
 
 * Fix Data.Aperture.RemoveBelowValue logic, which also applies to GetNonZeroItems.
+* Tolerate no pytransport at import.
 
 
 v 1.7 - 2019 / 02 / 27
