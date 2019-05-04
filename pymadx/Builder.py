@@ -15,12 +15,12 @@ Machine - a sequence of elements and associated options and beam etc.
 
 """
 
-import _General
-from   _General import IsFloat as _IsFloat
+from . import _General
+from ._General import IsFloat as _IsFloat
 from   decimal import Decimal as _Decimal
 import time
 
-from pymadx.Beam import Beam as _Beam
+from .Beam import Beam as _Beam
 
 madxcategories = [
     'drift',
@@ -200,7 +200,7 @@ class Machine(object):
 
     def AddDrift(self, name='dr', length=0.1, **kwargs):
         if self.verbose:
-            print 'AddDrift>  ',name,' ',length,' ',kwargs
+            print('AddDrift>  ',name,' ',length,' ',kwargs)
         if length < 1e-12:
             self.AddMarker(name)
         else:
@@ -213,7 +213,7 @@ class Machine(object):
         category - 'sbend' or 'rbend' - sector or rectangular bend
         """
         if self.verbose:
-            print 'AddDipole> ',name,' ',length,' ',kwargs
+            print('AddDipole> ',name,' ',length,' ',kwargs)
         if length < 1e-12:
             self.AddMarker(name)
         self.Append(Element(name,category,l=length,angle=angle,**kwargs))
@@ -312,7 +312,7 @@ def WriteMachine(machine, filename, verbose=False):
     ofilename = filename
     filename = _General.CheckFileExists(filename)
     if filename != ofilename:
-        print 'Warning, chosen filename already exists - using filename: ',filename.split('.')[0]
+        print('Warning, chosen filename already exists - using filename: ',filename.split('.')[0])
     basefilename = filename[:-5]#.split('/')[-1]
 
     #prepare names
@@ -420,7 +420,7 @@ def WriteMachine(machine, filename, verbose=False):
     f.close()
 
     #user feedback
-    print 'Machine written to:'
+    print('Machine written to:')
     for fn in files:
         print(fn)
-    print 'All included in main file: \n',fn_main
+    print('All included in main file: \n',fn_main)

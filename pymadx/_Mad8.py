@@ -16,8 +16,8 @@ def Mad8ToMadX(inputName) :
     outputName  = inputName[inputName.rfind('/')+1:inputName.rfind('.')]+".xsifx"
     outputFile = open(outputName,'w')
     
-    print 'Mad8ToMadX, input > ',inputName
-    print 'Mad8ToMadX, output> ',outputName
+    print('Mad8ToMadX, input > ',inputName
+    print('Mad8ToMadX, output> ',outputName
 
 
     ml = '' # merged line 

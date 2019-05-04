@@ -393,8 +393,8 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True, reverse=False, 
     requiredKeys = ['KEYWORD', 'S', 'L', 'K1L']
     okToProceed = all([key in tfs.columns for key in requiredKeys])
     if not okToProceed:
-        print "The required columns aren't present in this tfs file"
-        print "The required columns are: ", requiredKeys
+        print("The required columns aren't present in this tfs file")
+        print("The required columns are: ", requiredKeys)
         raise IOError
 
     axoptics  = figure.get_axes()[0]
@@ -421,7 +421,7 @@ def AddMachineLatticeToFigure(figure, tfsfile, tightLayout=True, reverse=False, 
                     x += xoffset
                     if x > tfs.smax:
                         x -= tfs.smax
-                print 'Closest element: ',tfs.NameFromNearestS(x)
+                print('Closest element: ',tfs.NameFromNearestS(x))
             except:
                 pass # don't complain if the S is out of bounds
 

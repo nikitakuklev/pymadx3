@@ -32,11 +32,11 @@ class TfsArray :
 
         # open gz file 
         if 'gz' in filename :
-            print 'pymadx.TfsArray.Load> zipped file'
+            print('pymadx.TfsArray.Load> zipped file'
             tar = tarfile.open(filename,'r')
             f = tar.extractfile(tar.firstmember)
         else:
-            print 'pymadx.TfsArray> normal file'
+            print('pymadx.TfsArray> normal file'
             f = open(filename)
 
 
@@ -48,19 +48,19 @@ class TfsArray :
             sl = line.strip('\n').split()
             if line[0] == "@" : 
                 # header
-                # print 'pymadx.TfsArray> header',line 
+                # print('pymadx.TfsArray> header',line 
                 self.header[sl[1]] = sl[-1].replace('"','')
             elif line[0] == '*' : 
                 # column name 
-                # print 'pymadx.TfsArray> columns',line 
+                # print('pymadx.TfsArray> columns',line 
                 self.columns.extend(sl[1:]) #miss *                
             elif line[0] == '$' : 
                 # column type
-                # print 'pymadx.TfsArray> type',line 
+                # print('pymadx.TfsArray> type',line 
                 self.formats.extend(sl[1:]) #miss $              
             elif sl[0] == '#segment' : 
                 # entry marker 
-                # print 'pymadx.TfsArray> marker',line, self.nitems,isegment
+                # print('pymadx.TfsArray> marker',line, self.nitems,isegment
                 self.isegment=self.isegment+1
                 
             else :                 
@@ -168,11 +168,11 @@ class TfsArray :
         Print out all the population of each type of
         element in the beam line (sequence)
         """
-        print 'Filename > ',self.filename
-        print 'Total number of items > ',self.nitems
+        print('Filename > ',self.filename
+        print('Total number of items > ',self.nitems
         i = self.ColumnIndex('KEYWORD')
         types = set(self.GetColumn('KEYWORD'))
         populations = [(len(self.GetElementsOfType(key)),key) for key in types]
-        print 'Type'.ljust(15,'.'),'Population'
+        print('Type'.ljust(15,'.'),'Population'
         for item in sorted(populations)[::-1]:
             print item[1].ljust(15,'.'),item[0]

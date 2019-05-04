@@ -56,7 +56,7 @@ def _TfsToPtc(ptctype,inputfile,outputfilename,ptcfile,startname=None,
     else:
         stopindex  = madx.IndexFromName(stopname)
     if stopindex <= startindex:
-        print 'stopindex <= startindex'
+        print('stopindex <= startindex'
         stopindex = startindex + 1
 
     requiredColumns = ['L', 'ANGLE', 'KSI', 'K0L', 'K0SL', 'K1L', 'K2L', 'K3L','K4L','K5L','K6L',
@@ -256,7 +256,7 @@ def _TfsToPtc(ptctype,inputfile,outputfilename,ptcfile,startname=None,
             hkick = madx.data[name][hkickangleindex]
             a.AddTKicker(rname, vkick=vkick, hkick=hkick, length=l)
         else:
-            print 'MadxTfs2Ptc> unknown element type: ',t,' for element named: ',name
+            print('MadxTfs2Ptc> unknown element type: ',t,' for element named: ',name
             if not zerolength:
                 print('MadxTfs2Ptc> replacing with drift')
                 a.AddDrift(rname,l)

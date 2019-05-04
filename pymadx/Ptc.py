@@ -70,7 +70,7 @@ class Inrays(list):
         setattr(self,variablename,GetAttribute)
 
     def Statistics(self):
-        print 'TBC - will return various moments'
+        print('TBC - will return various moments')
         
 def LoadInrays(fileName): 
     """Load input rays from file
@@ -116,11 +116,11 @@ def LoadInrays(fileName):
 
         i.AddParticle(x,px,y,py,t,pt)
 
-    print 'LoadInrays> Loaded ',len(i)
+    print('LoadInrays> Loaded ',len(i))
     return i
   
 def WriteInrays(fileName, inrays):
-    print 'pymadx.Ptc> WriteInrays - inrays written to: ',fileName
+    print('pymadx.Ptc> WriteInrays - inrays written to: ',fileName)
     f = open(fileName, 'w') 
     for particle in inrays:
         f.write(str(particle))
@@ -261,7 +261,7 @@ class FlatGenerator(object):
         if self.widthpy > 0:
             nd +=1
         nperdim = _np.ceil(nToGenerate**(1/nd))
-        print "FlatGenerator> making array square - there'll be ",nperdim**nd,'particles'
+        print("FlatGenerator> making array square - there'll be ",nperdim**nd,'particles')
 
         xmin = self.mux - self.widthx/2.0
         xmax = self.mux + self.widthx/2.0
